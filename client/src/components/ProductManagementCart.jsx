@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import EditProductAdmin from './EditProductAdmin';
+import EditProductAdmin from './EditProductModel';
 import ConfirmBox from './ConfirmBox';
 import SummaryApi from '../common/SummaryApi';
 import Axios from '../utils/Axios';
@@ -12,7 +12,7 @@ import GlareHover from './GlareHover';
 import { Button } from './ui/button';
 import { Badge } from './ui/badge';
 
-const ProductCartAdmin = ({ data, fetchProduct }) => {
+const ProductManagementCart = ({ data, fetchProduct }) => {
     const [openEdit, setOpenEdit] = useState(false);
     const [openConfirmBoxDelete, setOpenConfirmBoxDelete] = useState(false);
     const [imageURL, setImageURL] = useState('');
@@ -52,7 +52,7 @@ const ProductCartAdmin = ({ data, fetchProduct }) => {
                         <img
                             src={data?.image[0]}
                             alt={data?.name}
-                            className="w-full h-32 sm:h-44 object-contain bg-white rounded-t-2xl transition-transform duration-500 group-hover:scale-105 border"
+                            className="w-full h-32 sm:h-44 object-cover bg-white/80 rounded-t-2xl transition-transform duration-500 group-hover:scale-105 border"
                             onError={(e) => {
                                 e.target.onerror = null;
                                 e.target.src = '/placeholder-product.jpg';
@@ -77,7 +77,7 @@ const ProductCartAdmin = ({ data, fetchProduct }) => {
                         <div className="flex-1 space-y-2">
                             <h3
                                 title={data?.name}
-                                className="font-bold sm:text-base text-xs line-clamp-2 h-8 sm:h-12 md:h-11 lg:h-12"
+                                className="text-highlight_2 font-bold sm:text-base text-xs line-clamp-2 h-8 sm:h-12 md:h-11 lg:h-12"
                             >
                                 {data?.name}
                             </h3>
@@ -85,7 +85,7 @@ const ProductCartAdmin = ({ data, fetchProduct }) => {
                                 {data.category.map((cate) => (
                                     <Badge
                                         variant="outline"
-                                        className="bg-white/10 border-lime-300/80"
+                                        className="bg-background/50 border-highlight p-0.5 px-2 text-highlight"
                                     >
                                         {cate.name}
                                     </Badge>
@@ -95,11 +95,11 @@ const ProductCartAdmin = ({ data, fetchProduct }) => {
                         <div className="flex py-1 gap-3 md:text-base text-sm justify-between">
                             <p
                                 title={data?.unit}
-                                className="font-semibold line-clamp-1 text-lime-300"
+                                className="font-semibold line-clamp-1 text-highlight_2"
                             >
                                 {data?.unit}
                             </p>
-                            <p className="text-secondary-200 font-bold">
+                            <p className="text-highlight font-medium">
                                 {DisplayPriceInVND(data?.price)}
                             </p>
                         </div>
@@ -173,4 +173,4 @@ const ProductCartAdmin = ({ data, fetchProduct }) => {
     );
 };
 
-export default ProductCartAdmin;
+export default ProductManagementCart;

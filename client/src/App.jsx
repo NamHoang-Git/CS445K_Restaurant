@@ -5,7 +5,11 @@ import { useEffect } from 'react';
 import fetchUserDetails from './utils/fetchUserDetails';
 import { useDispatch } from 'react-redux';
 import { setUserDetails } from './store/userSlice';
-import { setAllCategory, setLoadingCategory } from './store/productSlice';
+import {
+    setAllCategory,
+    setLoadingCategory,
+    setAllSubCategory,
+} from './store/productSlice';
 import Axios from './utils/Axios';
 import SummaryApi from './common/SummaryApi';
 import GlobalProvider from './provider/GlobalProvider';
@@ -46,12 +50,17 @@ function App() {
 
     useEffect(() => {
         (async () => {
+            // 1) User
             const res = await fetchUserDetails();
             dispatch(setUserDetails(res?.success ? res.data : null));
 
+            // 2) Category + SubCategory (song song)
             try {
                 dispatch(setLoadingCategory(true));
-                const catRes = await Axios({ ...SummaryApi.get_category });
+                const [catRes, subCatRes] = await Promise.all([
+                    Axios({ ...SummaryApi.get_category }),
+                    Axios({ ...SummaryApi.get_sub_category }),
+                ]);
 
                 if (catRes.data?.success) {
                     dispatch(
@@ -62,8 +71,17 @@ function App() {
                         )
                     );
                 }
-            } catch (error) {
-                AxiosToastError(error);
+                if (subCatRes.data?.success) {
+                    dispatch(
+                        setAllSubCategory(
+                            subCatRes.data.data.sort((a, b) =>
+                                a.name.localeCompare(b.name)
+                            )
+                        )
+                    );
+                }
+            } catch (e) {
+                AxiosToastError(e);
             } finally {
                 dispatch(setLoadingCategory(false));
             }

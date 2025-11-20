@@ -7,9 +7,9 @@ import uploadImage from '../utils/UploadImage';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
 import Axios from '../utils/Axios';
-import ViewImage from '../components/ViewImage';
-import AddFieldComponent from '../components/AddFieldComponent';
-import successAlert from './../utils/successAlert';
+import ViewImage from './ViewImage';
+import AddFieldComponent from './AddFieldComponent';
+import successAlert from '../utils/successAlert';
 import {
     Card,
     CardContent,
@@ -25,15 +25,14 @@ import GlareHover from './GlareHover';
 import Loading from './Loading';
 import { Textarea } from './ui/textarea';
 
-const EditProductAdmin = ({ close, data: propsData, fetchProduct }) => {
-    const allCategory = useSelector((state) => state.product.allCategory);
-    const [selectCategoryValue, setSelectCategoryValue] = useState('');
+const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
     const [openAddField, setOpenAddField] = useState(false);
     const [data, setData] = useState({
         _id: propsData._id,
         name: propsData.name || '',
         image: propsData.image ? [...propsData.image] : [],
         category: propsData.category ? [...propsData.category] : [],
+        subCategory: propsData.subCategory ? [...propsData.subCategory] : [],
         unit: propsData.unit || '',
         stock: propsData.stock || '',
         price: propsData.price || '',
@@ -118,10 +117,29 @@ const EditProductAdmin = ({ close, data: propsData, fetchProduct }) => {
         }));
     };
 
+    // Category
+    const [selectCategoryValue, setSelectCategoryValue] = useState('');
+    const allCategory = useSelector((state) => state.product.allCategory);
+
     const handleRemoveCategorySelected = (categoryId) => {
         setData((prev) => ({
             ...prev,
             category: prev.category.filter((el) => el._id !== categoryId),
+        }));
+    };
+
+    // Sub Category
+    const [selectSubCategoryValue, setSelectSubCategoryValue] = useState('');
+    const allSubCategory = useSelector((state) => state.product.allSubCategory);
+
+    const handleRemoveSubCategorySelected = (subCategoryId) => {
+        const updated = data.subCategory.filter(
+            (el) => el._id !== subCategoryId
+        );
+
+        setData((prev) => ({
+            ...prev,
+            subCategory: updated,
         }));
     };
 
@@ -321,6 +339,7 @@ const EditProductAdmin = ({ close, data: propsData, fetchProduct }) => {
                                 </div>
                             )}
                         </div>
+
                         {/* Category Selection */}
                         <div className="space-y-2">
                             <Label htmlFor="category">
@@ -417,6 +436,93 @@ const EditProductAdmin = ({ close, data: propsData, fetchProduct }) => {
                                 </div>
                             </div>
                         </div>
+
+                        {/* SubCategory Selection */}
+                        <div className="grid gap-2">
+                            <label className="font-semibold">
+                                Sub Category
+                            </label>
+
+                            {/* Display Value */}
+                            <div
+                                className={`${
+                                    data.subCategory[0] ? 'flex' : 'hidden'
+                                } gap-4 flex-wrap`}
+                            >
+                                {data.subCategory.map((subCate) => {
+                                    return (
+                                        <span
+                                            key={subCate._id + 'subCategory'}
+                                            className="bg-slate-200 shadow-md px-2 mx-1 flex items-center gap-2"
+                                        >
+                                            {subCate.name}
+                                            <div
+                                                onClick={() =>
+                                                    handleRemoveSubCategorySelected(
+                                                        subCate._id
+                                                    )
+                                                }
+                                                className="cursor-pointer hover:text-red-600"
+                                            >
+                                                <IoClose size={18} />
+                                            </div>
+                                        </span>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Select Category */}
+                            <select
+                                className={`${
+                                    data.subCategory[0] ? 'mt-1' : 'mt-0'
+                                } bg-blue-50 p-2 border rounded outline-none focus-within:border-primary-200`}
+                                value={selectSubCategoryValue}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    if (!value) return;
+                                    const subCategoryDetails =
+                                        allSubCategory.find(
+                                            (el) => el._id == value
+                                        );
+
+                                    // Kiểm tra trùng lặp
+                                    const alreadySelected =
+                                        data.subCategory.some(
+                                            (subCate) => subCate._id === value
+                                        );
+
+                                    if (alreadySelected) {
+                                        return;
+                                    }
+
+                                    setData((prev) => {
+                                        return {
+                                            ...prev,
+                                            subCategory: [
+                                                ...prev.subCategory,
+                                                subCategoryDetails,
+                                            ],
+                                        };
+                                    });
+
+                                    setSelectSubCategoryValue('');
+                                }}
+                            >
+                                <option value={''}>Select Category</option>
+                                {allSubCategory.map((subCategory) => {
+                                    return (
+                                        <option
+                                            value={subCategory?._id}
+                                            key={subCategory._id + 'product'}
+                                        >
+                                            {subCategory?.name}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+
                         {/* Unit */}
                         <div className="space-y-2">
                             <Label htmlFor="unit">
@@ -660,4 +766,4 @@ const EditProductAdmin = ({ close, data: propsData, fetchProduct }) => {
     );
 };
 
-export default EditProductAdmin;
+export default EditProductModel;

@@ -1,4 +1,5 @@
 import React from 'react';
+
 import {
     flexRender,
     getCoreRowModel,
@@ -18,18 +19,17 @@ const DisplayTable = ({ data, column }) => {
     }
 
     return (
-        <div className="p-2 overflow-x-auto">
-            {' '}
-            {/* Thêm overflow-x-auto */}
-            <table className="w-full border-collapse">
-                {' '}
-                {/* Đặt min-width */}
+        <div className="p-2">
+            <table className="w-full px-0 py-0 border-collapse">
                 <thead className="bg-blue-950 text-white">
                     {table.getHeaderGroups().map((headerGroup) => (
                         <tr key={headerGroup.id}>
-                            <th className="border py-2 text-center">Sr.No</th>
+                            <th className="border py-2">Sr.No</th>
                             {headerGroup.headers.map((header) => (
-                                <th key={header.id} className="border py-2">
+                                <th
+                                    key={header.id}
+                                    className="border py-2 whitespace-nowrap"
+                                >
                                     {header.isPlaceholder
                                         ? null
                                         : flexRender(
@@ -43,21 +43,17 @@ const DisplayTable = ({ data, column }) => {
                 </thead>
                 <tbody>
                     {table.getRowModel().rows.map((row, index) => (
-                        <tr key={row.id} className="hover:bg-gray-100">
-                            <td className="text-center border p-2">
+                        <tr key={row.id}>
+                            <td className="text-center border px-2 py-1">
                                 {index + 1}
                             </td>
                             {row.getVisibleCells().map((cell) => (
                                 <td
                                     key={cell.id}
-                                    className={`border p-2 ${
+                                    className={`border px-2 py-1 whitespace-nowrap ${
                                         cell.column.columnDef.meta?.className ||
                                         ''
                                     }`}
-                                    style={{
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                    }}
                                 >
                                     {flexRender(
                                         cell.column.columnDef.cell,
@@ -69,6 +65,7 @@ const DisplayTable = ({ data, column }) => {
                     ))}
                 </tbody>
             </table>
+            <div className="h-4" />
         </div>
     );
 };

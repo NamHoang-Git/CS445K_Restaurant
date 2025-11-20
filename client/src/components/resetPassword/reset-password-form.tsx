@@ -133,13 +133,16 @@ export function ResetPasswordForm({
 
     return (
         <form
-            className={cn('flex flex-col gap-6 text-white', className)}
+            className={cn(
+                'flex flex-col gap-6 font-semibold text-foreground',
+                className
+            )}
             {...props}
             onSubmit={handleSubmit}
         >
             <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Đổi mật khẩu</h1>
-                <p className="text-balance text-sm text-muted-foreground">
+                <h1 className="text-2xl font-semibold">Đổi mật khẩu</h1>
+                <p className="text-balance text-sm">
                     Nhập mật khẩu mới của bạn và xác nhận để cập nhật mật khẩu
                     tài khoản.
                 </p>
@@ -152,10 +155,11 @@ export function ResetPasswordForm({
                             id="newPassword"
                             type={showNewPassword ? 'text' : 'password'}
                             name="newPassword"
+                            autoFocus
                             placeholder="Nhập mật khẩu mới"
                             onChange={handleChange}
                             value={data.newPassword}
-                            className="h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                            className="h-12 pr-10 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                         />
                         <Button
                             type="button"
@@ -165,9 +169,9 @@ export function ResetPasswordForm({
                             onClick={() => setShowNewPassword(!showNewPassword)}
                         >
                             {showNewPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                <EyeOff className="h-4 w-4" />
                             ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                <Eye className="h-4 w-4" />
                             )}
                         </Button>
                     </div>
@@ -184,7 +188,7 @@ export function ResetPasswordForm({
                             placeholder="Nhập lại mật khẩu để xác nhận"
                             onChange={handleChange}
                             value={data.confirmNewPassword}
-                            className="h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                            className="h-12 pr-10 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                         />
                         <Button
                             type="button"
@@ -198,16 +202,16 @@ export function ResetPasswordForm({
                             }
                         >
                             {showConfirmNewPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                <EyeOff className="h-4 w-4" />
                             ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                <Eye className="h-4 w-4" />
                             )}
                         </Button>
                     </div>
                 </div>
 
                 <GlareHover
-                    glareColor="#ffffff"
+                    background="transparent"
                     glareOpacity={0.3}
                     glareAngle={-30}
                     glareSize={300}
@@ -216,22 +220,20 @@ export function ResetPasswordForm({
                 >
                     <Button
                         type="submit"
-                        className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                        style={{ backgroundColor: '#000' }}
+                        className="bg-foreground w-full h-12 font-bold"
                     >
                         {loading ? <Loading /> : 'Xác nhận'}
                     </Button>
                 </GlareHover>
             </div>
-            <div className="text-center text-sm text-muted-foreground flex justify-center items-center gap-2">
-                <IoIosArrowRoundBack size={28} />
-                <Link
-                    to={'/login'}
-                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-lime-300"
-                >
-                    Quay lại đăng nhập.
-                </Link>
-            </div>
+            <Link
+                to={'/login'}
+                className="text-center text-sm flex justify-center items-center gap-2
+                hover:opacity-80 cursor-pointer text-highlight"
+            >
+                <IoIosArrowRoundBack size={28} className="mb-0.5" />
+                Quay lại.
+            </Link>
         </form>
     );
 }

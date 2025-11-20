@@ -10,12 +10,10 @@ import ForgotPassword from '../pages/ForgotPassword';
 import OtpVerification from '../pages/OtpVerification';
 import ResetPassword from '../pages/ResetPassword';
 import UserMenuMobile from '../pages/UserMenuMobile';
-import Dashboard from '../layouts/Dashboard';
 import Profile from '../pages/Profile';
 import MyOrders from '../pages/MyOrders';
 import Address from '../pages/Address';
 import CategoryPage from './../pages/CategoryPage';
-import ProductAdmin from '../pages/ProductAdmin';
 import AdminPermission from '../layouts/AdminPermission';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDisplayPage from '../pages/ProductDisplayPage';
@@ -29,6 +27,8 @@ import BillPage from './../pages/BillPage';
 import ReportPage from './../pages/ReportPage';
 import VoucherPage from '../pages/VoucherPage';
 import AdminDashboard from '@/layouts/AdminDashboard';
+import SubCategoryPage from '@/pages/SubCategoryPage';
+import ProductManagementPage from '../pages/ProductManagementPage';
 
 const router = createBrowserRouter([
     {
@@ -120,10 +120,18 @@ const router = createBrowserRouter([
                         ),
                     },
                     {
+                        path: 'sub-category',
+                        element: (
+                            <AdminPermission>
+                                <SubCategoryPage />
+                            </AdminPermission>
+                        ),
+                    },
+                    {
                         path: 'product',
                         element: (
                             <AdminPermission>
-                                <ProductAdmin />
+                                <ProductManagementPage />
                             </AdminPermission>
                         ),
                     },

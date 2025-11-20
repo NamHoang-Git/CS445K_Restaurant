@@ -29,6 +29,11 @@ import { RootState } from '@/store/store';
 
 const navigation = [
     { name: 'Quản lý danh mục', href: '/dashboard/category', icon: Layers },
+    {
+        name: 'Quản lý danh mục phụ',
+        href: '/dashboard/sub-category',
+        icon: Layers,
+    },
     { name: 'Quản lý sản phẩm', href: '/dashboard/product', icon: Package },
     { name: 'Quản lý đơn hàng', href: '/dashboard/bill', icon: FileText },
     { name: 'Báo cáo thống kê', href: '/dashboard/report', icon: BarChart2 },

@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import VerifyEmailForm from '@/components/verifyEmail/verify-email-form';
+import logo from '@/assets/logo2.png';
 
 const VerifyEmail = () => {
     return (
@@ -10,10 +11,10 @@ const VerifyEmail = () => {
                     <div className="flex justify-start gap-2 mb-2">
                         <Link
                             to="/"
-                            className="flex items-center gap-2 font-bold text-lg text-white"
+                            className="flex items-center gap-2 font-bold text-lg text-foreground"
                         >
-                            {/* <img src={logo} alt="Logo" width={30} height={30} /> */}
-                            TechSpace
+                            <img src={logo} alt="Logo" width={30} height={30} />
+                            EatEase
                         </Link>
                     </div>
                     <div className="flex flex-1 items-center justify-center">

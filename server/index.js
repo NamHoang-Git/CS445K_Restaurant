@@ -8,6 +8,7 @@ import helmet from "helmet";
 import connectDB from "./config/connectDB.js";
 import userRouter from "./route/user.route.js";
 import categoryRouter from "./route/category.route.js";
+import subCategoryRouter from "./route/subCategory.route.js";
 import uploadRouter from "./route/upload.route.js";
 import productRouter from "./route/product.route.js";
 import cartRouter from "./route/cart.route.js";
@@ -65,6 +66,7 @@ app.get("/", (req, res) => {
 
 app.use('/api/user', userRouter);
 app.use('/api/category', categoryRouter);
+app.use('/api/sub-category', subCategoryRouter);
 app.use('/api/file', uploadRouter);
 app.use('/api/product', productRouter);
 app.use('/api/cart', cartRouter);

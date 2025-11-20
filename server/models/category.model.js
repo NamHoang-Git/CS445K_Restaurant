@@ -3,11 +3,20 @@ import mongoose from "mongoose";
 const categorySchema = new mongoose.Schema({
     name: {
         type: String,
-        required: true
+        required: [true, "Vui lòng nhập tên danh mục"],
+        trim: true,
+        maxlength: [100, "Tên danh mục không vượt quá 100 ký tự"],
+        minlength: [2, "Tên danh mục ít nhất 2 ký tự"],
+    },
+    description: {
+        type: String,
+        default: "",
+        maxlength: [500, "Mô tả không vượt quá 500 ký tự"],
     },
     image: {
         type: String,
         default: "",
+        trim: true,
     },
 }, {
     timestamps: true

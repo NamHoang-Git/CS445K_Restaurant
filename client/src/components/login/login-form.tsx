@@ -144,18 +144,20 @@ export function LoginForm({
 
     return (
         <form
-            className={cn('flex flex-col gap-6 text-white', className)}
+            className={cn(
+                'flex flex-col gap-6 font-semibold text-foreground',
+                className
+            )}
             {...props}
             onSubmit={handleSubmit}
         >
             <div className="flex flex-col items-center gap-2 text-center">
-                <h1 className="text-2xl font-bold">Đăng Nhập Vào Tài Khoản</h1>
-                <p className="text-balance text-sm text-muted-foreground">
-                    Nhập email của bạn bên dưới để đăng nhập vào tài khoản của
-                    bạn
+                <h1 className="text-2xl">Đăng Nhập Vào Tài Khoản</h1>
+                <p className="text-balance text-sm">
+                    Nhập email của bạn bên dưới để đăng nhập vào tài khoản
                 </p>
             </div>
-            <div className="grid gap-6">
+            <div className="grid gap-6 font-bold">
                 <div className="grid gap-2">
                     <Label htmlFor="email">Email</Label>
                     <Input
@@ -166,7 +168,7 @@ export function LoginForm({
                         placeholder="m@example.com"
                         onChange={handleChange}
                         value={data.email}
-                        className="h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="h-12 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                     />
                 </div>
                 <div className="grid gap-2">
@@ -179,7 +181,7 @@ export function LoginForm({
                             placeholder="Nhập mật khẩu"
                             onChange={handleChange}
                             value={data.password}
-                            className="h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                            className="h-12 pr-10 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                         />
                         <Button
                             type="button"
@@ -189,14 +191,14 @@ export function LoginForm({
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                <EyeOff className="h-4 w-4" />
                             ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                <Eye className="h-4 w-4" />
                             )}
                         </Button>
                     </div>
                 </div>
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between font-semibold text-highlight">
                     <div className="flex items-center space-x-2">
                         <input
                             type="checkbox"
@@ -205,21 +207,21 @@ export function LoginForm({
                         />
                         <Label
                             htmlFor="remember"
-                            className="text-sm text-muted-foreground cursor-pointer"
+                            className="text-sm cursor-pointer hover:opacity-80"
                         >
                             Ghi nhớ đăng nhập
                         </Label>
                     </div>
                     <Link
                         to={'/forgot-password'}
-                        className="p-0 h-auto text-sm hover:text-opacity-80 cursor-pointer text-lime-300"
+                        className="p-0 h-auto text-sm hover:opacity-80 cursor-pointer"
                     >
                         Quên mật khẩu?
                     </Link>
                 </div>
 
                 <GlareHover
-                    glareColor="#ffffff"
+                    background="transparent"
                     glareOpacity={0.3}
                     glareAngle={-30}
                     glareSize={300}
@@ -228,34 +230,25 @@ export function LoginForm({
                 >
                     <Button
                         type="submit"
-                        className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                        style={{ backgroundColor: '#000' }}
+                        className="bg-foreground w-full h-12 font-bold"
                     >
                         {loading ? <Loading /> : 'Đăng nhập'}
                     </Button>
                 </GlareHover>
-
                 <>
-                    <div className="relative">
-                        <div className="relative text-center text-sm uppercase flex items-center justify-between px-1.5">
-                            <div
-                                className="relative after:absolute after:inset-0 after:top-1/2 after:left-0 after:z-0 after:flex after:items-end
-                        after:border-t after:border-border w-16 md:w-28 xl:w-56"
-                            ></div>
-                            <span className="relative z-10 px-2 text-muted-foreground">
-                                Hoặc đăng nhập bằng
-                            </span>
-                            <div
-                                className="relative after:absolute after:inset-0 after:top-1/2 after:right-0 after:z-0 after:flex after:items-start
-                        after:border-t after:border-border w-16 md:w-28 xl:w-56"
-                            ></div>
-                        </div>
+                    <div
+                        className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center
+                    after:border-t after:border-foreground"
+                    >
+                        <span className="relative z-10 bg-background px-2 py-1 rounded-md text-foreground uppercase">
+                            Hoặc đăng nhập với
+                        </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-highlight">
+                    <div className="grid grid-cols-2 gap-4 text-foreground">
                         <Button
                             variant="outline"
-                            className="flex items-center gap-2 h-12 border-gray-200 liquid-glass rounded-lg
+                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
                         shadow-none cursor-pointer"
                         >
                             <FaGoogle className="mb-1" />
@@ -263,7 +256,7 @@ export function LoginForm({
                         </Button>
                         <Button
                             variant="outline"
-                            className="flex items-center gap-2 h-12 border-gray-200 liquid-glass rounded-lg
+                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
                         shadow-none cursor-pointer"
                         >
                             <FaFacebookSquare className="mb-1" />
@@ -272,11 +265,11 @@ export function LoginForm({
                     </div>
                 </>
             </div>
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm">
                 Bạn chưa có tài khoản?{' '}
                 <Link
                     to={'/register'}
-                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-lime-300"
+                    className="p-0 h-auto text-sm hover:opacity-80 cursor-pointer text-highlight"
                 >
                     Đăng ký ngay.
                 </Link>

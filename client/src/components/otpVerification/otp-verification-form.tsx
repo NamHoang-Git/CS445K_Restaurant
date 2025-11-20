@@ -71,13 +71,16 @@ export function OtpVerificationForm({
 
     return (
         <form
-            className={cn('flex flex-col gap-6 text-white', className)}
+            className={cn(
+                'flex flex-col gap-6 font-bold text-foreground',
+                className
+            )}
             {...props}
             onSubmit={handleSubmit}
         >
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Xác nhận OTP</h1>
-                <p className="text-balance text-sm text-muted-foreground">
+                <p className="text-balance text-sm">
                     Nhập mã OTP đã được gửi đến email của bạn để tiếp tục quy
                     trình đặt lại mật khẩu.
                 </p>
@@ -110,8 +113,8 @@ export function OtpVerificationForm({
                                         }
                                     }}
                                     maxLength={1}
-                                    className="h-12 text-lime-200 border-gray-200 focus:ring-0 shadow-none rounded-lg
-                                    bg-black/50 focus:border-[#3F3FF3] no-spinner text-center"
+                                    className="h-12 text-highlight border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg
+                                    bg-background focus:border-[#3F3FF3] no-spinner text-center"
                                 />
                             );
                         })}
@@ -119,7 +122,7 @@ export function OtpVerificationForm({
                 </div>
 
                 <GlareHover
-                    glareColor="#ffffff"
+                    background="transparent"
                     glareOpacity={0.3}
                     glareAngle={-30}
                     glareSize={300}
@@ -128,18 +131,17 @@ export function OtpVerificationForm({
                 >
                     <Button
                         type="submit"
-                        className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                        style={{ backgroundColor: '#000' }}
+                        className="bg-foreground w-full h-12 font-bold"
                     >
                         {loading ? <Loading /> : 'Xác nhận OTP'}
                     </Button>
                 </GlareHover>
             </div>
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm">
                 Nhớ mật khẩu?{' '}
                 <Link
                     to={'/login'}
-                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-lime-300"
+                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-highlight"
                 >
                     Quay lại đăng nhập.
                 </Link>

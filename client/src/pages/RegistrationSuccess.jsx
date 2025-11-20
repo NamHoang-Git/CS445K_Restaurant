@@ -1,6 +1,7 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import RegistrationSuccessForm from '@/components/registrationSuccess/registration-success-form';
+import logo from '@/assets/logo2.png';
 
 const RegistrationSuccess = () => {
     return (
@@ -12,8 +13,8 @@ const RegistrationSuccess = () => {
                             to="/"
                             className="flex items-center gap-2 font-bold text-lg"
                         >
-                            {/* <img src={logo} alt="Logo" width={30} height={30} /> */}
-                            TechSpace
+                            <img src={logo} alt="Logo" width={30} height={30} />
+                            EatEase
                         </Link>
                     </div>
                     <div className="flex flex-1 items-center justify-center">

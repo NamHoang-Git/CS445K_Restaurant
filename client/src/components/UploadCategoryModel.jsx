@@ -23,6 +23,7 @@ const UploadCategoryModel = ({ close, fetchData }) => {
     const [data, setData] = useState({
         name: '',
         image: '',
+        description: '',
     });
 
     const [loading, setLoading] = useState(false);
@@ -108,13 +109,13 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                 {/* Header */}
                 <CardHeader className="pt-4">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                        <CardTitle className="text-lg text-highlight font-bold uppercase">
                             Thêm danh mục
                         </CardTitle>
                         <Button
                             onClick={close}
                             className="bg-transparent hover:bg-transparent text-foreground
-                        hover:text-lime-300 h-12"
+                        hover:text-highlight h-12"
                         >
                             <IoClose />
                         </Button>
@@ -139,6 +140,20 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                                 className="text-sm h-12"
                                 placeholder="Nhập tên danh mục"
                                 required
+                            />
+                        </div>
+
+                        {/* Description */}
+                        <div className="space-y-2">
+                            <Label htmlFor="description">Mô tả</Label>
+                            <Input
+                                type="text"
+                                id="description"
+                                name="description"
+                                value={data.description}
+                                onChange={handleOnChange}
+                                className="text-sm h-12"
+                                placeholder="Nhập mô tả"
                             />
                         </div>
 
@@ -211,7 +226,7 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                                 <Button
                                     type="button"
                                     onClick={close}
-                                    className="bg-foreground"
+                                    className="bg-baseColor"
                                 >
                                     Hủy
                                 </Button>
@@ -224,13 +239,7 @@ const UploadCategoryModel = ({ close, fetchData }) => {
                                 transitionDuration={800}
                                 playOnce={false}
                             >
-                                <Button
-                                    disabled={
-                                        !data.name || !data.image || loading
-                                    }
-                                    type="submit"
-                                    className="bg-foreground"
-                                >
+                                <Button type="submit" className="bg-foreground">
                                     {loading ? <Loading /> : 'Thêm Mới'}
                                 </Button>
                             </GlareHover>

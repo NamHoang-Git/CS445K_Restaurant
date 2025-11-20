@@ -30,6 +30,7 @@ const UploadProductModel = ({ close, fetchData }) => {
         name: '',
         image: [],
         category: [],
+        subCategory: [],
         unit: '',
         stock: 0,
         price: 0,
@@ -132,6 +133,21 @@ const UploadProductModel = ({ close, fetchData }) => {
         }));
     };
 
+    // Sub Category
+    const [selectSubCategoryValue, setSelectSubCategoryValue] = useState('');
+    const allSubCategory = useSelector((state) => state.product.allSubCategory);
+
+    const handleRemoveSubCategorySelected = (subCategoryId) => {
+        const updated = data.subCategory.filter(
+            (el) => el._id !== subCategoryId
+        );
+
+        setData((prev) => ({
+            ...prev,
+            subCategory: updated,
+        }));
+    };
+
     // Add More Field
     const [openAddField, setOpenAddField] = useState(false);
     const [fieldName, setFieldName] = useState('');
@@ -172,6 +188,7 @@ const UploadProductModel = ({ close, fetchData }) => {
                     name: '',
                     image: [],
                     category: [],
+                    subCategory: [],
                     unit: '',
                     stock: '',
                     price: '',
@@ -426,6 +443,92 @@ const UploadProductModel = ({ close, fetchData }) => {
                                 </div>
                             </div>
                         </div>
+
+                        <div className="grid gap-2">
+                            <label className="font-semibold">
+                                Sub Category
+                            </label>
+
+                            {/* Display Value */}
+                            <div
+                                className={`${
+                                    data.subCategory[0] ? 'flex' : 'hidden'
+                                } gap-4 flex-wrap`}
+                            >
+                                {data.subCategory.map((subCate) => {
+                                    return (
+                                        <span
+                                            key={subCate._id + 'subCategory'}
+                                            className="bg-slate-200 shadow-md px-2 mx-1 flex items-center gap-2"
+                                        >
+                                            {subCate.name}
+                                            <div
+                                                onClick={() =>
+                                                    handleRemoveSubCategorySelected(
+                                                        subCate._id
+                                                    )
+                                                }
+                                                className="cursor-pointer hover:text-red-600"
+                                            >
+                                                <IoClose size={18} />
+                                            </div>
+                                        </span>
+                                    );
+                                })}
+                            </div>
+
+                            {/* Select Category */}
+                            <select
+                                className={`${
+                                    data.subCategory[0] ? 'mt-1' : 'mt-0'
+                                } bg-blue-50 p-2 border rounded outline-none focus-within:border-primary-200`}
+                                value={selectSubCategoryValue}
+                                onChange={(e) => {
+                                    const value = e.target.value;
+
+                                    if (!value) return;
+                                    const subCategoryDetails =
+                                        allSubCategory.find(
+                                            (el) => el._id == value
+                                        );
+
+                                    // Kiểm tra trùng lặp
+                                    const alreadySelected =
+                                        data.subCategory.some(
+                                            (subCate) => subCate._id === value
+                                        );
+
+                                    if (alreadySelected) {
+                                        return;
+                                    }
+
+                                    setData((prev) => {
+                                        return {
+                                            ...prev,
+                                            subCategory: [
+                                                ...prev.subCategory,
+                                                subCategoryDetails,
+                                            ],
+                                        };
+                                    });
+
+                                    setSelectSubCategoryValue('');
+                                }}
+                            >
+                                <option value={''}>Select Sub Category</option>
+                                {allSubCategory.map((subCategory) => {
+                                    return (
+                                        <option
+                                            value={subCategory?._id}
+                                            key={subCategory._id + 'product'}
+                                        >
+                                            {subCategory?.name}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                        </div>
+
                         {/* Unit */}
                         <div className="space-y-2">
                             <Label htmlFor="unit">

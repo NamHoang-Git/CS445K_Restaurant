@@ -5,7 +5,7 @@ import SummaryApi from '../common/SummaryApi';
 import Loading from './../components/Loading';
 import NoData from '../components/NoData';
 import Axios from '../utils/Axios';
-import EditCategory from '../components/EditCategory';
+import EditCategory from '../components/EditCategoryModel';
 import ConfirmBox from '../components/ConfirmBox';
 import AxiosToastError from '../utils/AxiosToastError';
 import successAlert from '../utils/successAlert';
@@ -84,12 +84,12 @@ const CategoryPage = () => {
 
     return (
         <section className="container mx-auto grid gap-2 z-10">
-            <Card className="text-white py-6 flex-row justify-between gap-6 border-gray-600 border-2">
+            <Card className="py-6 flex-row justify-between gap-6 border-gray-600 border-2">
                 <CardHeader>
-                    <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Danh mục
                     </CardTitle>
-                    <CardDescription className="text-white">
+                    <CardDescription>
                         Quản lý thông tin danh mục
                     </CardDescription>
                 </CardHeader>
@@ -105,7 +105,7 @@ const CategoryPage = () => {
                     >
                         <Button
                             onClick={() => setOpenUploadCaregory(true)}
-                            className="bg-transparent text-white hover:bg-transparent"
+                            className="bg-foreground"
                         >
                             Thêm Mới
                         </Button>

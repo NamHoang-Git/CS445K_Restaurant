@@ -6,6 +6,12 @@ import { useNavigate } from 'react-router-dom';
 import { useRef, useState, useEffect } from 'react';
 import { valideURLConvert } from '../../utils/valideURLConvert';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
+import logo from '@/assets/logo.png';
+import { useDispatch } from 'react-redux';
+import { setAllCategory } from '@/store/productSlice';
+import Axios from '@/utils/Axios';
+import SummaryApi from '@/common/SummaryApi';
+import toast from 'react-hot-toast';
 
 export function CategoryPanel() {
     const loadingCategory = useSelector(
@@ -36,7 +42,7 @@ export function CategoryPanel() {
                 handleExploreClick();
                 scrollToTop();
             }}
-            className="rounded-full bg-lime-400 px-6 text-black hover:bg-lime-300"
+            className="rounded-full bg-background px-6 text-highlight font-bold hover:bg-background/80 transition-all"
         >
             Khám phá ngay
         </Button>
@@ -47,37 +53,43 @@ export function CategoryPanel() {
             <div className="container mx-auto px-4">
                 <div className="flex flex-col items-center justify-center py-14 sm:py-20">
                     <div className="mb-5 flex items-center gap-2">
-                        <p className="text-sm uppercase tracking-[0.25em] text-lime-300/80">
-                            Tech EcomSpace
+                        <img
+                            src={logo}
+                            alt="EatEase logo"
+                            width={30}
+                            height={30}
+                        />
+                        <p className="text-sm uppercase tracking-[0.25em] text-highlight font-extrabold">
+                            EatEase Restaurant
                         </p>
                     </div>
-                    <h1 className="mt-3 text-center text-gray-300 text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl uppercase grid gap-2">
-                        <span className="block">Công nghệ</span>
-                        <span className="block text-lime-300 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
-                            đỉnh cao
-                        </span>
-                        <span className="block">giá trị vượt trội</span>
+                    <h1 className="mt-3 text-center text-baseColor text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl uppercase grid gap-2">
+                        <span className="block">Ẩm thực</span>
+                        <span className="block text-highlight">tinh hoa</span>
+                        <span className="block">Hương vị đẳng cấp</span>
                     </h1>
                     <div className="mt-6">{buttonNew}</div>
 
                     {/* Categories with navigation */}
                     <div className="mt-10 relative w-full">
-                        <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10 hidden md:block">
-                            <button
-                                onClick={() => {
-                                    if (containerRef.current) {
-                                        containerRef.current.scrollBy({
-                                            left: -300,
-                                            behavior: 'smooth',
-                                        });
-                                    }
-                                }}
-                                className="bg-white/20 backdrop-blur-sm p-2 rounded-full hover:bg-white/30 transition-colors"
-                                aria-label="Previous categories"
-                            >
-                                <ChevronLeft className="w-6 h-6 text-white" />
-                            </button>
-                        </div>
+                        {categoryData?.length > 0 && (
+                            <div className="absolute left-0 top-1/2 -translate-y-1/2 z-10">
+                                <button
+                                    onClick={() => {
+                                        if (containerRef.current) {
+                                            containerRef.current.scrollBy({
+                                                left: -300,
+                                                behavior: 'smooth',
+                                            });
+                                        }
+                                    }}
+                                    className="bg-foreground/20 backdrop-blur-sm p-2 rounded-full hover:bg-foreground/50 transition-colors"
+                                    aria-label="Previous categories"
+                                >
+                                    <ChevronLeft className="w-6 h-6 text-highlight_2" />
+                                </button>
+                            </div>
+                        )}
 
                         <div
                             ref={containerRef}
@@ -142,22 +154,24 @@ export function CategoryPanel() {
                             )}
                         </div>
 
-                        <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10 hidden md:block">
-                            <button
-                                onClick={() => {
-                                    if (containerRef.current) {
-                                        containerRef.current.scrollBy({
-                                            left: 300,
-                                            behavior: 'smooth',
-                                        });
-                                    }
-                                }}
-                                className="bg-white/20 backdrop-blur-sm p-2 rounded-full hover:bg-white/30 transition-colors"
-                                aria-label="Next categories"
-                            >
-                                <ChevronRight className="w-6 h-6 text-white" />
-                            </button>
-                        </div>
+                        {categoryData?.length > 0 && (
+                            <div className="absolute right-0 top-1/2 -translate-y-1/2 z-10">
+                                <button
+                                    onClick={() => {
+                                        if (containerRef.current) {
+                                            containerRef.current.scrollBy({
+                                                left: 300,
+                                                behavior: 'smooth',
+                                            });
+                                        }
+                                    }}
+                                    className="bg-foreground/20 backdrop-blur-sm p-2 rounded-full hover:bg-foreground/50 transition-colors"
+                                    aria-label="Next categories"
+                                >
+                                    <ChevronRight className="w-6 h-6 text-highlight_2" />
+                                </button>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -196,14 +210,14 @@ function PhoneCard({
                 <div
                     className={`absolute rounded-2xl inset-0 bg-gradient-to-b from-black/75 to-black/5 transition-all duration-500 ${
                         isHovered
-                            ? 'border-4 border-lime-200/70 bg-gradient-to-b from-black/5 to-cyan-500/30 transition-opacity duration-500 shadow-[0_0_25px_rgba(132,204,22,0.45)]'
+                            ? 'border-4 border-highlight/70 bg-gradient-to-b from-black/5 to-cyan-500/30 transition-opacity duration-500 shadow-[0_0_25px_rgba(132,204,22,0.45)]'
                             : 'border border-transparent'
                     }`}
                 />
             </div>
             <div className="absolute inset-0 flex flex-col justify-start p-6">
-                <h3 className="text-xl font-bold text-lime-300">{title}</h3>
-                <p className="text-sm font-semibold text-white/80">{sub}</p>
+                <h3 className="text-xl font-bold text-highlight">{title}</h3>
+                <p className="text-sm font-semibold text-white">{sub}</p>
             </div>
         </div>
     );

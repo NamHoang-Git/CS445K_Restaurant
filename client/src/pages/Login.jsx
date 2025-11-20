@@ -2,6 +2,7 @@ import { LoginForm } from '@/components/login/login-form';
 import banner from '@/assets/register_banner.jpg';
 import { TypeAnimation } from 'react-type-animation';
 import { Link } from 'react-router-dom';
+import logo from '@/assets/logo2.png';
 
 export default function LoginPage() {
     return (
@@ -11,10 +12,10 @@ export default function LoginPage() {
                     <div className="flex justify-center gap-2 md:justify-start mb-2">
                         <Link
                             to="/"
-                            className="flex items-center gap-2 font-bold text-lg text-white"
+                            className="flex items-center gap-2 font-bold text-lg"
                         >
-                            {/* <img src={logo} alt="Logo" width={30} height={30} /> */}
-                            TechSpace
+                            <img src={logo} alt="Logo" width={30} height={30} />
+                            EatEase
                         </Link>
                     </div>
                     <div className="flex flex-1 items-center justify-center">
@@ -32,7 +33,7 @@ export default function LoginPage() {
                         backgroundRepeat: 'no-repeat',
                     }}
                 >
-                    <h1 className="px-4 text-white font-bold text-2xl">
+                    <h1 className="px-4 text-highlight_2 font-bold text-2xl">
                         <TypeAnimation
                             sequence={['Chào mừng bạn trở lại!', 800, '', 500]}
                             wrapper="span"

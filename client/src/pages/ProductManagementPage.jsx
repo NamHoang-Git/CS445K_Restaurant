@@ -4,14 +4,7 @@ import Axios from '../utils/Axios';
 import AxiosToastError from '../utils/AxiosToastError';
 import Loading from '../components/Loading';
 import NoData from '../components/NoData';
-import ProductCartAdmin from '../components/ProductCartAdmin';
-import {
-    IoArrowBack,
-    IoArrowForward,
-    IoSearch,
-    IoFilter,
-    IoClose,
-} from 'react-icons/io5';
+import { IoArrowBack, IoArrowForward, IoSearch } from 'react-icons/io5';
 import { debounce } from 'lodash';
 import UploadProductModel from '../components/UploadProductModel';
 import {
@@ -34,8 +27,9 @@ import {
     SelectTrigger,
     SelectValue,
 } from '@/components/ui/select';
+import ProductManagementCart from '../components/ProductManagementCart';
 
-const ProductAdmin = () => {
+const ProductManagementPage = () => {
     const [productData, setProductData] = useState([]);
     const [page, setPage] = useState(1);
     const [loading, setLoading] = useState(false);
@@ -121,7 +115,7 @@ const ProductAdmin = () => {
                 setLoading(false);
             }
         },
-        []
+        [search, filters, page]
     );
 
     // Reset all filters
@@ -185,6 +179,7 @@ const ProductAdmin = () => {
     useEffect(() => {
         fetchCategories();
         fetchProduct();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const handleNextPage = () => {
@@ -202,23 +197,23 @@ const ProductAdmin = () => {
     // Render filter controls
     const renderFilterControls = () => (
         <div
-            className="liquid-glass p-4 rounded-lg shadow-lg mb-4 border border-secondary-100
+            className="liquid-glass-header p-4 rounded-lg shadow-lg mb-4 border border-secondary-100
         text-secondary-200 sm:text-base text-sm"
         >
             <div className="flex justify-between items-center mb-4">
-                <h2 className="uppercase text-lime-300 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
+                <h2 className="uppercase text-highlight_2 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
                     Bộ lọc
                 </h2>
                 <button
                     onClick={resetFilters}
-                    className="hover:bg-zinc-800 hover:border-emerald-500 flex items-center gap-2
-                    transition-all duration-300 text-lime-300 border-2 border-zinc-400 px-4 py-1.5 rounded-md"
+                    className="hover:bg-zinc-800 hover:border-emerald-500 flex items-center gap-2 bg-background/20
+                    transition-all duration-300 text-highlight_2 border-2 border-highlight px-4 py-1.5 rounded-md"
                 >
                     <RiResetLeftFill />
                     Đặt lại
                 </button>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 text-highlight_2">
                 <div className="flex items-center gap-2.5 sm:text-sm text-xs">
                     <Label htmlFor="email">Giá từ</Label>
                     <Input
@@ -227,7 +222,7 @@ const ProductAdmin = () => {
                         value={filters.minPrice}
                         onChange={handleFilterChange}
                         placeholder="Thấp nhất"
-                        className="w-24 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="w-24 text-sm placeholder:text-highlight_2"
                     />
                     <span>-</span>
                     <Input
@@ -236,7 +231,7 @@ const ProductAdmin = () => {
                         value={filters.maxPrice}
                         onChange={handleFilterChange}
                         placeholder="Cao nhất"
-                        className="w-24 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="w-24 text-sm placeholder:text-highlight_2"
                     />
                     <span className="">VNĐ</span>
                 </div>
@@ -251,11 +246,11 @@ const ProductAdmin = () => {
                             })
                         }
                     >
-                        <SelectTrigger className="w-32 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]">
+                        <SelectTrigger className="w-32 text-sm">
                             <SelectValue placeholder="Sắp xếp" />
                         </SelectTrigger>
 
-                        <SelectContent className="liquid-glass-2 text-white cursor-pointer">
+                        <SelectContent className="cursor-pointer">
                             <SelectItem
                                 value="newest"
                                 className="cursor-pointer"
@@ -283,11 +278,11 @@ const ProductAdmin = () => {
                             })
                         }
                     >
-                        <SelectTrigger className="w-40 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]">
+                        <SelectTrigger className="w-40 text-sm">
                             <SelectValue placeholder="Danh mục" />
                         </SelectTrigger>
 
-                        <SelectContent className="liquid-glass-2 text-white cursor-pointer">
+                        <SelectContent className="cursor-pointer">
                             <SelectItem value="all" className="cursor-pointer">
                                 Tất cả
                             </SelectItem>
@@ -311,7 +306,7 @@ const ProductAdmin = () => {
             {/* Header */}
             <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
-                    <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Sản phẩm
                     </CardTitle>
                     <CardDescription>Quản lý sản phẩm của bạn</CardDescription>
@@ -348,7 +343,7 @@ const ProductAdmin = () => {
                 >
                     <Button
                         onClick={() => setShowFilters(!showFilters)}
-                        className="flex items-center gap-2 px-4 text-lime-300 h-11 w-full hover:bg-transparent"
+                        className="flex items-center gap-2 px-4 text-highlight_2 h-11 w-full hover:bg-transparent"
                     >
                         <FaFilter className="mb-[3px]" />
                         <span className="font-bold uppercase">Lọc</span>
@@ -357,8 +352,8 @@ const ProductAdmin = () => {
 
                 {/* Search */}
                 <div
-                    className="sm:h-[42px] h-8 max-w-72 w-full min-w-16 lg:min-w-24 bg-black/60 border border-gray-500 px-4 sm:py-3 py-[6px]
-                        flex items-center gap-3 rounded-xl shadow-md shadow-secondary-100 focus-within:border-lime-200"
+                    className="text-highlight h-11 max-w-72 w-full min-w-16 lg:min-w-24 liquid-glass-2 border border-gray-500 px-4
+                flex items-center gap-3 rounded-xl shadow-md shadow-secondary-100 focus-within:border-lime-200"
                 >
                     <IoSearch size={22} className="mb-[3px] sm:block hidden" />
                     <IoSearch
@@ -368,7 +363,7 @@ const ProductAdmin = () => {
                     <input
                         type="text"
                         placeholder="Tìm kiếm sản phẩm..."
-                        className="h-full w-full outline-none bg-transparent"
+                        className="h-full w-full outline-none bg-transparent placeholder:text-highlight"
                         value={search}
                         onChange={handleOnChange}
                         spellCheck={false}
@@ -387,9 +382,9 @@ const ProductAdmin = () => {
             ) : (
                 <div className="">
                     <div className="min-h-[65vh]">
-                        <div className="pt-2 pb-8 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-5 gap-[10px] sm:gap-6">
+                        <div className="pt-2 pb-8 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-4 2xl:grid-cols-5 gap-[10px] sm:gap-6">
                             {productData.map((product, index) => (
-                                <ProductCartAdmin
+                                <ProductManagementCart
                                     key={product._id || index}
                                     data={product}
                                     fetchProduct={fetchProduct}
@@ -443,4 +438,4 @@ const ProductAdmin = () => {
     );
 };
 
-export default ProductAdmin;
+export default ProductManagementPage;

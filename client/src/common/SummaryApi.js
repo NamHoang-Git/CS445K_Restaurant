@@ -92,6 +92,24 @@ const SummaryApi = {
         method: 'delete'
     },
 
+    // Sub Category
+    add_sub_category: {
+        url: '/api/sub-category/add-sub-category',
+        method: 'post'
+    },
+    get_sub_category: {
+        url: '/api/sub-category/get-sub-category',
+        method: 'get'
+    },
+    update_sub_category: {
+        url: '/api/sub-category/update-sub-category',
+        method: 'put'
+    },
+    delete_sub_category: {
+        url: '/api/sub-category/delete-sub-category',
+        method: 'delete'
+    },
+
     // Product
     add_product: {
         url: '/api/product/add-product',
@@ -101,12 +119,12 @@ const SummaryApi = {
         url: '/api/product/get-product',
         method: 'post'
     },
-    get_product_by_category_home: {
-        url: '/api/product/get-product-by-category-home',
+    get_product_by_category: {
+        url: '/api/product/get-product-by-category',
         method: 'post'
     },
-    get_product_by_category_list: {
-        url: '/api/product/get-product-by-category-list',
+    get_product_by_category_and_sub_category: {
+        url: '/api/product/get-product-by-category-and-subcategory',
         method: 'post'
     },
     get_product_details: {

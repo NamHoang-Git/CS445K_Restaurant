@@ -12,41 +12,14 @@ import jwt from 'jsonwebtoken'
 // Register Controller
 export async function registerUserController(req, res) {
     try {
-        const { name, email, password } = req.body
+        const { name, email, password, mobile } = req.body
 
-        if (!name || !email || !password) {
+        if (!name || !email || !password || !mobile) {
             return res.status(400).json({
                 message: "Vui lòng nhập các trường bắt buộc",
                 error: true,
                 success: false
             })
-        }
-
-        // Validate email format more strictly
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-
-        // List of valid TLDs (you can extend this list as needed)
-        const validTLDs = ['com', 'net', 'org', 'io', 'co', 'ai', 'vn', 'com.vn', 'edu.vn', 'gov.vn'];
-
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({
-                message: "Định dạng email không hợp lệ",
-                error: true,
-                success: false
-            });
-        }
-
-        // Extract domain and TLD
-        const domain = email.split('@')[1];
-        const tld = domain.split('.').slice(1).join('.');
-
-        // Check if TLD is in the valid list
-        if (!validTLDs.includes(tld)) {
-            return res.status(400).json({
-                message: "Tên miền email không được hỗ trợ",
-                error: true,
-                success: false
-            });
         }
 
         const user = await UserModel.findOne({ email })
@@ -65,7 +38,8 @@ export async function registerUserController(req, res) {
         const payload = {
             name,
             email,
-            password: hashPassword
+            password: hashPassword,
+            mobile
         }
 
         const newUser = new UserModel(payload)
@@ -75,7 +49,7 @@ export async function registerUserController(req, res) {
 
         const verifyEmail = await sendEmail({
             sendTo: email,
-            subject: "Xác nhận email từ TechSpace",
+            subject: "Xác nhận email từ EatEase",
             html: verifyEmailTemplate({
                 name,
                 url: VerifyEmailUrl

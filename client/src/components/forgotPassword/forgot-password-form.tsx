@@ -114,13 +114,16 @@ export function ForgotPasswordForm({
 
     return (
         <form
-            className={cn('flex flex-col gap-6 text-white', className)}
+            className={cn(
+                'flex flex-col gap-6 font-bold text-foreground',
+                className
+            )}
             {...props}
             onSubmit={handleSubmit}
         >
             <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Quên Mật Khẩu</h1>
-                <p className="text-balance text-sm text-muted-foreground">
+                <p className="text-balance text-sm">
                     Nhập địa chỉ email của bạn và chúng tôi sẽ gửi cho bạn mã
                     OTP.
                 </p>
@@ -136,12 +139,13 @@ export function ForgotPasswordForm({
                         placeholder="Nhập email của bạn"
                         onChange={handleChange}
                         value={data.email}
-                        className="h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="h-12 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg
+                        bg-white/20 focus:border-[#3F3FF3]"
                     />
                 </div>
 
                 <GlareHover
-                    glareColor="#ffffff"
+                    background="transparent"
                     glareOpacity={0.3}
                     glareAngle={-30}
                     glareSize={300}
@@ -150,18 +154,17 @@ export function ForgotPasswordForm({
                 >
                     <Button
                         type="submit"
-                        className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                        style={{ backgroundColor: '#000' }}
+                        className="bg-foreground w-full h-12 font-bold"
                     >
                         {loading ? <Loading /> : 'Gửi OTP'}
                     </Button>
                 </GlareHover>
             </div>
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm">
                 Nhớ mật khẩu?{' '}
                 <Link
                     to={'/login'}
-                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-lime-300"
+                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-highlight"
                 >
                     Quay lại đăng nhập.
                 </Link>

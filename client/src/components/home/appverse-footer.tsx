@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/card';
-import logo from '../../assets/Apple-iPhone-17-Pro.jpg';
 import GradientText from '../GradientText';
 interface FooterContent {
     tagline: string;
@@ -33,7 +32,7 @@ export function AppverseFooter() {
     }, []);
 
     return (
-        <section className="text-white">
+        <section className="">
             <div className="container mx-auto px-4 py-8 sm:py-10">
                 <Card className="relative overflow-hidden rounded-3xl liquid-glass p-6 sm:p-10">
                     <div className="relative grid items-center gap-8 md:grid-cols-2">
@@ -56,8 +55,8 @@ export function AppverseFooter() {
                             <div className="relative rounded-[28px] liquid-glass p-2 shadow-2xl">
                                 <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
                                     <img
-                                        src={logo}
-                                        // src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Timeline%202-YFaCK7cEiHWSMRv8XEHaLCoYj2SUAi.mp4"
+                                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Timeline%202-YFaCK7cEiHWSMRv8XEHaLCoYj2SUAi.mp4"
+                                        // src={logo}
                                         className="absolute inset-0 h-full w-full object-cover opacity-40"
                                         aria-label="Skitbit app preview - approvals made easy"
                                     />

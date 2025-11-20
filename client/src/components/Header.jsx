@@ -106,7 +106,7 @@ export default function Header() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 p-4">
+            <header className="sticky top-0 z-50 p-4 text-amber-50 font-semibold">
                 <div className="container mx-auto">
                     <div className="flex h-16 items-center justify-between px-6 liquid-glass-header rounded-full">
                         {/* Brand Logo */}
@@ -117,18 +117,18 @@ export default function Header() {
                         >
                             <img
                                 src={logo}
-                                alt="TechSpace logo"
+                                alt="EatEase logo"
                                 width={25}
                                 height={25}
                                 className="h-5 w-5"
                             />
-                            <span className="font-semibold tracking-wide text-white">
-                                TechSpace
+                            <span className="font-semibold tracking-wide">
+                                EatEase
                             </span>
                         </Link>
                         {/* Desktop Nav */}
                         <div className="hidden md:flex items-center gap-6">
-                            <nav className="flex items-center gap-6 text-sm text-gray-300">
+                            <nav className="flex items-center gap-6 text-sm">
                                 {links.map((l) => (
                                     <Link
                                         key={l.href}
@@ -142,10 +142,7 @@ export default function Header() {
                                 ))}
                             </nav>
                             <Link to="/search">
-                                <FaSearch
-                                    size={14}
-                                    className="text-white mb-[3px]"
-                                />
+                                <FaSearch size={14} className=" mb-[3px]" />
                             </Link>
                         </div>
                         {/* User */}
@@ -155,7 +152,7 @@ export default function Header() {
                                     <div className="relative">
                                         <button
                                             onClick={toggleUserMenu}
-                                            className="flex items-center gap-2 w-full px-2 py-1.5 text-white rounded-lg hover:bg-white/10 transition-colors"
+                                            className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-background/15 transition-colors"
                                             aria-expanded={openUserMenu}
                                             aria-haspopup="true"
                                             aria-label="User menu"
@@ -176,12 +173,12 @@ export default function Header() {
                                             <div className="flex flex-col items-start flex-1 min-w-0">
                                                 <span
                                                     title={user.name}
-                                                    className="text-sm font-medium text-white truncate max-w-16 lg:max-w-20 xl:max-w-max"
+                                                    className="text-sm font-medium  truncate max-w-16 lg:max-w-20 xl:max-w-max"
                                                 >
                                                     {user.name}
                                                 </span>
                                                 {user.role === 'ADMIN' && (
-                                                    <span className="text-xs text-purple-400">
+                                                    <span className="text-xs text-highlight">
                                                         Quản trị viên
                                                     </span>
                                                 )}
@@ -222,7 +219,7 @@ export default function Header() {
                             ) : (
                                 <button
                                     onClick={redirectToLoginPage}
-                                    className="underline text-sm text-gray-300 hover:text-purple-300 transition-colors"
+                                    className="underline text-sm hover:text-purple-300 transition-colors"
                                 >
                                     Đăng nhập
                                 </button>
@@ -236,7 +233,7 @@ export default function Header() {
                                     }
                                     className={`${
                                         cartItem[0] ? ' py-1.5' : ' py-3'
-                                    } flex items-center gap-2 bg-lime-400 text-gray-700 font-medium rounded-lg px-3.5
+                                    } flex items-center gap-2 bg-background text-highlight font-medium rounded-lg px-3.5
                                 hover:bg-lime-300 hover:shadow-md hover:scale-[1.02] transition-all`}
                                 >
                                     <div className="animate-bounce">
@@ -269,7 +266,7 @@ export default function Header() {
                                     <Button
                                         variant="outline"
                                         size="icon"
-                                        className="border-gray-700 bg-gray-800 text-white hover:bg-gray-600 hover:text-lime-300"
+                                        className="border-gray-700 bg-gray-800  hover:bg-gray-600 hover:text-lime-300"
                                     >
                                         <Menu className="h-5 w-5" />
                                         <span className="sr-only">
@@ -279,7 +276,7 @@ export default function Header() {
                                 </SheetTrigger>
                                 <SheetContent
                                     side="right"
-                                    className="liquid-glass text-white border-gray-800 p-0 w-72 flex flex-col"
+                                    className="liquid-glass  border-gray-800 p-0 w-72 flex flex-col"
                                 >
                                     <div className="flex items-center gap-1.5 px-4 py-4 border-b border-gray-800">
                                         <Link
@@ -294,7 +291,7 @@ export default function Header() {
                                                 height={25}
                                                 className="h-5 w-5"
                                             />
-                                            <span className="font-semibold tracking-wide text-white">
+                                            <span className="font-semibold tracking-wide">
                                                 TechSpace
                                             </span>
                                         </Link>
@@ -335,7 +332,7 @@ export default function Header() {
                                                             onClick={
                                                                 toggleUserMenu
                                                             }
-                                                            className="flex items-center gap-2 w-full px-2 py-1.5 text-white rounded-lg hover:bg-white/10 transition-colors"
+                                                            className="flex items-center gap-2 w-full px-2 py-1.5  rounded-lg hover:bg-white/10 transition-colors"
                                                             aria-expanded={
                                                                 openUserMenu
                                                             }
@@ -362,7 +359,7 @@ export default function Header() {
                                                                     title={
                                                                         user.name
                                                                     }
-                                                                    className="text-sm font-medium text-white"
+                                                                    className="text-sm font-medium"
                                                                 >
                                                                     {user.name}
                                                                 </span>

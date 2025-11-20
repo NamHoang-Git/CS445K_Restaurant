@@ -33,15 +33,15 @@ const RegistrationSuccessForm: FC = () => {
     }
 
     return (
-        <div className="flex items-center justify-center text-sm text-white font-bold">
+        <div className="flex items-center justify-center text-sm text-foreground font-bold">
             <div className="max-w-xl w-full space-y-8 sm:p-8 py-8 px-6">
                 <div className="text-center">
                     <div className="flex justify-center">
-                        <div className="bg-lime-500 rounded-full p-3">
+                        <div className="bg-green-100 rounded-full p-3">
                             <FaCheckCircle className="h-12 w-12 text-highlight" />
                         </div>
                     </div>
-                    <h2 className="mt-6 text-xl font-extrabold text-lime-300">
+                    <h2 className="mt-6 text-xl font-extrabold text-highlight">
                         Đăng ký thành công!
                     </h2>
                     <div className="grid gap-4">
@@ -51,7 +51,7 @@ const RegistrationSuccessForm: FC = () => {
                         </p>
                         <p>
                             Chúng tôi đã gửi một liên kết xác nhận đến:
-                            <span className="block font-bold mt-1 text-lime-300">
+                            <span className="block font-bold mt-1 text-highlight">
                                 {email}
                             </span>
                         </p>
@@ -59,7 +59,7 @@ const RegistrationSuccessForm: FC = () => {
                             Vui lòng kiểm tra hộp thư đến và nhấp vào liên kết
                             xác nhận để kích hoạt tài khoản của bạn.
                         </p>
-                        <div className="py-5 px-4 liquid-glass rounded-md text-xs text-highlight">
+                        <div className="py-5 px-2 bg-blue-50 liquid-glass-3 rounded-md text-xs text-highlight">
                             <p>Lưu ý:</p>
                             <ul className="mt-1 space-y-2 opacity-80">
                                 <li>
@@ -119,7 +119,10 @@ const RegistrationSuccessForm: FC = () => {
                                     to="/login"
                                     className="flex justify-center items-center gap-2 bg-foreground w-full h-12 font-bold"
                                 >
-                                    <FaArrowRight size={14} className="mb-0.5" />
+                                    <FaArrowRight
+                                        size={14}
+                                        className="mb-0.5"
+                                    />
                                     Đi đến đăng nhập
                                 </Link>
                             </GlareHover>

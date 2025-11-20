@@ -1,5 +1,6 @@
 import { ForgotPasswordForm } from '@/components/forgotPassword/forgot-password-form';
 import { Link } from 'react-router-dom';
+import logo from '@/assets/logo2.png';
 
 export default function ForgotPasswordPage() {
     return (
@@ -9,10 +10,10 @@ export default function ForgotPasswordPage() {
                     <div className="flex justify-center gap-2 md:justify-start mb-2">
                         <Link
                             to="/"
-                            className="flex items-center gap-2 font-bold text-lg text-white"
+                            className="flex items-center gap-2 font-bold text-lg"
                         >
-                            {/* <img src={logo} alt="Logo" width={30} height={30} /> */}
-                            TechSpace
+                            <img src={logo} alt="Logo" width={30} height={30} />
+                            EatEase
                         </Link>
                     </div>
                     <div className="flex flex-1 items-center justify-center">

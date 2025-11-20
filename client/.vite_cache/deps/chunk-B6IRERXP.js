@@ -1,6 +1,6 @@
 import {
   useLayoutEffect2
-} from "./chunk-AEUQ5J2I.js";
+} from "./chunk-D65NI23Z.js";
 import {
   require_jsx_runtime
 } from "./chunk-J3XBGEQK.js";
@@ -99,17 +99,29 @@ function composeContextScopes(...scopes) {
   return createScope;
 }
 
+// node_modules/@radix-ui/react-id/dist/index.mjs
+var React2 = __toESM(require_react(), 1);
+var useReactId = React2[" useId ".trim().toString()] || (() => void 0);
+var count = 0;
+function useId(deterministicId) {
+  const [id, setId] = React2.useState(useReactId());
+  useLayoutEffect2(() => {
+    if (!deterministicId) setId((reactId) => reactId ?? String(count++));
+  }, [deterministicId]);
+  return deterministicId || (id ? `radix-${id}` : "");
+}
+
 // node_modules/@radix-ui/react-use-controllable-state/dist/index.mjs
-var React3 = __toESM(require_react(), 1);
+var React4 = __toESM(require_react(), 1);
 var React22 = __toESM(require_react(), 1);
 
 // node_modules/@radix-ui/react-use-effect-event/dist/index.mjs
-var React2 = __toESM(require_react(), 1);
-var useReactEffectEvent = React2[" useEffectEvent ".trim().toString()];
-var useReactInsertionEffect = React2[" useInsertionEffect ".trim().toString()];
+var React3 = __toESM(require_react(), 1);
+var useReactEffectEvent = React3[" useEffectEvent ".trim().toString()];
+var useReactInsertionEffect = React3[" useInsertionEffect ".trim().toString()];
 
 // node_modules/@radix-ui/react-use-controllable-state/dist/index.mjs
-var useInsertionEffect = React3[" useInsertionEffect ".trim().toString()] || useLayoutEffect2;
+var useInsertionEffect = React4[" useInsertionEffect ".trim().toString()] || useLayoutEffect2;
 function useControllableState({
   prop,
   defaultProp,
@@ -124,8 +136,8 @@ function useControllableState({
   const isControlled = prop !== void 0;
   const value = isControlled ? prop : uncontrolledProp;
   if (true) {
-    const isControlledRef = React3.useRef(prop !== void 0);
-    React3.useEffect(() => {
+    const isControlledRef = React4.useRef(prop !== void 0);
+    React4.useEffect(() => {
       const wasControlled = isControlledRef.current;
       if (wasControlled !== isControlled) {
         const from = wasControlled ? "controlled" : "uncontrolled";
@@ -137,7 +149,7 @@ function useControllableState({
       isControlledRef.current = isControlled;
     }, [isControlled, caller]);
   }
-  const setValue = React3.useCallback(
+  const setValue = React4.useCallback(
     (nextValue) => {
       if (isControlled) {
         const value2 = isFunction(nextValue) ? nextValue(prop) : nextValue;
@@ -156,13 +168,13 @@ function useUncontrolledState({
   defaultProp,
   onChange
 }) {
-  const [value, setValue] = React3.useState(defaultProp);
-  const prevValueRef = React3.useRef(value);
-  const onChangeRef = React3.useRef(onChange);
+  const [value, setValue] = React4.useState(defaultProp);
+  const prevValueRef = React4.useRef(value);
+  const onChangeRef = React4.useRef(onChange);
   useInsertionEffect(() => {
     onChangeRef.current = onChange;
   }, [onChange]);
-  React3.useEffect(() => {
+  React4.useEffect(() => {
     if (prevValueRef.current !== value) {
       onChangeRef.current?.(value);
       prevValueRef.current = value;
@@ -175,23 +187,11 @@ function isFunction(value) {
 }
 var SYNC_STATE = Symbol("RADIX:SYNC_STATE");
 
-// node_modules/@radix-ui/react-id/dist/index.mjs
-var React4 = __toESM(require_react(), 1);
-var useReactId = React4[" useId ".trim().toString()] || (() => void 0);
-var count = 0;
-function useId(deterministicId) {
-  const [id, setId] = React4.useState(useReactId());
-  useLayoutEffect2(() => {
-    if (!deterministicId) setId((reactId) => reactId ?? String(count++));
-  }, [deterministicId]);
-  return deterministicId || (id ? `radix-${id}` : "");
-}
-
 export {
   composeEventHandlers,
   createContext2,
   createContextScope,
-  useControllableState,
-  useId
+  useId,
+  useControllableState
 };
-//# sourceMappingURL=chunk-OMNWOPVK.js.map
+//# sourceMappingURL=chunk-B6IRERXP.js.map

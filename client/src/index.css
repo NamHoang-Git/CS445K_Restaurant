@@ -2,117 +2,20 @@
 @tailwind components;
 @tailwind utilities;
 
-html {
-    scroll-behavior: smooth;
+@keyframes gradient {
+    0% {
+        background-position: 0% 50%;
+    }
+    50% {
+        background-position: 100% 50%;
+    }
+    100% {
+        background-position: 0% 50%;
+    }
 }
 
-body {
-    @apply bg-black scroll-smooth;
-    font-family: 'Bahnschrift', sans-serif;
-    font-weight: 400;
-    font-style: normal;
-}
-
-.vertical-text {
-    writing-mode: vertical-rl;
-}
-
-.no-spinner::-webkit-outer-spin-button,
-.no-spinner::-webkit-inner-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-}
-
-input[type='date']::-webkit-calendar-picker-indicator {
-    position: absolute;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-
-input[type='datetime-local']::-webkit-calendar-picker-indicator {
-    position: absolute;
-    right: 0;
-    width: 100%;
-    height: 100%;
-    opacity: 0;
-    cursor: pointer;
-}
-
-/* Styles */
-.liquid-glass-header {
-    backdrop-filter: blur(20px) saturate(180%);
-    background: #ffffff0f;
-    border: 1px solid #ffffff1a;
-    box-shadow: 0 2px 12px #00000014, inset 0 1px #ffffff26;
-}
-
-.liquid-glass-menu {
-    backdrop-filter: blur(50px) saturate(180%);
-    background: #ffffff0f;
-    border: 1px solid #ffffff1a;
-    box-shadow: 0 2px 12px #00000014, inset 0 1px #ffffff26;
-}
-
-.liquid-glass {
-    backdrop-filter: blur(20px) saturate(180%);
-    background: #ffffff14;
-    border: 1px solid #ffffff1f;
-    box-shadow: 0 4px 16px #0000001a, inset 0 1px #fff3;
-}
-
-.liquid-glass-2 {
-    backdrop-filter: blur(50px) saturate(180%);
-    -webkit-backdrop-filter: blur(50px) saturate(180%);
-    background: rgba(255, 255, 255, 0.2); /* thay vì #ffffff14 */
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
-        inset 0 1px rgba(255, 255, 255, 0.3);
-}
-
-.glass-border {
-    backdrop-filter: blur(20px) saturate(180%);
-    background: #ffffff14;
-    border: 1px solid #ffffff1f;
-    box-shadow: 0 4px 16px #0000001a, inset 0 1px #fff3;
-}
-
-.animate-scroll-right {
-    animation: 45s linear infinite scroll-right;
-}
-
-.animate-scroll-left {
-    animation: 45s linear infinite scroll-left;
-}
-
-/* Firefox */
-.no-spinner {
-    -moz-appearance: textfield;
-}
-
-.scrollbar-hide::-webkit-scrollbar {
-    display: none; /* Chrome, Safari */
-}
-
-.scrollbar-hide {
-    -ms-overflow-style: none; /* IE, Edge */
-    scrollbar-width: none; /* Firefox */
-}
-
-.scrollbarCustom::-webkit-scrollbar {
-    width: 10px;
-    height: 12px;
-    @apply bg-slate-200;
-}
-
-.scrollbarCustom::-webkit-scrollbar-thumb {
-    @apply bg-rose-200 rounded-full;
-}
-
-.border-inset {
-    border-style: inset;
+.animate-gradient {
+    animation: gradient 8s linear infinite;
 }
 
 @custom-variant dark (&:is(.dark *));
@@ -120,6 +23,8 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 @theme inline {
     --color-background: var(--background);
     --color-foreground: var(--foreground);
+    --color-active: var(--active);
+    --color-text: var(--text);
     --color-card: var(--card);
     --color-card-foreground: var(--card-foreground);
     --color-popover: var(--popover);
@@ -161,67 +66,195 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
         @apply border-border outline-ring/50;
     }
     body {
-        @apply text-white;
+        @apply bg-background text-foreground;
     }
     :root {
-        --background: 0 0% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 0 0% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 0 0% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        --secondary: 0 0% 14.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%;
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
+        /* --background: 48 100% 96%; */
+        --background: 0 0% 100%;
+        --base-color: 0 0% 25%;
+        --highlight: 210 100% 35%;
+        --highlight-2: 0 0% 100%;
+        --foreground: 260 10% 20%;
+        --active: 0 0% 89.8%;
+        --card: 0 0% 100%;
+        --card-foreground: 260 10% 20%;
+        --popover: 0 0% 100%;
+        --popover-foreground: 260 10% 20%;
+        --primary: 0 0% 9%;
+        --primary-foreground: 0 0% 98%;
+        --secondary: 0 0% 96.1%;
+        --secondary-foreground: 0 0% 9%;
+        --muted: 0 0% 96.1%;
+        --muted-foreground: 0 0% 45.1%;
+        --accent: 0 0% 96.1%;
+        --accent-foreground: 0 0% 9%;
+        --destructive: 0 84.2% 60.2%;
         --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 14.9%;
-        --input: 0 0% 14.9%;
-        --ring: 0 0% 83.1%;
-        --chart-1: 220 70% 50%;
-        --chart-2: 160 60% 45%;
-        --chart-3: 30 80% 55%;
-        --chart-4: 280 65% 60%;
-        --chart-5: 340 75% 55%;
-        --radius: 0.625rem;
-        --sidebar: oklch(0.985 0 0);
-        --sidebar-foreground: oklch(0.145 0 0);
-        --sidebar-primary: oklch(0.205 0 0);
-        --sidebar-primary-foreground: oklch(0.985 0 0);
-        --sidebar-accent: oklch(0.97 0 0);
-        --sidebar-accent-foreground: oklch(0.205 0 0);
-        --sidebar-border: oklch(0.922 0 0);
-        --sidebar-ring: oklch(0.708 0 0);
+        --border: 0 0% 45.1%;
+        --input: 0 0% 89.8%;
+        --ring: 0 0% 3.9%;
+        --chart-1: 12 76% 61%;
+        --chart-2: 173 58% 39%;
+        --chart-3: 197 37% 24%;
+        --chart-4: 43 74% 66%;
+        --chart-5: 27 87% 67%;
+        --radius: 0.5rem;
+
+        --ether-1: #7cc5fc;
+        --ether-2: #85daf9;
+        --ether-3: #b7cadb;
     }
     .dark {
-        --background: 0 0% 3.9%;
-        --foreground: 0 0% 98%;
-        --card: 0 0% 3.9%;
-        --card-foreground: 0 0% 98%;
-        --popover: 0 0% 3.9%;
-        --popover-foreground: 0 0% 98%;
-        --primary: 0 0% 98%;
-        --primary-foreground: 0 0% 9%;
-        --secondary: 0 0% 14.9%;
-        --secondary-foreground: 0 0% 98%;
-        --muted: 0 0% 14.9%;
-        --muted-foreground: 0 0% 63.9%;
-        --accent: 0 0% 14.9%;
-        --accent-foreground: 0 0% 98%;
-        --destructive: 0 62.8% 30.6%;
-        --destructive-foreground: 0 0% 98%;
-        --border: 0 0% 14.9%;
+        --background: 224 71% 4%;
+        --base-color: 0 0% 100%;
+        --highlight: 84 81% 68%;
+        --highlight-2: 84 81% 68%;
+
+        --foreground: 213 31% 91%;
+        --active: 0 0% 14.9%;
+        --card: 224 71% 4%;
+        --card-foreground: 213 31% 91%;
+
+        --popover: 224 71% 4%;
+        --popover-foreground: 215 20.2% 65.1%;
+
+        --primary: 210 40% 98%;
+        --primary-foreground: 222.2 47.4% 1.2%;
+
+        --secondary: 222.2 47.4% 11.2%;
+        --secondary-foreground: 210 40% 98%;
+
+        --muted: 223 47% 11%;
+        --muted-foreground: 215.4 16.3% 56.9%;
+
+        --accent: 216 34% 17%;
+        --accent-foreground: 210 40% 98%;
+
+        --destructive: 0 63% 31%;
+        --destructive-foreground: 210 40% 98%;
+
+        --border: 217 19% 27%;
         --input: 0 0% 14.9%;
-        --ring: 0 0% 83.1%;
+
+        --ring: 216 34% 17%;
+
         --chart-1: 220 70% 50%;
         --chart-2: 160 60% 45%;
         --chart-3: 30 80% 55%;
         --chart-4: 280 65% 60%;
         --chart-5: 340 75% 55%;
+
+        --ether-1: #cbb3a7;
+        --ether-2: #a6b1e1;
+        --ether-3: #b7cadb;
     }
+}
+
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    @apply scroll-smooth;
+    font-family: 'Bahnschrift', sans-serif;
+    font-weight: 400;
+    font-style: normal;
+}
+
+.text-gradient {
+    background: linear-gradient(
+        120deg,
+        #78350f 0%,
+        #b45309 20%,
+        #fbbf24 40%,
+        #fffbeb 60%,
+        #ffd6a5 80%,
+        #ffead0 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-sunrise {
+    background: linear-gradient(
+        100deg,
+        #78350f 0%,
+        #b45309 25%,
+        #fbbf24 50%,
+        #ffead0 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.text-gradient-soft {
+    background: linear-gradient(
+        120deg,
+        #fff7ed 0%,
+        #ffead0 40%,
+        #ffd6a5 70%,
+        #fffbeb 100%
+    );
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.vertical-text {
+    writing-mode: vertical-rl;
+}
+
+.no-spinner::-webkit-outer-spin-button,
+.no-spinner::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+/* Styles */
+.liquid-glass-header {
+    backdrop-filter: blur(20px) saturate(200%);
+    background: rgba(15, 82, 120, 0.65);
+    border: 1px solid #ffffff1a;
+    box-shadow: 0 2px 12px #00000014, inset 0 1px #ffffff26;
+}
+
+.liquid-glass-menu {
+    backdrop-filter: blur(50px) saturate(180%);
+    background: #ffffff0f;
+    border: 1px solid #ffffff1a;
+    box-shadow: 0 2px 12px #00000014, inset 0 1px #ffffff26;
+}
+
+.liquid-glass {
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(60, 60, 60, 0.15);
+    border: 1px solid #ffffff1f;
+    box-shadow: 0 4px 16px #0000001a, inset 0 1px #fff3;
+}
+
+.liquid-glass-2 {
+    backdrop-filter: blur(50px) saturate(180%);
+    -webkit-backdrop-filter: blur(50px) saturate(180%);
+    background: rgba(32, 32, 32, 0.2);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1),
+        inset 0 1px rgba(255, 255, 255, 0.3);
+}
+
+.glass-border {
+    backdrop-filter: blur(20px) saturate(180%);
+    background: #ffffff14;
+    border: 1px solid #ffffff1f;
+    box-shadow: 0 4px 16px #0000001a, inset 0 1px #fff3;
+}
+
+.animate-scroll-right {
+    animation: 45s linear infinite scroll-right;
+}
+
+.animate-scroll-left {
+    animation: 45s linear infinite scroll-left;
+}
+
+.no-spinner {
+    -moz-appearance: textfield;
 }

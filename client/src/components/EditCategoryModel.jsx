@@ -19,11 +19,12 @@ import Divider from './Divider';
 import GlareHover from './GlareHover';
 import Loading from './Loading';
 
-const EditCategory = ({ close, fetchData, data: CategoryData }) => {
+const EditCategoryModel = ({ close, fetchData, data: CategoryData }) => {
     const [data, setData] = useState({
         _id: CategoryData._id,
         name: CategoryData.name,
         image: CategoryData.image,
+        description: CategoryData.description,
     });
 
     const [loading, setLoading] = useState(false);
@@ -144,6 +145,20 @@ const EditCategory = ({ close, fetchData, data: CategoryData }) => {
                             />
                         </div>
 
+                        {/* Description */}
+                        <div className="space-y-2">
+                            <Label htmlFor="description">Mô tả</Label>
+                            <Input
+                                type="text"
+                                id="description"
+                                name="description"
+                                value={data.description}
+                                onChange={handleOnChange}
+                                className="text-sm h-12"
+                                placeholder="Nhập mô tả"
+                            />
+                        </div>
+
                         {/* Image Upload */}
                         <div className="space-y-2">
                             <Label htmlFor="image">
@@ -244,4 +259,4 @@ const EditCategory = ({ close, fetchData, data: CategoryData }) => {
     );
 };
 
-export default EditCategory;
+export default EditCategoryModel;

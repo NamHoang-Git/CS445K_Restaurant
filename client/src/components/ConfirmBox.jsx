@@ -25,15 +25,15 @@ const ConfirmBox = ({
         >
             <Card
                 onClick={(e) => e.stopPropagation()}
-                className="py-6 w-full max-w-md mx-auto rounded-md shadow-md grid gap-4 border-foreground liquid-glass"
+                className="py-6 w-full max-w-md mx-auto rounded-md shadow-md grid gap-4 border-foreground"
             >
                 <CardHeader className="flex justify-between items-center gap-4">
-                    <CardTitle className="font-semibold sm:text-lg text-base text-secondary-200">
+                    <CardTitle className="font-semibold sm:text-lg text-base text-highlight">
                         {title}
                     </CardTitle>
                     <Button
                         onClick={close}
-                        className="bg-transparent hover:bg-transparent text-lime-300
+                        className="bg-transparent hover:bg-transparent text-foreground
                         hover:text-highlight"
                     >
                         <IoClose />
@@ -62,7 +62,7 @@ const ConfirmBox = ({
                                         }
                                     }}
                                     disabled={cancelLoading}
-                                    className="bg-white/40 hover:bg-white/50 text-white"
+                                    className="px-6 bg-baseColor hover:bg-baseColor_2"
                                 >
                                     {confirmLoading ? <Loading /> : confirmText}
                                 </Button>

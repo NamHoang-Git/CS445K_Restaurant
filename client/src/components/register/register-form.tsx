@@ -22,6 +22,7 @@ export function RegisterForm({
     const [data, setData] = useState({
         name: '',
         email: '',
+        mobile: '',
         password: '',
         confirmPassword: '',
     });
@@ -30,23 +31,6 @@ export function RegisterForm({
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
-
-    // const handleKeyDown = (e) => {
-    //     if (e.key === 'Enter') {
-    //         e.preventDefault();
-    //         const form = e.target.form;
-    //         const focusable = Array.from(form.elements).filter(
-    //             (el) =>
-    //                 el.tagName === 'INPUT' ||
-    //                 el.tagName === 'SELECT' ||
-    //                 el.tagName === 'TEXTAREA'
-    //         );
-    //         const index = focusable.indexOf(e.target);
-    //         if (index > -1 && index < focusable.length - 1) {
-    //             focusable[index + 1].focus();
-    //         }
-    //     }
-    // };
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -98,10 +82,23 @@ export function RegisterForm({
         return true;
     };
 
+    const validateMobile = (mobile) => {
+        // Vietnamese phone number validation
+        // Starts with 0, followed by 9 or 1-9, then 8 more digits (total 10 digits)
+        const mobileRegex = /^(0[1-9]|0[1-9][0-9]{8})$/;
+        if (!mobile) {
+            return false;
+        }
+        if (!mobileRegex.test(mobile)) {
+            return false;
+        }
+        return true;
+    };
+
     const handleSubmit = async (e) => {
         e.preventDefault();
 
-        if (!data.name && !data.email && !data.password) {
+        if (!data.name && !data.email && !data.mobile && !data.password) {
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
         }
@@ -111,6 +108,14 @@ export function RegisterForm({
             return;
         } else if (!validateEmail(data.email)) {
             toast.error('Vui lòng nhập địa chỉ email hợp lệ');
+            return;
+        }
+
+        if (!data.mobile) {
+            toast.error('Vui lòng nhập đầy đủ thông tin.');
+            return;
+        } else if (!validateMobile(data.mobile)) {
+            toast.error('Số điện thoại không hợp lệ');
             return;
         }
 
@@ -158,7 +163,10 @@ export function RegisterForm({
 
     return (
         <form
-            className={cn('flex flex-col gap-6 text-white', className)}
+            className={cn(
+                'flex flex-col gap-6 font-bold text-foreground',
+                className
+            )}
             {...props}
             onSubmit={handleSubmit}
         >
@@ -179,7 +187,7 @@ export function RegisterForm({
                         placeholder="Nhập tên của bạn"
                         onChange={handleChange}
                         value={data.name}
-                        className="h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="h-12 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                     />
                 </div>
                 <div className="grid gap-2">
@@ -188,11 +196,22 @@ export function RegisterForm({
                         id="email"
                         type="email"
                         name="email"
-                        autoFocus
                         placeholder="m@example.com"
                         onChange={handleChange}
                         value={data.email}
-                        className="h-12 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="h-12 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="mobile">Số điện thoại</Label>
+                    <Input
+                        id="mobile"
+                        type="tel"
+                        name="mobile"
+                        placeholder="Nhập số điện thoại của bạn"
+                        onChange={handleChange}
+                        value={data.mobile}
+                        className="h-12 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                     />
                 </div>
                 <div className="grid gap-2">
@@ -205,7 +224,7 @@ export function RegisterForm({
                             placeholder="Nhập mật khẩu"
                             onChange={handleChange}
                             value={data.password}
-                            className="h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                            className="h-12 pr-10 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                         />
                         <Button
                             type="button"
@@ -215,9 +234,9 @@ export function RegisterForm({
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                <EyeOff className="h-4 w-4" />
                             ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                <Eye className="h-4 w-4" />
                             )}
                         </Button>
                     </div>
@@ -232,7 +251,7 @@ export function RegisterForm({
                             placeholder="Nhập lại mật khẩu để xác nhận"
                             onChange={handleChange}
                             value={data.confirmPassword}
-                            className="h-12 pr-10 border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                            className="h-12 pr-10 border-muted-foreground border-2 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
                         />
                         <Button
                             type="button"
@@ -244,16 +263,16 @@ export function RegisterForm({
                             }
                         >
                             {showConfirmPassword ? (
-                                <EyeOff className="h-4 w-4 text-muted-foreground" />
+                                <EyeOff className="h-4 w-4" />
                             ) : (
-                                <Eye className="h-4 w-4 text-muted-foreground" />
+                                <Eye className="h-4 w-4" />
                             )}
                         </Button>
                     </div>
                 </div>
 
                 <GlareHover
-                    glareColor="#d8b4fe"
+                    background="transparent"
                     glareOpacity={0.3}
                     glareAngle={-30}
                     glareSize={300}
@@ -262,43 +281,34 @@ export function RegisterForm({
                 >
                     <Button
                         type="submit"
-                        className="w-full h-12 text-sm font-medium text-white hover:opacity-90 rounded-lg shadow-none cursor-pointer"
-                        style={{ backgroundColor: '#000' }}
+                        className="bg-foreground w-full h-12 font-bold"
                     >
                         {loading ? <Loading /> : 'Đăng ký'}
                     </Button>
                 </GlareHover>
-
                 <>
-                    <div className="relative">
-                        <div className="relative text-center text-sm uppercase flex items-center justify-between px-1.5">
-                            <div
-                                className="relative after:absolute after:inset-0 after:top-1/2 after:left-0 after:z-0 after:flex after:items-end
-                        after:border-t after:border-border w-16 md:w-28 xl:w-56"
-                            ></div>
-                            <span className="relative z-10 px-2 text-muted-foreground">
-                                Hoặc đăng ký bằng
-                            </span>
-                            <div
-                                className="relative after:absolute after:inset-0 after:top-1/2 after:right-0 after:z-0 after:flex after:items-start
-                        after:border-t after:border-border w-16 md:w-28 xl:w-56"
-                            ></div>
-                        </div>
+                    <div
+                        className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center
+                    after:border-t after:border-foreground"
+                    >
+                        <span className="relative z-10 bg-background px-2 py-1 rounded-md text-foreground uppercase">
+                            Hoặc đăng ký với
+                        </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-highlight">
+                    <div className="grid grid-cols-2 gap-4 text-foreground">
                         <Button
                             variant="outline"
-                            className="flex items-center gap-2 h-12 border-gray-200 liquid-glass rounded-lg
-                                            shadow-none cursor-pointer"
+                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
+                        shadow-none cursor-pointer"
                         >
                             <FaGoogle className="mb-1" />
                             Google
                         </Button>
                         <Button
                             variant="outline"
-                            className="flex items-center gap-2 h-12 border-gray-200 liquid-glass rounded-lg
-                                            shadow-none cursor-pointer"
+                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
+                        shadow-none cursor-pointer"
                         >
                             <FaFacebookSquare className="mb-1" />
                             Facebook
@@ -306,11 +316,11 @@ export function RegisterForm({
                     </div>
                 </>
             </div>
-            <div className="text-center text-sm text-muted-foreground">
+            <div className="text-center text-sm">
                 Bạn đã có tài khoản?{' '}
                 <Link
                     to={'/login'}
-                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-lime-300"
+                    className="p-0 h-auto text-sm hover:text-opacity-80 font-medium cursor-pointer text-highlight"
                 >
                     Đăng nhập.
                 </Link>

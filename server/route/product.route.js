@@ -4,25 +4,21 @@ import { admin } from '../middleware/Admin.js'
 import {
     addProductController,
     deleteProductDetails,
-    getProductByCategoryHome,
-    getProductByCategoryList,
+    getProductByCategory,
+    getProductByCategoryAndSubCategory,
     getProductController,
     getProductDetails,
     searchProduct,
-    updateProductDetails,
-    getInitialProducts
+    updateProductDetails
 } from "../controllers/product.controller.js";
 
 const productRouter = Router()
 
 productRouter.post('/add-product', auth, admin, addProductController)
 productRouter.post('/get-product', getProductController)
-productRouter.post('/get-product-by-category-home', getProductByCategoryHome)
-productRouter.post('/get-product-by-category-list', getProductByCategoryList)
+productRouter.post('/get-product-by-category', getProductByCategory)
+productRouter.post('/get-product-by-category-and-subcategory', getProductByCategoryAndSubCategory)
 productRouter.post('/get-product-details', getProductDetails)
-
-// Initial products for homepage
-productRouter.post('/initial-products', getInitialProducts)
 
 //update product
 productRouter.put('/update-product-details', auth, admin, updateProductDetails)

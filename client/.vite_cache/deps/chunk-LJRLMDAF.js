@@ -15,13 +15,7 @@ function useCallbackRef(callback) {
   return React.useMemo(() => (...args) => callbackRef.current?.(...args), []);
 }
 
-// node_modules/@radix-ui/react-use-layout-effect/dist/index.mjs
-var React2 = __toESM(require_react(), 1);
-var useLayoutEffect2 = globalThis?.document ? React2.useLayoutEffect : () => {
-};
-
 export {
-  useCallbackRef,
-  useLayoutEffect2
+  useCallbackRef
 };
-//# sourceMappingURL=chunk-AEUQ5J2I.js.map
+//# sourceMappingURL=chunk-LJRLMDAF.js.map
