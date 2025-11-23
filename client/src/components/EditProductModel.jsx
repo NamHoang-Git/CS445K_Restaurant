@@ -24,6 +24,13 @@ import Divider from './Divider';
 import GlareHover from './GlareHover';
 import Loading from './Loading';
 import { Textarea } from './ui/textarea';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from './ui/select';
 
 const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
     const [openAddField, setOpenAddField] = useState(false);
@@ -39,6 +46,9 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
         discount: propsData.discount || '',
         description: propsData.description || '',
         more_details: propsData.more_details || {},
+        status: propsData.status || 'available',
+        preparationTime: propsData.preparationTime || 15,
+        isFeatured: propsData.isFeatured || false,
     });
 
     const [loading, setLoading] = useState(false);
@@ -122,9 +132,29 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
     const allCategory = useSelector((state) => state.product.allCategory);
 
     const handleRemoveCategorySelected = (categoryId) => {
+        const updatedCategories = data.category.filter(
+            (el) => el._id !== categoryId
+        );
+
+        // Tự động xóa các subcategory không còn thuộc về category nào đã chọn
+        const updatedSubCategories = data.subCategory.filter((subCat) => {
+            // Kiểm tra xem subcategory có thuộc về ít nhất 1 category còn lại không
+            return (
+                subCat.category &&
+                Array.isArray(subCat.category) &&
+                subCat.category.some((subCatCategory) =>
+                    updatedCategories.some(
+                        (selectedCategory) =>
+                            selectedCategory._id === subCatCategory._id
+                    )
+                )
+            );
+        });
+
         setData((prev) => ({
             ...prev,
-            category: prev.category.filter((el) => el._id !== categoryId),
+            category: updatedCategories,
+            subCategory: updatedSubCategories,
         }));
     };
 
@@ -372,42 +402,36 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                             )}
 
                             {/* Category Selector */}
-                            <div className="relative">
-                                <select
-                                    className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
-                                            px-3 py-1 rounded-md"
-                                    value={selectCategoryValue}
-                                    onChange={(e) => {
-                                        const value = e.target.value;
-                                        if (!value) return;
+                            <Select
+                                value={selectCategoryValue}
+                                onValueChange={(value) => {
+                                    if (!value) return;
 
-                                        const categoryDetails =
-                                            allCategory.find(
-                                                (el) => el._id === value
-                                            );
+                                    const categoryDetails = allCategory.find(
+                                        (el) => el._id === value
+                                    );
 
-                                        // Check for duplicates
-                                        const alreadySelected =
-                                            data.category.some(
-                                                (cate) => cate._id === value
-                                            );
+                                    // Check for duplicates
+                                    const alreadySelected = data.category.some(
+                                        (cate) => cate._id === value
+                                    );
 
-                                        if (
-                                            !alreadySelected &&
-                                            categoryDetails
-                                        ) {
-                                            setData((prev) => ({
-                                                ...prev,
-                                                category: [
-                                                    ...prev.category,
-                                                    categoryDetails,
-                                                ],
-                                            }));
-                                            setSelectCategoryValue('');
-                                        }
-                                    }}
-                                >
-                                    <option value="">Chọn danh mục</option>
+                                    if (!alreadySelected && categoryDetails) {
+                                        setData((prev) => ({
+                                            ...prev,
+                                            category: [
+                                                ...prev.category,
+                                                categoryDetails,
+                                            ],
+                                        }));
+                                        setSelectCategoryValue('');
+                                    }
+                                }}
+                            >
+                                <SelectTrigger className="w-full h-12">
+                                    <SelectValue placeholder="Chọn danh mục" />
+                                </SelectTrigger>
+                                <SelectContent>
                                     {allCategory
                                         .filter(
                                             (cat) =>
@@ -417,110 +441,133 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                                                 )
                                         )
                                         .map((category) => (
-                                            <option
+                                            <SelectItem
                                                 key={category._id}
                                                 value={category._id}
                                             >
                                                 {category.name}
-                                            </option>
+                                            </SelectItem>
                                         ))}
-                                </select>
-                                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                    <svg
-                                        className="fill-current h-4 w-4"
-                                        xmlns="http://www.w3.org/2000/svg"
-                                        viewBox="0 0 20 20"
-                                    >
-                                        <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-                                    </svg>
-                                </div>
-                            </div>
+                                </SelectContent>
+                            </Select>
                         </div>
 
-                        {/* SubCategory Selection */}
-                        <div className="grid gap-2">
-                            <label className="font-semibold">
-                                Sub Category
-                            </label>
+                        {/* Sub Category Selection */}
+                        <div className="space-y-2">
+                            <Label htmlFor="subCategory">Danh mục phụ</Label>
 
-                            {/* Display Value */}
-                            <div
-                                className={`${
-                                    data.subCategory[0] ? 'flex' : 'hidden'
-                                } gap-4 flex-wrap`}
-                            >
-                                {data.subCategory.map((subCate) => {
-                                    return (
+                            {/* Selected SubCategories */}
+                            {data.subCategory.length > 0 && (
+                                <div className="flex flex-wrap gap-2 mb-2">
+                                    {data.subCategory.map((subCate) => (
                                         <span
-                                            key={subCate._id + 'subCategory'}
-                                            className="bg-slate-200 shadow-md px-2 mx-1 flex items-center gap-2"
+                                            key={subCate._id}
+                                            className="inline-flex items-center gap-2 bg-rose-600/90 text-white sm:text-sm text-xs px-3 py-1 rounded-full"
                                         >
                                             {subCate.name}
-                                            <div
+                                            <button
+                                                type="button"
                                                 onClick={() =>
                                                     handleRemoveSubCategorySelected(
                                                         subCate._id
                                                     )
                                                 }
-                                                className="cursor-pointer hover:text-red-600"
+                                                className="hover:opacity-80 mb-[1.5px]"
                                             >
-                                                <IoClose size={18} />
-                                            </div>
+                                                <IoClose size={16} />
+                                            </button>
                                         </span>
-                                    );
-                                })}
-                            </div>
+                                    ))}
+                                </div>
+                            )}
 
-                            {/* Select Category */}
-                            <select
-                                className={`${
-                                    data.subCategory[0] ? 'mt-1' : 'mt-0'
-                                } bg-blue-50 p-2 border rounded outline-none focus-within:border-primary-200`}
-                                value={selectSubCategoryValue}
-                                onChange={(e) => {
-                                    const value = e.target.value;
+                            {/* SubCategory Selector */}
+                            {data.category.length > 0 ? (
+                                <Select
+                                    value={selectSubCategoryValue}
+                                    onValueChange={(value) => {
+                                        if (!value) return;
 
-                                    if (!value) return;
-                                    const subCategoryDetails =
-                                        allSubCategory.find(
-                                            (el) => el._id == value
-                                        );
+                                        const subCategoryDetails =
+                                            allSubCategory.find(
+                                                (el) => el._id === value
+                                            );
 
-                                    // Kiểm tra trùng lặp
-                                    const alreadySelected =
-                                        data.subCategory.some(
-                                            (subCate) => subCate._id === value
-                                        );
+                                        // Check for duplicates
+                                        const alreadySelected =
+                                            data.subCategory.some(
+                                                (subCate) =>
+                                                    subCate._id === value
+                                            );
 
-                                    if (alreadySelected) {
-                                        return;
-                                    }
+                                        if (
+                                            !alreadySelected &&
+                                            subCategoryDetails
+                                        ) {
+                                            setData((prev) => ({
+                                                ...prev,
+                                                subCategory: [
+                                                    ...prev.subCategory,
+                                                    subCategoryDetails,
+                                                ],
+                                            }));
+                                            setSelectSubCategoryValue('');
+                                        }
+                                    }}
+                                >
+                                    <SelectTrigger className="w-full h-12">
+                                        <SelectValue placeholder="Chọn danh mục phụ" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        {allSubCategory
+                                            .filter((subCat) => {
+                                                // Lọc subcategory đã được chọn
+                                                const notSelected =
+                                                    !data.subCategory.some(
+                                                        (selected) =>
+                                                            selected._id ===
+                                                            subCat._id
+                                                    );
 
-                                    setData((prev) => {
-                                        return {
-                                            ...prev,
-                                            subCategory: [
-                                                ...prev.subCategory,
-                                                subCategoryDetails,
-                                            ],
-                                        };
-                                    });
+                                                // Lọc subcategory thuộc về các category đã chọn
+                                                const belongsToSelectedCategory =
+                                                    subCat.category &&
+                                                    Array.isArray(
+                                                        subCat.category
+                                                    ) &&
+                                                    subCat.category.some(
+                                                        (subCatCategory) =>
+                                                            data.category.some(
+                                                                (
+                                                                    selectedCategory
+                                                                ) =>
+                                                                    selectedCategory._id ===
+                                                                    subCatCategory._id
+                                                            )
+                                                    );
 
-                                    setSelectSubCategoryValue('');
-                                }}
-                            >
-                                <option value={''}>Select Category</option>
-                                {allSubCategory.map((subCategory) => {
-                                    return (
-                                        <option
-                                            value={subCategory?._id}
-                                            key={subCategory._id + 'product'}
-                                        >
-                                            {subCategory?.name}
-                                        </option>
-                                    );
-                                })}
-                            </select>
+                                                return (
+                                                    notSelected &&
+                                                    belongsToSelectedCategory
+                                                );
+                                            })
+                                            .map((subCategory) => (
+                                                <SelectItem
+                                                    key={subCategory._id}
+                                                    value={subCategory._id}
+                                                >
+                                                    {subCategory.name}
+                                                </SelectItem>
+                                            ))}
+                                    </SelectContent>
+                                </Select>
+                            ) : (
+                                <div className="w-full h-12 flex items-center justify-center border border-dashed border-gray-300 rounded-md bg-gray-50/50">
+                                    <p className="text-sm text-muted-foreground">
+                                        Vui lòng chọn danh mục trước
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Unit */}
@@ -613,6 +660,80 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                                 spellCheck={false}
                                 onKeyDown={handleKeyDown}
                             />
+                        </div>
+
+                        {/* Status - Trạng thái món */}
+                        <div className="space-y-2">
+                            <Label htmlFor="status">
+                                Trạng thái món{' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
+                            <Select
+                                value={data.status}
+                                onValueChange={(value) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        status: value,
+                                    }))
+                                }
+                            >
+                                <SelectTrigger className="w-full h-12">
+                                    <SelectValue placeholder="Chọn trạng thái" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="available">
+                                        Có sẵn
+                                    </SelectItem>
+                                    <SelectItem value="out_of_stock">
+                                        Hết hàng
+                                    </SelectItem>
+                                    <SelectItem value="seasonal">
+                                        Theo mùa
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        {/* Preparation Time */}
+                        <div className="space-y-2">
+                            <Label htmlFor="preparationTime">
+                                Thời gian chuẩn bị (phút){' '}
+                                <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                type="number"
+                                id="preparationTime"
+                                name="preparationTime"
+                                min="0"
+                                value={data.preparationTime || ''}
+                                onChange={handleOnChange}
+                                className="text-sm h-12 no-spinner"
+                                placeholder="Nhập thời gian chuẩn bị (phút)"
+                                required
+                                onKeyDown={handleKeyDown}
+                            />
+                        </div>
+
+                        {/* Is Featured */}
+                        <div className="flex items-center space-x-2">
+                            <input
+                                type="checkbox"
+                                id="isFeatured"
+                                checked={data.isFeatured}
+                                onChange={(e) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        isFeatured: e.target.checked,
+                                    }))
+                                }
+                                className="w-4 h-4 text-rose-600 bg-gray-100 border-gray-300 rounded focus:ring-rose-500"
+                            />
+                            <Label
+                                htmlFor="isFeatured"
+                                className="text-sm font-medium cursor-pointer"
+                            >
+                                Món nổi bật/đặc biệt
+                            </Label>
                         </div>
 
                         {/* Additional Fields */}

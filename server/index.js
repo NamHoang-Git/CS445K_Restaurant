@@ -15,6 +15,8 @@ import cartRouter from "./route/cart.route.js";
 import addressRouter from "./route/address.route.js";
 import orderRouter from './route/order.route.js';
 import voucherRouter from './route/voucher.route.js';
+import tableRouter from './route/table.route.js';
+import bookingRouter from './route/booking.route.js';
 
 const app = express();
 
@@ -74,6 +76,8 @@ app.use('/api/address', addressRouter);
 app.use('/api/order', orderRouter);
 app.use('/api/stripe', orderRouter);
 app.use('/api/voucher', voucherRouter);
+app.use('/api/table', tableRouter);
+app.use('/api/booking', bookingRouter);
 
 connectDB().then(() => {
     app.listen(PORT, () => {

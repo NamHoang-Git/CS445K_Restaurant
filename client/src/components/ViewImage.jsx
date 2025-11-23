@@ -63,7 +63,7 @@ const ViewImage = ({ url, close }) => {
                 }`}
                 onClick={(e) => e.stopPropagation()}
             >
-                <div className="absolute top-2 right-2 flex gap-2 z-10 text-lime-300">
+                <div className="absolute top-2 right-2 flex gap-2 z-10 text-highlight_2">
                     <button
                         onClick={(e) => {
                             e.stopPropagation();
@@ -138,7 +138,7 @@ const ViewImage = ({ url, close }) => {
                 </div>
 
                 {!isLoading && !hasError && (
-                    <div className="absolute bottom-4 left-0 right-0 font-bold text-center text-sm text-rose-600">
+                    <div className="absolute bottom-4 left-0 right-0 font-bold text-center text-sm text-highlight_2">
                         {imageSize.width} × {imageSize.height}px
                     </div>
                 )}

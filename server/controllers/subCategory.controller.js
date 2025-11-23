@@ -6,7 +6,7 @@ export const addSubCategoryController = async (req, res) => {
 
         if (!name || !image || !category[0]) {
             return res.status(400).json({
-                message: "Enter required fields",
+                message: "Vui lòng điền đầy đủ các trường bắt buộc.",
                 error: true,
                 success: false
             })
@@ -22,14 +22,14 @@ export const addSubCategoryController = async (req, res) => {
 
         if (!saveCategory) {
             return res.status(500).json({
-                message: "Not created",
+                message: "Không tạo được",
                 error: true,
                 success: false
             })
         }
 
         return res.json({
-            message: "Add sub category successfully",
+            message: "Thêm danh mục phụ thành công",
             data: saveCategory,
             error: false,
             success: true
@@ -49,7 +49,7 @@ export const getSubCategoryController = async (req, res) => {
         const data = await SubCategoryModel.find().sort({ createdAt: -1 }).populate('category')
 
         return res.json({
-            message: 'Sub Category Data',
+            message: 'Danh mục phụ Data',
             data: data,
             error: false,
             success: true
@@ -72,7 +72,7 @@ export const updateSubCategoryController = async (req, res) => {
 
         if (!check) {
             return res.status(400).json({
-                message: 'Check your _id',
+                message: 'Không tìm thấy _id',
                 error: true,
                 success: false
             })
@@ -85,7 +85,7 @@ export const updateSubCategoryController = async (req, res) => {
         );
 
         return res.json({
-            message: 'Update Sub Category Successfully',
+            message: 'Cập nhật danh mục phụ thành công',
             error: false,
             success: true,
             data: update
@@ -107,7 +107,7 @@ export const deleteSubCategoryController = async (req, res) => {
         const deleteSubCategory = await SubCategoryModel.findByIdAndDelete(_id)
 
         return res.json({
-            message: 'Delete category successfully',
+            message: 'Xóa danh mục phụ thành công',
             data: deleteSubCategory,
             error: false,
             success: true

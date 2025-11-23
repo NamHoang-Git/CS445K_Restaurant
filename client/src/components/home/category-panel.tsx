@@ -200,7 +200,7 @@ function PhoneCard({
             onMouseLeave={() => setIsHovered(false)}
             className="relative rounded-[28px] p-[2px] transition-all duration-700 ease-out"
         >
-            <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black group">
+            <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-white group">
                 <img
                     src={imageSrc}
                     alt={title}
@@ -208,16 +208,16 @@ function PhoneCard({
                     loading="lazy"
                 />
                 <div
-                    className={`absolute rounded-2xl inset-0 bg-gradient-to-b from-black/75 to-black/5 transition-all duration-500 ${
+                    className={`absolute rounded-2xl inset-0 bg-gradient-to-b from-white/10 to-white/5 transition-all duration-500 ${
                         isHovered
-                            ? 'border-4 border-highlight/70 bg-gradient-to-b from-black/5 to-cyan-500/30 transition-opacity duration-500 shadow-[0_0_25px_rgba(132,204,22,0.45)]'
+                            ? 'border-4 border-highlight/70 bg-gradient-to-b from-black/50 to-cyan-500/30 transition-opacity duration-500 shadow-[0_0_25px_rgba(132,204,22,0.45)]'
                             : 'border border-transparent'
                     }`}
                 />
             </div>
             <div className="absolute inset-0 flex flex-col justify-start p-6">
                 <h3 className="text-xl font-bold text-highlight">{title}</h3>
-                <p className="text-sm font-semibold text-white">{sub}</p>
+                <p className="text-sm font-semibold text-rose-400">{sub}</p>
             </div>
         </div>
     );

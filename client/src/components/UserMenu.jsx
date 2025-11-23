@@ -114,11 +114,11 @@ const UserMenu = ({ close }) => {
                         <img
                             src={user?.avatar || defaultAvatar}
                             alt={user?.name}
-                            className="w-full p-0.5 rounded-full object-cover border-2 border-red-600"
+                            className="w-16 h-16 p-0.5 rounded-full object-cover border-2 border-red-600"
                         />
                         {user.role === 'ADMIN' && (
                             <span
-                                className="absolute -bottom-1 -right-1 bg-rose-600 text-white text-xs font-medium
+                                className="absolute -bottom-1 bg-rose-600 text-white text-xs font-medium
                                         px-2.5 py-0.5 rounded-full"
                             >
                                 Quản trị
@@ -186,7 +186,7 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Danh mục
+                            Quản Lý Danh Mục
                         </span>
                     </Link>
                 )}
@@ -202,7 +202,7 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Danh mục phụ
+                            Quản Lý Danh Mục Phụ
                         </span>
                     </Link>
                 )}
@@ -218,7 +218,39 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Sản phẩm
+                            Quản Lý Sản Phẩm
+                        </span>
+                    </Link>
+                )}
+
+                {isAdmin(user.role) && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/table'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/table')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Quản lý Bàn Ăn
+                        </span>
+                    </Link>
+                )}
+
+                {isAdmin(user.role) && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/booking'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/booking')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Quản lý Danh Sách Đặt Bàn
                         </span>
                     </Link>
                 )}
@@ -234,7 +266,7 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Đơn hàng
+                            Quản lý Danh Sách Hóa Đơn
                         </span>
                     </Link>
                 )}
@@ -250,7 +282,7 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Báo cáo
+                            Báo Cáo Thống Kê
                         </span>
                     </Link>
                 )}
@@ -266,7 +298,7 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Mã giảm giá
+                            Quản Lý Mã Giảm Giá
                         </span>
                     </Link>
                 )}

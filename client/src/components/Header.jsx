@@ -11,6 +11,7 @@ import {
     FaCaretUp,
     FaHome,
     FaSearch,
+    FaCalendarAlt,
 } from 'react-icons/fa';
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
@@ -43,6 +44,11 @@ export default function Header() {
                 : '/products',
             icon: <FaBoxOpen size={14} className="" />,
             label: 'Sản phẩm',
+        },
+        {
+            href: '/booking',
+            icon: <FaCalendarAlt size={14} className="" />,
+            label: 'Đặt bàn',
         },
     ];
 
@@ -158,7 +164,7 @@ export default function Header() {
                                             aria-label="User menu"
                                             type="button"
                                         >
-                                            <div className="relative p-0.5 overflow-hidden rounded-full liquid-glass">
+                                            <div className="relative p-0.5 overflow-hidden rounded-full liquid-glass-2">
                                                 <img
                                                     src={
                                                         user.avatar ||
@@ -178,8 +184,8 @@ export default function Header() {
                                                     {user.name}
                                                 </span>
                                                 {user.role === 'ADMIN' && (
-                                                    <span className="text-xs text-highlight">
-                                                        Quản trị viên
+                                                    <span className="text-xs text-highlight py-0.5 px-1 bg-background rounded-md">
+                                                        Quản trị
                                                     </span>
                                                 )}
                                             </div>

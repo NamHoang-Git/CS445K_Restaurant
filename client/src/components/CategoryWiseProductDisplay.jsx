@@ -1,15 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
-import { FaCaretRight } from 'react-icons/fa';
 import { valideURLConvert } from '../utils/valideURLConvert';
 import Axios from './../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from './../utils/AxiosToastError';
-import CardProduct from './CardProduct';
 import CardLoading from './CardLoading';
-import { ProductCard } from './product/product-card';
 import GradientText from './GradientText';
+import ProductCard from './product/product-card';
 
 const CategoryWiseProductDisplay = ({ id, name }) => {
     const [data, setData] = useState([]);
@@ -22,7 +20,7 @@ const CategoryWiseProductDisplay = ({ id, name }) => {
         try {
             setLoading(true);
             const response = await Axios({
-                ...SummaryApi.get_product_by_category_home,
+                ...SummaryApi.get_product_by_category,
                 data: {
                     id: id,
                 },

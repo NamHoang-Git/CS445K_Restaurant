@@ -352,7 +352,7 @@ const ProductManagementPage = () => {
 
                 {/* Search */}
                 <div
-                    className="text-highlight h-11 max-w-72 w-full min-w-16 lg:min-w-24 liquid-glass-2 border border-gray-500 px-4
+                    className="text-highlight h-11 max-w-72 w-full min-w-16 lg:min-w-24 bg-background/80 border border-muted-foreground px-4
                 flex items-center gap-3 rounded-xl shadow-md shadow-secondary-100 focus-within:border-lime-200"
                 >
                     <IoSearch size={22} className="mb-[3px] sm:block hidden" />

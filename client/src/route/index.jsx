@@ -29,6 +29,10 @@ import VoucherPage from '../pages/VoucherPage';
 import AdminDashboard from '@/layouts/AdminDashboard';
 import SubCategoryPage from '@/pages/SubCategoryPage';
 import ProductManagementPage from '../pages/ProductManagementPage';
+import TableManagementPage from '../pages/TableManagementPage';
+import BookingManagementPage from '../pages/BookingManagementPage';
+import BookingPage from '../pages/BookingPage';
+import BookingSuccessPage from '../pages/BookingSuccessPage';
 
 const router = createBrowserRouter([
     {
@@ -42,6 +46,14 @@ const router = createBrowserRouter([
             {
                 path: 'search',
                 element: <SearchPage />,
+            },
+            {
+                path: 'booking',
+                element: <BookingPage />,
+            },
+            {
+                path: 'booking/success',
+                element: <BookingSuccessPage />,
             },
             {
                 path: 'login',
@@ -132,6 +144,22 @@ const router = createBrowserRouter([
                         element: (
                             <AdminPermission>
                                 <ProductManagementPage />
+                            </AdminPermission>
+                        ),
+                    },
+                    {
+                        path: 'table',
+                        element: (
+                            <AdminPermission>
+                                <TableManagementPage />
+                            </AdminPermission>
+                        ),
+                    },
+                    {
+                        path: 'booking',
+                        element: (
+                            <AdminPermission>
+                                <BookingManagementPage />
                             </AdminPermission>
                         ),
                     },

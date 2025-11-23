@@ -48,6 +48,23 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: true,
     },
+    // Trạng thái món ăn
+    status: {
+        type: String,
+        enum: ['available', 'out_of_stock', 'seasonal'],
+        default: 'available'
+    },
+    // Thời gian chuẩn bị (phút)
+    preparationTime: {
+        type: Number,
+        default: 15,
+        min: 0
+    },
+    // Món nổi bật/đặc biệt
+    isFeatured: {
+        type: Boolean,
+        default: false
+    },
 }, {
     timestamps: true
 })

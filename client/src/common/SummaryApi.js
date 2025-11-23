@@ -238,6 +238,74 @@ const SummaryApi = {
     bulk_update_vouchers_status: {
         url: '/api/voucher/bulk-update-vouchers-status',
         method: 'put'
+    },
+
+    // Table
+    create_table: {
+        url: '/api/table/create',
+        method: 'post'
+    },
+    get_all_tables: {
+        url: '/api/table/get-all',
+        method: 'get'
+    },
+    get_table_by_id: {
+        url: '/api/table/get/:id',
+        method: 'get'
+    },
+    update_table: {
+        url: '/api/table/update',
+        method: 'put'
+    },
+    delete_table: {
+        url: '/api/table/delete',
+        method: 'delete'
+    },
+    update_table_status: {
+        url: '/api/table/update-status',
+        method: 'patch'
+    },
+    get_available_tables: {
+        url: '/api/table/available',
+        method: 'get'
+    },
+
+    // Booking
+    create_booking: {
+        url: '/api/booking/create',
+        method: 'post'
+    },
+    get_all_bookings: {
+        url: '/api/booking/get-all',
+        method: 'get'
+    },
+    get_booking_by_id: {
+        url: '/api/booking/get/:id',
+        method: 'get'
+    },
+    update_booking: {
+        url: '/api/booking/update',
+        method: 'put'
+    },
+    cancel_booking: {
+        url: '/api/booking/cancel',
+        method: 'delete'
+    },
+    confirm_booking: {
+        url: '/api/booking/confirm',
+        method: 'patch'
+    },
+    get_available_tables_for_booking: {
+        url: '/api/booking/available-tables',
+        method: 'post'
+    },
+    customer_bookings: {
+        url: '/api/booking/customer-bookings',
+        method: 'post'
+    },
+    create_booking_payment_session: {
+        url: '/api/booking/create-payment-session',
+        method: 'post'
     }
 }
 

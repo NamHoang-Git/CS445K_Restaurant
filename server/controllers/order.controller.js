@@ -6,6 +6,9 @@ import CartProductModel from './../models/cartProduct.model.js';
 import { updateProductStock } from "../utils/productStockUpdater.js";
 import { calculatePointsFromOrder, calculateUsablePoints } from "../utils/pointsUtils.js";
 import VoucherModel from "../models/voucher.model.js";
+import BookingModel from "../models/booking.model.js";
+import sendEmail from "../config/sendEmail.js";
+import bookingEmailTemplate from "../utils/bookingEmailTemplate.js";
 
 export async function CashOnDeliveryOrderController(request, response) {
     const maxRetries = 3;
@@ -817,7 +820,27 @@ export async function webhookStripe(request, response) {
 
                 try {
                     await dbSession.withTransaction(async () => {
-                        const { userId, tempOrderIds, pointsToUse: pointsToUseStr, orderTotal } = stripeSession.metadata || {};
+                        const { userId, tempOrderIds, pointsToUse: pointsToUseStr, orderTotal, type, bookingId } = stripeSession.metadata || {};
+
+                        // Handle Booking Deposit
+                        if (type === 'booking_deposit' && bookingId) {
+                            const booking = await BookingModel.findById(bookingId).session(dbSession);
+                            if (booking && !booking.depositPaid) {
+                                booking.depositPaid = true;
+                                booking.paymentIntentId = stripeSession.payment_intent;
+                                booking.status = 'confirmed'; // Auto-confirm after deposit
+                                await booking.save({ session: dbSession });
+
+                                // Send confirmation email
+                                if (booking.email) {
+                                    // We need to commit transaction before sending email to avoid duplicate emails if commit fails
+                                    // But here we are inside transaction. We can send email after transaction.
+                                    // For now, let's just prepare it.
+                                }
+                            }
+                            return; // Exit after handling booking
+                        }
+
                         if (!userId || !tempOrderIds) {
                             throw new Error('Missing required metadata in Stripe session');
                         }
@@ -890,6 +913,22 @@ export async function webhookStripe(request, response) {
                     // Do not send a 500 to Stripe, as it will retry. Log the error for manual inspection.
                 } finally {
                     await dbSession.endSession();
+
+                    // Send email for booking if applicable (outside transaction)
+                    if (stripeSession.metadata?.type === 'booking_deposit' && stripeSession.metadata?.bookingId) {
+                        try {
+                            const booking = await BookingModel.findById(stripeSession.metadata.bookingId);
+                            if (booking && booking.email) {
+                                await sendEmail({
+                                    sendTo: booking.email,
+                                    subject: "Xác nhận đặt bàn & Thanh toán cọc thành công - EatEase Restaurant",
+                                    html: bookingEmailTemplate(booking)
+                                });
+                            }
+                        } catch (emailError) {
+                            console.error("Failed to send booking confirmation email:", emailError);
+                        }
+                    }
                 }
                 break;
             }
@@ -964,7 +1003,7 @@ export async function updateOrderStatusController(request, response) {
         if (status === 'Đã hủy') {
             updateData.status = 'cancelled';
             updateData.cancelledAt = new Date();
-            
+
             if (request.body.cancelReason) {
                 updateData.cancelReason = request.body.cancelReason;
             }

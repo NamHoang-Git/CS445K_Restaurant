@@ -6,7 +6,6 @@ import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
 import { FaArrowUp, FaSort, FaChevronDown } from 'react-icons/fa';
-import CardProduct from '../components/CardProduct';
 import CardLoading from '../components/CardLoading';
 import { IoFilter } from 'react-icons/io5';
 import ProductCard from '@/components/product/product-card';
@@ -27,13 +26,18 @@ const ProductListPage = () => {
     const observer = useRef();
     const params = useParams();
     const AllCategory = useSelector((state) => state.product.allCategory);
+    const AllSubCategory = useSelector((state) => state.product.allSubCategory);
     const [displayCategory, setDisplayCategory] = useState([]);
+    const [expandedCategories, setExpandedCategories] = useState({});
 
     const category = params?.category?.split('-');
     const categoryId = category?.slice(-1)[0];
     const categoryInfo = AllCategory.find((cat) => cat._id === categoryId);
     const categoryName = categoryInfo ? categoryInfo.name : '';
     const [showSidebar, setShowSidebar] = useState(false);
+
+    const subCategory = params?.subCategory?.split('-');
+    const subCategoryId = subCategory?.slice(-1)[0];
 
     const lastProductRef = useCallback(
         (node) => {
@@ -83,28 +87,51 @@ const ProductListPage = () => {
             }
 
             try {
-                const requestData = {
-                    categoryId,
-                    page: isInitialLoad ? 1 : page,
-                    limit: 12,
-                    sort: sortBy,
-                };
+                // Kiểm tra xem có subCategoryId hay không để gọi API phù hợp
+                const hasSubCategory =
+                    subCategoryId && subCategoryId.trim() !== '';
 
-                // Only add price filters if they have valid values
-                const minPrice = priceRange.min?.trim();
-                const maxPrice = priceRange.max?.trim();
+                let response;
 
-                if (minPrice) {
-                    requestData.minPrice = parseInt(minPrice, 10);
+                if (hasSubCategory) {
+                    // Có cả categoryId và subCategoryId -> gọi API get_product_by_category_and_sub_category
+                    const requestData = {
+                        categoryId,
+                        subCategoryId,
+                        page: isInitialLoad ? 1 : page,
+                        limit: 12,
+                        sort: sortBy,
+                    };
+
+                    // Only add price filters if they have valid values
+                    const minPrice = priceRange.min?.trim();
+                    const maxPrice = priceRange.max?.trim();
+
+                    if (minPrice) {
+                        requestData.minPrice = parseInt(minPrice, 10);
+                    }
+                    if (maxPrice) {
+                        requestData.maxPrice = parseInt(maxPrice, 10);
+                    }
+
+                    response = await Axios({
+                        ...SummaryApi.get_product_by_category_and_sub_category,
+                        data: requestData,
+                    });
+                } else if (categoryId) {
+                    // Chỉ có categoryId (không có subCategoryId) -> gọi API get_product_by_category
+                    const requestData = {
+                        id: [categoryId], // API này cần id dưới dạng array
+                    };
+
+                    response = await Axios({
+                        ...SummaryApi.get_product_by_category,
+                        data: requestData,
+                    });
+                } else {
+                    // Không có categoryId -> không fetch
+                    return;
                 }
-                if (maxPrice) {
-                    requestData.maxPrice = parseInt(maxPrice, 10);
-                }
-
-                const response = await Axios({
-                    ...SummaryApi.get_product_by_category_list,
-                    data: requestData,
-                });
 
                 const { data: responseData } = response;
 
@@ -114,8 +141,19 @@ const ProductListPage = () => {
                             ? [...(responseData.data || [])]
                             : [...prev, ...(responseData.data || [])]
                     );
-                    setTotalCount(responseData.totalCount || 0);
-                    setHasMore((responseData.data?.length || 0) === 12);
+                    setTotalCount(
+                        responseData.totalCount ||
+                            responseData.data?.length ||
+                            0
+                    );
+
+                    // Chỉ khi dùng API có phân trang mới check hasMore
+                    if (hasSubCategory) {
+                        setHasMore((responseData.data?.length || 0) === 12);
+                    } else {
+                        // API get_product_by_category không phân trang, disable load more
+                        setHasMore(false);
+                    }
                 } else {
                     // Only show error toast if there's a meaningful message
                     const errorMessage = responseData?.message?.trim();
@@ -139,7 +177,14 @@ const ProductListPage = () => {
                 setLoadingMore(false);
             }
         },
-        [categoryId, page, sortBy, priceRange.min, priceRange.max]
+        [
+            categoryId,
+            subCategoryId,
+            page,
+            sortBy,
+            priceRange.min,
+            priceRange.max,
+        ]
     );
 
     // Update the filter effect to validate before fetching
@@ -195,6 +240,16 @@ const ProductListPage = () => {
         setDisplayCategory(AllCategory);
     }, [AllCategory]);
 
+    // Tự động mở danh mục phụ khi danh mục được active
+    useEffect(() => {
+        if (categoryId) {
+            setExpandedCategories((prev) => ({
+                ...prev,
+                [categoryId]: true,
+            }));
+        }
+    }, [categoryId]);
+
     // Xử lý thay đổi sắp xếp
     const handleSortChange = (e) => {
         setSortBy(e.target.value);
@@ -209,6 +264,14 @@ const ProductListPage = () => {
     // Cuộn lên đầu trang
     const scrollToTop = () => {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    // Toggle hiển thị danh mục phụ
+    const toggleCategory = (categoryId) => {
+        setExpandedCategories((prev) => ({
+            ...prev,
+            [categoryId]: !prev[categoryId],
+        }));
     };
 
     return (
@@ -240,36 +303,137 @@ const ProductListPage = () => {
                                 Danh mục
                             </h3>
                             <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto p-4">
+                                {/* Categories List with nested SubCategories */}
                                 {displayCategory.map((s) => {
                                     const link = `/${valideURLConvert(
                                         s.name
                                     )}-${s._id}`;
+
+                                    // Lấy danh sách subcategories cho category này
+                                    const categorySubCategories =
+                                        AllSubCategory.filter((subCat) => {
+                                            return subCat.category.some(
+                                                (cat) => cat._id === s._id
+                                            );
+                                        });
+
+                                    const hasSubCategories =
+                                        categorySubCategories.length > 0;
+                                    const isExpanded =
+                                        expandedCategories[s._id];
+
                                     return (
-                                        <Link
-                                            key={s._id}
-                                            to={link}
-                                            className={`flex items-center gap-4 p-2 rounded-lg transition-colors ${
-                                                categoryId === s._id
-                                                    ? 'bg-white/50 text-black'
-                                                    : 'hover:bg-black/50 text-lime-300'
-                                            }`}
-                                            onClick={() =>
-                                                setShowSidebar(false)
-                                            }
-                                        >
-                                            <img
-                                                src={
-                                                    s.image ||
-                                                    '/placeholder-category.jpg'
-                                                }
-                                                alt={s.name}
-                                                onError={handleImageError}
-                                                className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-md border border-inset border-secondary-200"
-                                            />
-                                            <span className="sm:text-sm text-xs font-medium">
-                                                {s.name}
-                                            </span>
-                                        </Link>
+                                        <div key={s._id}>
+                                            <div className="flex items-center gap-2">
+                                                <Link
+                                                    to={link}
+                                                    className={`flex items-center gap-4 p-2 rounded-lg transition-colors flex-1 ${
+                                                        categoryId === s._id
+                                                            ? 'bg-white/50 text-black'
+                                                            : 'hover:bg-black/50 text-lime-300'
+                                                    }`}
+                                                    onClick={() =>
+                                                        setShowSidebar(false)
+                                                    }
+                                                >
+                                                    <img
+                                                        src={
+                                                            s.image ||
+                                                            '/placeholder-category.jpg'
+                                                        }
+                                                        alt={s.name}
+                                                        onError={
+                                                            handleImageError
+                                                        }
+                                                        className="w-8 h-8 lg:w-10 lg:h-10 object-cover rounded-md border border-inset border-secondary-200"
+                                                    />
+                                                    <span className="sm:text-sm text-xs font-medium">
+                                                        {s.name}
+                                                    </span>
+                                                </Link>
+
+                                                {/* Toggle button cho subcategories */}
+                                                {hasSubCategories && (
+                                                    <button
+                                                        onClick={() =>
+                                                            toggleCategory(
+                                                                s._id
+                                                            )
+                                                        }
+                                                        className="p-2 hover:bg-black/30 rounded-lg transition-colors"
+                                                        aria-label={
+                                                            isExpanded
+                                                                ? 'Thu gọn'
+                                                                : 'Mở rộng'
+                                                        }
+                                                    >
+                                                        <FaChevronDown
+                                                            className={`transition-transform text-lime-300 ${
+                                                                isExpanded
+                                                                    ? 'transform rotate-180'
+                                                                    : ''
+                                                            }`}
+                                                            size={14}
+                                                        />
+                                                    </button>
+                                                )}
+                                            </div>
+
+                                            {/* SubCategories - hiển thị ngay dưới category */}
+                                            {hasSubCategories && isExpanded && (
+                                                <div className="ml-4 mt-1 space-y-1 border-l-2 border-gray-500/30 pl-2">
+                                                    {categorySubCategories.map(
+                                                        (subCat) => {
+                                                            const subLink = `/${valideURLConvert(
+                                                                s.name
+                                                            )}-${
+                                                                s._id
+                                                            }/${valideURLConvert(
+                                                                subCat.name
+                                                            )}-${subCat._id}`;
+                                                            return (
+                                                                <Link
+                                                                    key={
+                                                                        subCat._id
+                                                                    }
+                                                                    to={subLink}
+                                                                    className={`flex items-center gap-3 p-2 rounded-lg transition-colors ${
+                                                                        subCategoryId ===
+                                                                        subCat._id
+                                                                            ? 'bg-rose-200/50 text-black'
+                                                                            : 'hover:bg-black/30 text-lime-200'
+                                                                    }`}
+                                                                    onClick={() =>
+                                                                        setShowSidebar(
+                                                                            false
+                                                                        )
+                                                                    }
+                                                                >
+                                                                    <img
+                                                                        src={
+                                                                            subCat.image ||
+                                                                            '/placeholder-category.jpg'
+                                                                        }
+                                                                        alt={
+                                                                            subCat.name
+                                                                        }
+                                                                        onError={
+                                                                            handleImageError
+                                                                        }
+                                                                        className="w-6 h-6 lg:w-8 lg:h-8 object-cover rounded-md border border-inset border-secondary-200"
+                                                                    />
+                                                                    <span className="sm:text-xs text-[11px] font-medium">
+                                                                        {
+                                                                            subCat.name
+                                                                        }
+                                                                    </span>
+                                                                </Link>
+                                                            );
+                                                        }
+                                                    )}
+                                                </div>
+                                            )}
+                                        </div>
                                     );
                                 })}
                             </div>

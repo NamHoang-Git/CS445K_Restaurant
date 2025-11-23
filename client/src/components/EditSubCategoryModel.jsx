@@ -7,6 +7,25 @@ import AxiosToastError from '../utils/AxiosToastError.js';
 import Loading from './Loading.jsx';
 import { useSelector } from 'react-redux';
 import successAlert from '../utils/successAlert.js';
+import {
+    Card,
+    CardContent,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from './ui/card';
+import { Button } from './ui/button';
+import { Label } from '@radix-ui/react-label';
+import { Input } from './ui/input';
+import Divider from './Divider';
+import GlareHover from './GlareHover';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from './ui/select';
 
 const EditSubCategoryModel = ({ close, fetchData, data: SubCategoryData }) => {
     const [data, setData] = useState({
@@ -94,179 +113,222 @@ const EditSubCategoryModel = ({ close, fetchData, data: SubCategoryData }) => {
 
     return (
         <section
-            className="fixed top-0 bottom-0 left-0 right-0
-        bg-neutral-800 z-50 bg-opacity-60 p-4 flex items-center justify-center"
+            className="bg-neutral-800 z-50 bg-opacity-60 fixed top-0 left-0 right-0 bottom-0 overflow-auto
+        flex items-center justify-center px-2"
         >
-            <div className="bg-white max-w-4xl w-full p-4 rounded">
-                <div className="flex items-center justify-between">
-                    <h1 className="font-bold">Edit Sub Category</h1>
-                    <button
-                        onClick={close}
-                        className="text-neutral-900 w-fit block ml-auto"
-                    >
-                        <IoClose size={25} />
-                    </button>
-                </div>
-                <form
-                    action=""
-                    className="mt-6 mb-2 grid gap-6"
-                    onSubmit={handleSubmit}
-                >
-                    <div className="grid gap-2">
-                        <label id="name" htmlFor="name">
-                            Name (<span className="text-red-500">*</span>)
-                        </label>
-                        <input
-                            type="text"
-                            className="bg-blue-50 p-2 border rounded outline-none
-                            focus-within:border-primary-200"
-                            id="name"
-                            placeholder="Enter sub category name!"
-                            value={data.name}
-                            name="name"
-                            onChange={handleOnChange}
-                        />
+            <Card className="max-w-2xl w-full overflow-hidden border-foreground">
+                <CardHeader className="pt-4">
+                    <div className="flex items-center justify-between">
+                        <CardTitle className="text-lg text-highlight font-bold uppercase">
+                            Sửa danh mục phụ
+                        </CardTitle>
+                        <Button
+                            onClick={close}
+                            className="bg-transparent hover:bg-transparent text-foreground
+                        hover:text-highlight h-12"
+                        >
+                            <IoClose />
+                        </Button>
                     </div>
-                    <div className="grid gap-2">
-                        <p>
-                            Image (<span className="text-red-500">*</span>)
-                        </p>
-                        <div className="flex gap-4 items-center flex-col lg:flex-row">
-                            <div
-                                className="bg-blue-50 p-2 h-36 w-full lg:w-36 border rounded
-                                flex items-center justify-center"
+                </CardHeader>
+
+                <form onSubmit={handleSubmit}>
+                    <CardContent className="py-4 space-y-5 text-sm">
+                        <div className="space-y-2">
+                            <Label id="name" htmlFor="name">
+                                Tên (<span className="text-red-500">*</span>)
+                            </Label>
+                            <Input
+                                type="text"
+                                className="text-sm h-12"
+                                id="name"
+                                placeholder="Nhập tên danh mục phụ"
+                                name="name"
+                                value={data.name}
+                                onChange={handleOnChange}
+                                required
+                            />
+                        </div>
+
+                        {/* Image Upload */}
+                        <div className="space-y-2">
+                            <Label htmlFor="image">
+                                Hình ảnh <span className="text-red-500">*</span>
+                            </Label>
+                            <Label
+                                htmlFor="image"
+                                className={`block border-2 border-dashed rounded-xl p-6 text-center cursor-pointer
+                            transition-all duration-200 group ${
+                                data.image
+                                    ? 'border-green-300 bg-green-50'
+                                    : 'border-gray-300 hover:border-red-500'
+                            }`}
                             >
                                 {data.image ? (
-                                    <img
-                                        src={data.image}
-                                        alt="subCategory"
-                                        className="w-full h-full object-scale-down"
-                                    />
-                                ) : (
-                                    <p className="text-sm text-neutral-500">
-                                        No Image
-                                    </p>
-                                )}
-                            </div>
-                            <label htmlFor="uploadSubCategoryImage">
-                                <div
-                                    className={`${
-                                        !data.name
-                                            ? 'bg-gray-300 text-white cursor-no-drop'
-                                            : 'bg-blue-400 text-white hover:bg-blue-600 cursor-pointer'
-                                    } px-3 py-1 text-sm rounded-md`}
-                                >
-                                    {loading ? (
-                                        <Loading />
-                                    ) : (
-                                        <IoAddSharp size={42} />
-                                    )}
-                                </div>
-                                <input
-                                    disabled={!data.name}
-                                    onChange={handleUploadSubCategoryImage}
-                                    type="file"
-                                    accept="image/*"
-                                    id="uploadSubCategoryImage"
-                                    className="hidden"
-                                />
-                            </label>
-                        </div>
-                    </div>
-                    <div className="grid gap-2">
-                        <label>
-                            Category (<span className="text-red-500">*</span>)
-                        </label>
-
-                        {/* Display Value */}
-                        <div
-                            className={`${
-                                data.category[0] ? 'flex' : 'hidden'
-                            } gap-4 flex-wrap`}
-                        >
-                            {data.category.map((cate) => {
-                                return (
-                                    <span
-                                        key={cate._id + 'selectedValue'}
-                                        className="bg-slate-200 shadow-md px-2 mx-1 flex items-center gap-2"
-                                    >
-                                        {cate.name}
-                                        <div
-                                            onClick={() =>
-                                                handleRemoveCategorySelected(
-                                                    cate._id
-                                                )
-                                            }
-                                            className="cursor-pointer hover:text-red-600"
-                                        >
-                                            <IoClose size={18} />
+                                    <div className="relative">
+                                        <img
+                                            src={data.image}
+                                            alt="Preview"
+                                            className="sm:h-40 h-32 mx-auto object-contain rounded-lg"
+                                        />
+                                        <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 rounded-lg transition-all flex items-center justify-center">
+                                            <span className="text-white bg-black/70 text-xs px-2 py-1 rounded">
+                                                Thay đổi ảnh
+                                            </span>
                                         </div>
-                                    </span>
-                                );
-                            })}
+                                    </div>
+                                ) : (
+                                    <div className="space-y-2">
+                                        <div
+                                            className="mx-auto w-12 h-12 bg-gray-100 text-gray-400 group-hover:text-red-400 group-hover:bg-red-50 rounded-full
+                                        flex items-center justify-center"
+                                        >
+                                            <IoAddSharp size={24} />
+                                        </div>
+                                        <div className="sm:text-sm text-xs text-red-500">
+                                            <p className="font-medium">
+                                                Tải ảnh lên
+                                            </p>
+                                            <p className="sm:text-xs text-[10px] text-red-300">
+                                                PNG, JPG, JPEG (tối đa 10MB)
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
+                                <input
+                                    type="file"
+                                    id="image"
+                                    className="hidden"
+                                    onChange={handleUploadSubCategoryImage}
+                                    accept="image/*"
+                                />
+                            </Label>
                         </div>
 
-                        {/* Select Category */}
-                        <select
-                            className={`${
-                                data.category[0] ? 'mt-1' : 'mt-0'
-                            } bg-blue-50 p-2 border rounded outline-none focus-within:border-primary-200`}
-                            value={selectCategoryValue}
-                            onChange={(e) => {
-                                const value = e.target.value;
+                        <div className="space-y-2">
+                            <Label>
+                                Danh mục (
+                                <span className="text-red-500">*</span>)
+                            </Label>
 
-                                if (!value) return;
-                                const categoryDetails = allCategory.find(
-                                    (el) => el._id == value
-                                );
+                            {/* Display Value */}
+                            <div
+                                className={`${
+                                    data.category[0] ? 'flex' : 'hidden'
+                                } gap-4 flex-wrap`}
+                            >
+                                {data.category.map((cate) => {
+                                    return (
+                                        <span
+                                            key={cate._id + 'selectedValue'}
+                                            className="inline-flex items-center gap-2 bg-rose-600/90 text-white sm:text-sm text-xs px-3 py-1 rounded-full"
+                                        >
+                                            {cate.name}
+                                            <div
+                                                onClick={() =>
+                                                    handleRemoveCategorySelected(
+                                                        cate._id
+                                                    )
+                                                }
+                                                className="cursor-pointer hover:text-red-600"
+                                            >
+                                                <IoClose size={18} />
+                                            </div>
+                                        </span>
+                                    );
+                                })}
+                            </div>
 
-                                // Kiểm tra trùng lặp
-                                const alreadySelected = data.category.some(
-                                    (cate) => cate._id === value
-                                );
+                            {/* Select Category */}
+                            <Select
+                                value={selectCategoryValue}
+                                onValueChange={(value) => {
+                                    if (!value) return;
+                                    const categoryDetails = allCategory.find(
+                                        (el) => el._id == value
+                                    );
 
-                                if (alreadySelected) {
-                                    return;
-                                }
+                                    // Kiểm tra trùng lặp
+                                    const alreadySelected = data.category.some(
+                                        (cate) => cate._id === value
+                                    );
 
-                                setData((prev) => {
-                                    return {
-                                        ...prev,
-                                        category: [
-                                            ...prev.category,
-                                            categoryDetails,
-                                        ],
-                                    };
-                                });
+                                    if (alreadySelected) {
+                                        return;
+                                    }
 
-                                setSelectCategoryValue('');
-                            }}
-                        >
-                            <option value={''}>Select Category</option>
-                            {allCategory.map((category) => {
-                                return (
-                                    <option
-                                        value={category?._id}
-                                        key={category._id + 'subCategory'}
-                                    >
-                                        {category?.name}
-                                    </option>
-                                );
-                            })}
-                        </select>
-                    </div>
+                                    setData((prev) => {
+                                        return {
+                                            ...prev,
+                                            category: [
+                                                ...prev.category,
+                                                categoryDetails,
+                                            ],
+                                        };
+                                    });
 
-                    <button
-                        className={`${
-                            data.name && data.image && data.category[0]
-                                ? 'bg-orange-600 text-white hover:bg-orange-500 cursor-pointer'
-                                : 'bg-gray-300 text-gray-700 font-semibold cursor-no-drop'
-                        } py-2 rounded-md`}
-                    >
-                        Update
-                    </button>
+                                    setSelectCategoryValue('');
+                                }}
+                            >
+                                <SelectTrigger
+                                    className={`${
+                                        data.category[0] ? 'mt-1' : 'mt-0'
+                                    } w-full h-12`}
+                                >
+                                    <SelectValue placeholder="Chọn danh mục" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {allCategory.map((category) => {
+                                        return (
+                                            <SelectItem
+                                                value={category?._id}
+                                                key={
+                                                    category._id + 'subCategory'
+                                                }
+                                            >
+                                                {category?.name}
+                                            </SelectItem>
+                                        );
+                                    })}
+                                </SelectContent>
+                            </Select>
+                        </div>
+
+                        <Divider />
+                        {/* Actions */}
+                        <CardFooter className="px-0 text-sm flex items-center justify-end gap-3">
+                            <GlareHover
+                                background="transparent"
+                                glareOpacity={0.3}
+                                glareAngle={-30}
+                                glareSize={300}
+                                transitionDuration={800}
+                                playOnce={false}
+                            >
+                                <Button
+                                    type="button"
+                                    onClick={close}
+                                    className="bg-baseColor"
+                                >
+                                    Hủy
+                                </Button>
+                            </GlareHover>
+                            <GlareHover
+                                background="transparent"
+                                glareOpacity={0.3}
+                                glareAngle={-30}
+                                glareSize={300}
+                                transitionDuration={800}
+                                playOnce={false}
+                            >
+                                <Button type="submit" className="bg-foreground">
+                                    {loading ? <Loading /> : 'Cập nhật'}
+                                </Button>
+                            </GlareHover>
+                        </CardFooter>
+                    </CardContent>
                 </form>
-            </div>
+            </Card>
         </section>
     );
 };

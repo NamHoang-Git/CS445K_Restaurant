@@ -1,65 +1,62 @@
-import React, { useState } from 'react';
-import { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { format } from 'date-fns';
-import UploadSubCategoryModel from '../components/UploadSubCategoryModel';
 import SummaryApi from '../common/SummaryApi';
 import Axios from '../utils/Axios';
 import AxiosToastError from '../utils/AxiosToastError';
-import ViewImage from '../components/ViewImage';
 import { LuPencil, LuTrash } from 'react-icons/lu';
 import Loading from '../components/Loading';
 import ConfirmBox from '../components/ConfirmBox';
 import successAlert from '../utils/successAlert';
-import EditSubCategoryModel from '@/components/EditSubCategoryModel';
 import DynamicTable from '@/components/table/dynamic-table';
 import {
     Card,
-    CardContent,
-    CardDescription,
     CardFooter,
     CardHeader,
     CardTitle,
+    CardDescription,
 } from '@/components/ui/card';
 import GlareHover from '@/components/GlareHover';
 import { Button } from '@/components/ui/button';
+import UploadTableModel from '@/components/UploadTableModel';
+import EditTableModel from '@/components/EditTableModel';
 
-const SubCategoryPage = () => {
-    const [openAddSubCategory, setOpenAddSubCategory] = useState(false);
+const TableManagementPage = () => {
+    const [openAddTable, setOpenAddTable] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
-    const [imageURL, setImageURL] = useState('');
 
     const [openEdit, setOpenEdit] = useState(false);
     const [editData, setEditData] = useState({
         _id: '',
-        name: '',
-        image: '',
+        tableNumber: '',
+        capacity: 0,
+        status: 'available',
+        location: '',
+        description: '',
     });
 
     const [openConfirmBoxDelete, setOpenConfirmBoxDelete] = useState(false);
-    const [deleteSubCategory, setDeleteSubCategory] = useState({
+    const [deleteTable, setDeleteTable] = useState({
         _id: '',
     });
 
-    const fetchSubCategory = async () => {
+    const fetchTables = async () => {
         try {
             setLoading(true);
             const response = await Axios({
-                ...SummaryApi.get_sub_category,
+                ...SummaryApi.get_all_tables,
             });
 
             if (response.data.success) {
                 const formattedData = response.data.data.map((item, index) => ({
                     id: index + 1,
                     _id: item._id,
-                    name: item.name,
+                    tableNumber: item.tableNumber,
+                    capacity: item.capacity,
+                    status: item.status,
+                    location: item.location || 'Chưa xác định',
+                    description: item.description || '',
                     date: format(new Date(item.createdAt), 'dd/MM/yyyy HH:mm'),
-                    image: item.image || '',
-                    category:
-                        Array.isArray(item.category) && item.category.length > 0
-                            ? item.category.map((cat) => cat.name).join(', ')
-                            : 'Chưa có danh mục',
-                    categoryData: item.category,
                 }));
                 setData(formattedData);
             }
@@ -71,21 +68,21 @@ const SubCategoryPage = () => {
     };
 
     useEffect(() => {
-        fetchSubCategory();
+        fetchTables();
     }, []);
 
-    const handleDeleteSubCategory = async () => {
+    const handleDeleteTable = async () => {
         try {
             const response = await Axios({
-                ...SummaryApi.delete_sub_category,
-                data: deleteSubCategory,
+                ...SummaryApi.delete_table,
+                data: deleteTable,
             });
 
             const { data: responseData } = response;
 
             if (responseData.success) {
                 successAlert(responseData.message);
-                fetchSubCategory();
+                fetchTables();
                 setOpenConfirmBoxDelete(false);
             }
         } catch (error) {
@@ -93,65 +90,54 @@ const SubCategoryPage = () => {
         }
     };
 
+    const getStatusBadge = (status) => {
+        const statusConfig = {
+            available: {
+                text: 'Trống',
+                className: 'bg-green-100 text-green-800',
+            },
+            occupied: {
+                text: 'Đang sử dụng',
+                className: 'bg-red-100 text-red-800',
+            },
+            reserved: {
+                text: 'Đã đặt',
+                className: 'bg-yellow-100 text-yellow-800',
+            },
+            maintenance: {
+                text: 'Bảo trì',
+                className: 'bg-gray-100 text-gray-800',
+            },
+        };
+
+        const config = statusConfig[status] || statusConfig.available;
+
+        return (
+            <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.className}`}
+            >
+                {config.text}
+            </span>
+        );
+    };
+
     const columns = [
+        { key: 'tableNumber', label: 'Số bàn', type: 'string', sortable: true },
         { key: 'id', label: 'ID', type: 'number', sortable: true },
-        { key: 'name', label: 'Tên', type: 'string', sortable: true },
+        { key: 'capacity', label: 'Sức chứa', type: 'number', sortable: true },
+        {
+            key: 'status',
+            label: 'Trạng thái',
+            type: 'string',
+            sortable: true,
+            format: (value) => getStatusBadge(value),
+        },
+        { key: 'location', label: 'Vị trí', type: 'string', sortable: true },
         {
             key: 'date',
             label: 'Ngày tạo',
             type: 'string',
             sortable: true,
-        },
-        {
-            key: 'image',
-            label: 'Hình ảnh',
-            type: 'string',
-            sortable: false,
-            format: (value, row) => {
-                if (!row) return 'Không có';
-                return row.image ? (
-                    <img
-                        src={row.image}
-                        alt={row.name || 'Image'}
-                        className="w-12 h-12 object-cover rounded hover:scale-105 cursor-pointer border border-muted-foreground/50"
-                        onClick={() => setImageURL(row.image)}
-                    />
-                ) : (
-                    'Không có'
-                );
-            },
-        },
-        {
-            key: 'category',
-            label: 'Danh mục',
-            type: 'string',
-            sortable: false,
-            format: (value, row) => {
-                if (
-                    !row ||
-                    !row.categoryData ||
-                    !Array.isArray(row.categoryData) ||
-                    row.categoryData.length === 0
-                ) {
-                    return (
-                        <span className="text-muted-foreground text-sm">
-                            Chưa có danh mục
-                        </span>
-                    );
-                }
-                return (
-                    <div className="flex flex-wrap gap-1">
-                        {row.categoryData.map((cat, index) => (
-                            <span
-                                key={cat._id || index}
-                                className="inline-flex items-center px-2 py-1 rounded-md bg-background/50 text-foreground text-xs font-medium border border-highlight"
-                            >
-                                {cat.name}
-                            </span>
-                        ))}
-                    </div>
-                );
-            },
         },
         {
             key: 'action',
@@ -176,7 +162,7 @@ const SubCategoryPage = () => {
                             onClick={(e) => {
                                 e.stopPropagation();
                                 setOpenConfirmBoxDelete(true);
-                                setDeleteSubCategory(row);
+                                setDeleteTable(row);
                             }}
                         >
                             <LuTrash size={18} />
@@ -191,10 +177,10 @@ const SubCategoryPage = () => {
             <Card className="py-6 flex-row justify-between gap-6 border-gray-600 border-2">
                 <CardHeader>
                     <CardTitle className="text-lg text-highlight font-bold uppercase">
-                        Danh mục phụ
+                        Quản lý bàn
                     </CardTitle>
                     <CardDescription>
-                        Quản lý thông tin danh mục phụ
+                        Quản lý thông tin bàn ăn trong nhà hàng
                     </CardDescription>
                 </CardHeader>
 
@@ -208,10 +194,10 @@ const SubCategoryPage = () => {
                         playOnce={false}
                     >
                         <Button
-                            onClick={() => setOpenAddSubCategory(true)}
+                            onClick={() => setOpenAddTable(true)}
                             className="bg-foreground"
                         >
-                            Thêm Mới
+                            Thêm Bàn Mới
                         </Button>
                     </GlareHover>
                 </CardFooter>
@@ -221,9 +207,9 @@ const SubCategoryPage = () => {
                 <DynamicTable
                     data={data}
                     columns={columns}
-                    pageSize={5}
-                    sortable={false}
-                    searchable={false}
+                    pageSize={10}
+                    sortable={true}
+                    searchable={true}
                     filterable={false}
                     groupable={false}
                 />
@@ -231,21 +217,17 @@ const SubCategoryPage = () => {
 
             {loading && <Loading />}
 
-            {openAddSubCategory && (
-                <UploadSubCategoryModel
-                    close={() => setOpenAddSubCategory(false)}
-                    fetchData={fetchSubCategory}
+            {openAddTable && (
+                <UploadTableModel
+                    close={() => setOpenAddTable(false)}
+                    fetchData={fetchTables}
                 />
             )}
 
-            {imageURL && (
-                <ViewImage url={imageURL} close={() => setImageURL('')} />
-            )}
-
             {openEdit && (
-                <EditSubCategoryModel
+                <EditTableModel
                     close={() => setOpenEdit(false)}
-                    fetchData={fetchSubCategory}
+                    fetchData={fetchTables}
                     data={editData}
                 />
             )}
@@ -254,9 +236,9 @@ const SubCategoryPage = () => {
                 <ConfirmBox
                     close={() => setOpenConfirmBoxDelete(false)}
                     cancel={() => setOpenConfirmBoxDelete(false)}
-                    confirm={handleDeleteSubCategory}
-                    title="Xóa danh mục phụ"
-                    message="Bạn có chắc chắn muốn xóa danh mục phụ này?"
+                    confirm={handleDeleteTable}
+                    title="Xóa bàn"
+                    message="Bạn có chắc chắn muốn xóa bàn này?"
                     confirmText="Xóa"
                     cancelText="Hủy"
                 />
@@ -265,4 +247,4 @@ const SubCategoryPage = () => {
     );
 };
 
-export default SubCategoryPage;
+export default TableManagementPage;
