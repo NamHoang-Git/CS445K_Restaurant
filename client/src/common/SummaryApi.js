@@ -299,12 +299,96 @@ const SummaryApi = {
         url: '/api/booking/available-tables',
         method: 'post'
     },
-    customer_bookings: {
-        url: '/api/booking/customer-bookings',
-        method: 'post'
-    },
     create_booking_payment_session: {
         url: '/api/booking/create-payment-session',
+        method: 'post'
+    },
+
+    // Employee Management
+    get_all_employees: {
+        url: '/api/employee/all',
+        method: 'get'
+    },
+    get_employee_by_id: {
+        url: '/api/employee/:id',
+        method: 'get'
+    },
+    create_employee: {
+        url: '/api/employee/create',
+        method: 'post'
+    },
+    update_employee: {
+        url: '/api/employee/update/:id',
+        method: 'put'
+    },
+    delete_employee: {
+        url: '/api/employee/delete/:id',
+        method: 'delete'
+    },
+    get_employees_by_role: {
+        url: '/api/employee/role/:role',
+        method: 'get'
+    },
+
+    // Shift Management
+    create_shift: {
+        url: '/api/shift/create',
+        method: 'post'
+    },
+    get_shifts_by_date: {
+        url: '/api/shift/date',
+        method: 'get'
+    },
+    get_shifts_by_employee: {
+        url: '/api/shift/employee/:employeeId',
+        method: 'get'
+    },
+    update_shift: {
+        url: '/api/shift/update/:id',
+        method: 'put'
+    },
+    delete_shift: {
+        url: '/api/shift/delete/:id',
+        method: 'delete'
+    },
+    assign_staff_to_shift: {
+        url: '/api/shift/assign',
+        method: 'post'
+    },
+
+    // Attendance Management
+    check_in: {
+        url: '/api/attendance/check-in',
+        method: 'post'
+    },
+    check_out: {
+        url: '/api/attendance/check-out',
+        method: 'post'
+    },
+    get_current_attendance: {
+        url: '/api/attendance/current',
+        method: 'get'
+    },
+    get_attendance_by_employee: {
+        url: '/api/attendance/employee/:employeeId',
+        method: 'get'
+    },
+    get_attendance_by_date: {
+        url: '/api/attendance/date/:date',
+        method: 'get'
+    },
+
+    // Performance Management
+    get_performance_stats: {
+        url: '/api/performance/employee/:employeeId',
+        method: 'get'
+    },
+    get_team_performance: {
+        url: '/api/performance/team',
+        method: 'get'
+    },
+    update_performance_metrics: {
+        url: '/api/performance/update',
         method: 'post'
     }
 }

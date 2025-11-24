@@ -17,6 +17,10 @@ import orderRouter from './route/order.route.js';
 import voucherRouter from './route/voucher.route.js';
 import tableRouter from './route/table.route.js';
 import bookingRouter from './route/booking.route.js';
+import employeeRouter from './route/employee.route.js';
+import shiftRouter from './route/shift.route.js';
+import attendanceRouter from './route/attendance.route.js';
+import performanceRouter from './route/performance.route.js';
 
 const app = express();
 
@@ -78,6 +82,10 @@ app.use('/api/stripe', orderRouter);
 app.use('/api/voucher', voucherRouter);
 app.use('/api/table', tableRouter);
 app.use('/api/booking', bookingRouter);
+app.use('/api/employee', employeeRouter);
+app.use('/api/shift', shiftRouter);
+app.use('/api/attendance', attendanceRouter);
+app.use('/api/performance', performanceRouter);
 
 connectDB().then(() => {
     app.listen(PORT, () => {

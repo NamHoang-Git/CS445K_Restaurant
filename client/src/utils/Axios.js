@@ -71,6 +71,7 @@ const refreshAccessToken = async (refreshToken) => {
     try {
         const response = await axios({
             ...SummaryApi.refresh_token,
+            baseURL: baseURL, // Add baseURL here
             headers: {
                 Authorization: `Bearer ${refreshToken}`,
             },

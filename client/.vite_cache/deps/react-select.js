@@ -3,9 +3,6 @@ import {
   toPropertyKey
 } from "./chunk-XG5IKD4O.js";
 import {
-  require_react_is
-} from "./chunk-EC4PBLXT.js";
-import {
   _arrayLikeToArray,
   _slicedToArray,
   _unsupportedIterableToArray
@@ -13,6 +10,9 @@ import {
 import {
   _typeof
 } from "./chunk-SITVF2AJ.js";
+import {
+  require_react_is
+} from "./chunk-EC4PBLXT.js";
 import {
   autoUpdate
 } from "./chunk-BIDPXX6L.js";

@@ -255,6 +255,112 @@ const UserMenu = ({ close }) => {
                     </Link>
                 )}
 
+                {/* Employee Management - Admin/Manager */}
+                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/employee-management'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/employee-management')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Quản lý Nhân viên
+                        </span>
+                    </Link>
+                )}
+
+                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/shift-management'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/shift-management')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Quản lý Ca làm
+                        </span>
+                    </Link>
+                )}
+
+                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/attendance-management'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/attendance-management')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Quản lý Chấm công
+                        </span>
+                    </Link>
+                )}
+
+                {/* Employee Dashboard - For all employees */}
+                {['WAITER', 'CHEF', 'CASHIER', 'MANAGER'].includes(
+                    user.role
+                ) && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/employee-dashboard'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/employee-dashboard')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Dashboard Nhân viên
+                        </span>
+                    </Link>
+                )}
+
+                {/* My Shifts - For all employees */}
+                {['WAITER', 'CHEF', 'CASHIER', 'MANAGER'].includes(
+                    user.role
+                ) && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/my-shifts'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/my-shifts')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Ca làm của tôi
+                        </span>
+                    </Link>
+                )}
+
+                {/* My Performance - For all employees */}
+                {['WAITER', 'CHEF', 'CASHIER', 'MANAGER'].includes(
+                    user.role
+                ) && (
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/my-performance'}
+                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                            isActive('/dashboard/my-performance')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Hiệu suất của tôi
+                        </span>
+                    </Link>
+                )}
+
                 {isAdmin(user.role) && (
                     <Link
                         onClick={handleClose}

@@ -65,6 +65,20 @@ const productSchema = new mongoose.Schema({
         type: Boolean,
         default: false
     },
+    // Tùy chọn món ăn (Size, Topping, etc.)
+    options: [
+        {
+            name: { type: String, required: true }, // e.g., "Size", "Đường", "Đá"
+            type: { type: String, enum: ['radio', 'checkbox'], default: 'radio' }, // radio = chọn 1, checkbox = chọn nhiều
+            choices: [
+                {
+                    name: { type: String, required: true }, // e.g., "M", "L", "50%"
+                    priceModifier: { type: Number, default: 0 }, // Giá cộng thêm
+                    isDefault: { type: Boolean, default: false }
+                }
+            ]
+        }
+    ],
 }, {
     timestamps: true
 })

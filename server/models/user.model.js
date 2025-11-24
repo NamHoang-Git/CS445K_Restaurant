@@ -93,8 +93,31 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["ADMIN", "USER"],
+        enum: ["ADMIN", "MANAGER", "WAITER", "CHEF", "CASHIER", "USER"],
         default: "USER",
+    },
+    // Employee-specific fields
+    employeeId: {
+        type: String,
+        unique: true,
+        sparse: true, // Allow null for non-employees
+    },
+    hireDate: {
+        type: Date,
+    },
+    position: {
+        type: String,
+    },
+    employeeStatus: {
+        type: String,
+        enum: ["active", "inactive", "on_leave"],
+        default: "active",
+    },
+    performanceStats: {
+        totalWorkingHours: { type: Number, default: 0 },
+        ordersHandled: { type: Number, default: 0 }, // For Waiter
+        dishesCooked: { type: Number, default: 0 },  // For Chef
+        averageRating: { type: Number, default: 0, min: 0, max: 5 },
     },
     rewardsPoint: {
         type: Number,

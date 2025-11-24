@@ -13,6 +13,17 @@ const cartProductSchema = new mongoose.Schema({
         type: mongoose.Schema.ObjectId,
         ref: "user",
     },
+    notes: {
+        type: String,
+        default: ""
+    },
+    selectedOptions: [
+        {
+            optionName: String, // e.g., "Size"
+            choiceName: String, // e.g., "L"
+            priceModifier: Number // e.g., 5000
+        }
+    ]
 }, {
     timestamps: true
 })

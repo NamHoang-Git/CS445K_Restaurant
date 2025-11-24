@@ -15,6 +15,7 @@ import MyOrders from '../pages/MyOrders';
 import Address from '../pages/Address';
 import CategoryPage from './../pages/CategoryPage';
 import AdminPermission from '../layouts/AdminPermission';
+import ManagerPermission from '../layouts/ManagerPermission';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDisplayPage from '../pages/ProductDisplayPage';
 import CheckoutPage from './../pages/CheckoutPage';
@@ -33,6 +34,12 @@ import TableManagementPage from '../pages/TableManagementPage';
 import BookingManagementPage from '../pages/BookingManagementPage';
 import BookingPage from '../pages/BookingPage';
 import BookingSuccessPage from '../pages/BookingSuccessPage';
+import EmployeeManagementPage from '../pages/EmployeeManagementPage';
+import EmployeeDashboard from '../pages/EmployeeDashboard';
+import ShiftManagementPage from '../pages/ShiftManagementPage';
+import AttendanceManagementPage from '../pages/AttendanceManagementPage';
+import MyShiftsPage from '../pages/MyShiftsPage';
+import MyPerformancePage from '../pages/MyPerformancePage';
 
 const router = createBrowserRouter([
     {
@@ -194,6 +201,42 @@ const router = createBrowserRouter([
                     {
                         path: 'my-orders',
                         element: <MyOrders />,
+                    },
+                    {
+                        path: 'employee-management',
+                        element: (
+                            <ManagerPermission>
+                                <EmployeeManagementPage />
+                            </ManagerPermission>
+                        ),
+                    },
+                    {
+                        path: 'employee-dashboard',
+                        element: <EmployeeDashboard />,
+                    },
+                    {
+                        path: 'shift-management',
+                        element: (
+                            <ManagerPermission>
+                                <ShiftManagementPage />
+                            </ManagerPermission>
+                        ),
+                    },
+                    {
+                        path: 'attendance-management',
+                        element: (
+                            <ManagerPermission>
+                                <AttendanceManagementPage />
+                            </ManagerPermission>
+                        ),
+                    },
+                    {
+                        path: 'my-shifts',
+                        element: <MyShiftsPage />,
+                    },
+                    {
+                        path: 'my-performance',
+                        element: <MyPerformancePage />,
                     },
                 ],
             },

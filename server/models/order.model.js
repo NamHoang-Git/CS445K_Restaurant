@@ -35,6 +35,19 @@ const orderSchema = new mongoose.Schema({
     delivery_address: {
         type: mongoose.Schema.ObjectId,
         ref: "address",
+        required: function () {
+            return this.orderType === 'delivery';
+        }
+    },
+    // New fields for restaurant
+    tableNumber: {
+        type: String, // Can be number or string (e.g., "A1")
+        default: null
+    },
+    orderType: {
+        type: String,
+        enum: ['dine_in', 'takeaway', 'delivery'],
+        default: 'delivery'
     },
     is_deleted: {
         type: Boolean,
