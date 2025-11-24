@@ -150,6 +150,9 @@ export async function CashOnDeliveryOrderController(request, response) {
                         subTotalAmt: itemSubTotal,
                         totalAmt: itemTotal,
                         status: 'pending',
+                        // Restaurant specific fields
+                        tableNumber: request.body.tableNumber || null,
+                        orderType: request.body.orderType || 'delivery',
                         // Voucher information
                         voucherCode: regularVoucher?.code || null,
                         voucherDiscount: discountAmount,
@@ -715,7 +718,9 @@ export async function paymentController(request, response) {
                 metadata: {
                     userId: userId.toString(),
                     addressId: addressId.toString(),
-                    orderTotal: Math.round(finalTotal).toString()
+                    orderTotal: Math.round(finalTotal).toString(),
+                    tableNumber: (request.body.tableNumber || '').toString(),
+                    orderType: (request.body.orderType || 'delivery').toString()
                 }
             },
             line_items,

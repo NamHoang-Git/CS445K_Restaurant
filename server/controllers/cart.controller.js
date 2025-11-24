@@ -4,7 +4,7 @@ import CartProductModel from './../models/cartProduct.model.js';
 export const addToCartItemController = async (request, response) => {
     try {
         const userId = request.userId
-        const { productId } = request.body
+        const { productId, notes, selectedOptions } = request.body
 
         if (!productId) {
             return response.status(402).json({
@@ -14,14 +14,45 @@ export const addToCartItemController = async (request, response) => {
             })
         }
 
-        const checkItemCart = await CartProductModel.findOne({
+        // Check if item exists with SAME options
+        // Note: Deep comparison of selectedOptions would be ideal, but for now we might just create new entry
+        // or check exact match. For simplicity in restaurant ordering, we often allow multiple entries of same product
+        // if they have different notes/options.
+        // Let's modify to allow duplicates if options/notes differ, or just always add new line item for simplicity?
+        // "Tech Shop" logic was single item per product. Restaurant logic usually requires separate lines for "Coke (No Ice)" vs "Coke (Less Ice)".
+
+        // Strategy: Always create new cart item for restaurant mode to support different customizations
+        // OR: Check if an item with exact same productId, notes AND selectedOptions exists.
+
+        // For now, let's keep it simple: If options/notes are provided, treat as unique item.
+        // If no options/notes, fallback to old logic?
+        // Actually, best to just allow multiple entries for same product in restaurant context.
+        // But to avoid breaking existing "Tech Shop" flow completely if used mixed:
+
+        // Let's try to find an existing item with same ProductID AND same Options/Notes
+        // Converting objects to string for comparison is a quick hack for deep equality of simple objects
+        const optionsString = JSON.stringify(selectedOptions || []);
+        const notesString = notes || "";
+
+        // Find all cart items for this user and product
+        const existingItems = await CartProductModel.find({
             userId: userId,
             productId: productId
-        })
+        });
 
-        if (checkItemCart) {
+        let existingItemMatch = null;
+        for (const item of existingItems) {
+            const itemOptionsString = JSON.stringify(item.selectedOptions || []);
+            const itemNotesString = item.notes || "";
+            if (itemOptionsString === optionsString && itemNotesString === notesString) {
+                existingItemMatch = item;
+                break;
+            }
+        }
+
+        if (existingItemMatch) {
             return response.status(400).json({
-                message: "Sản phẩm đã tồn tại trong giỏ hàng",
+                message: "Sản phẩm với tùy chọn này đã có trong giỏ hàng",
                 error: true,
                 success: false
             })
@@ -30,7 +61,9 @@ export const addToCartItemController = async (request, response) => {
         const cartItem = new CartProductModel({
             quantity: 1,
             userId: userId,
-            productId: productId
+            productId: productId,
+            notes: notes,
+            selectedOptions: selectedOptions
         })
         const save = await cartItem.save()
 
@@ -83,7 +116,7 @@ export const getCartItemController = async (request, response) => {
 export const updateCartItemQtyController = async (request, response) => {
     try {
         const userId = request.userId
-        const { _id, qty } = request.body
+        const { _id, qty, notes, selectedOptions } = request.body
 
         if (!_id || !qty) {
             return response.status(400).json({
@@ -93,12 +126,14 @@ export const updateCartItemQtyController = async (request, response) => {
             })
         }
 
+        const updateFields = { quantity: qty };
+        if (notes !== undefined) updateFields.notes = notes;
+        if (selectedOptions !== undefined) updateFields.selectedOptions = selectedOptions;
+
         const updateCartitem = await CartProductModel.updateOne({
             _id: _id,
             userId: userId
-        }, {
-            quantity: qty
-        })
+        }, updateFields)
 
         return response.json({
             message: "Cập nhật giỏ hàng",

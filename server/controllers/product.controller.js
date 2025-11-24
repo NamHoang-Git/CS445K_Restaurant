@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 export const addProductController = async (req, res) => {
     try {
         const { name, image, category, subCategory, unit, stock,
-            price, discount, description, more_details } = req.body
+            price, discount, description, more_details, options } = req.body
 
         if (!name || !image[0] || !category[0] || !unit || !stock || !price) {
             return res.status(400).json({
@@ -24,7 +24,8 @@ export const addProductController = async (req, res) => {
             price,
             discount,
             description,
-            more_details
+            more_details,
+            options
         })
 
         const saveProduct = await addProduct.save()
@@ -305,7 +306,8 @@ export const updateProductDetails = async (request, response) => {
         }
 
         const updateProduct = await ProductModel.updateOne({ _id: _id }, {
-            ...request.body
+            ...request.body,
+            options: request.body.options // Ensure options are updated
         })
 
         return response.json({
