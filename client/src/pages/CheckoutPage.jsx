@@ -302,8 +302,9 @@ const CheckoutPage = () => {
     ]);
 
     useEffect(() => {
+        // Maximum 20% discount from points (changed from 50%)
         const maxPoints = Math.min(
-            Math.floor((filteredTotalPrice * 0.5) / pointsValue),
+            Math.floor((filteredTotalPrice * 0.2) / pointsValue),
             userPoints
         );
         setMaxPointsToUse(maxPoints);
@@ -434,7 +435,10 @@ const CheckoutPage = () => {
 
     const confirmCashOnDelivery = async () => {
         try {
-            const maxPointsAllowed = Math.floor(filteredTotalPrice / 2 / 100);
+            // Maximum 20% discount from points (changed from 50%)
+            const maxPointsAllowed = Math.floor(
+                (filteredTotalPrice * 0.2) / 100
+            );
             const actualPointsToUse = usePoints
                 ? Math.min(pointsToUse, maxPointsAllowed)
                 : 0;
@@ -546,7 +550,10 @@ const CheckoutPage = () => {
 
     const executeOnlinePayment = async () => {
         try {
-            const maxPointsAllowed = Math.floor(filteredTotalPrice / 2 / 100);
+            // Maximum 20% discount from points (changed from 50%)
+            const maxPointsAllowed = Math.floor(
+                (filteredTotalPrice * 0.2) / 100
+            );
             const actualPointsToUse = usePoints
                 ? Math.min(pointsToUse, maxPointsAllowed, userPoints)
                 : 0;
@@ -1936,7 +1943,7 @@ const CheckoutPage = () => {
                                                     )
                                                 </p>
                                                 <p className="text-xs italic">
-                                                    Bạn chỉ được dùng tối đa 50%
+                                                    Bạn chỉ được dùng tối đa 20%
                                                     giá trị đơn hàng
                                                 </p>
                                             </div>

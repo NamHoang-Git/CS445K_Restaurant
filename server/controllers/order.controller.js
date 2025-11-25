@@ -904,6 +904,22 @@ export async function webhookStripe(request, response) {
                                     await order.save({ session: dbSession });
                                 }
 
+                                // Award points for booking with pre-order
+                                if (order.userId) {
+                                    const pointsEarned = calculatePointsFromOrder(order.totalAmt);
+                                    console.log(`Calculating points: ${order.totalAmt} VND → ${pointsEarned} points`);
+
+                                    await UserModel.findByIdAndUpdate(
+                                        order.userId,
+                                        { $inc: { rewardsPoint: pointsEarned } },
+                                        { session: dbSession }
+                                    );
+
+                                    console.log(`✅ Awarded ${pointsEarned} points for booking with pre-order to user ${order.userId}`);
+                                } else {
+                                    console.log('❌ Order has no userId, points not awarded');
+                                }
+
                                 console.log(`Booking ${bookingId} and Order ${orderId} updated successfully`);
                             }
                             return; // Exit after handling booking with pre-order
