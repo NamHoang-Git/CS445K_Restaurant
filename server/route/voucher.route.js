@@ -5,7 +5,8 @@ import {
     bulkUpdateVouchersStatusController, deleteVoucherController,
     getAllVoucherController, updateVoucherController,
     getAvailableVouchersController,
-    applyVoucherController
+    applyVoucherController,
+    getBestVoucherController
 } from '../controllers/voucher.controller.js';
 
 const voucherRouter = Router()
@@ -22,5 +23,8 @@ voucherRouter.post('/available', getAvailableVouchersController)
 
 // Apply a voucher
 voucherRouter.post('/apply', applyVoucherController)
+
+// Get best voucher combination
+voucherRouter.post('/best', getBestVoucherController)
 
 export default voucherRouter
