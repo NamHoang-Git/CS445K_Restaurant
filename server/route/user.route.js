@@ -3,7 +3,7 @@ import {
     changePassword, forgotPasswordController, loginController,
     logoutController, refreshTokenController, registerUserController, resetPassword,
     updateUserDetails, uploadAvatar, userDetails, userPoints, verifyEmailController,
-    verifyForgotPasswordOtp, verifyPassword
+    verifyForgotPasswordOtp, verifyPassword, getCustomerAnalytics
 } from '../controllers/user.controller.js'
 import auth from '../middleware/auth.js'
 import upload from './../middleware/multer.js';
@@ -24,5 +24,8 @@ userRouter.post('/verify-password', auth, verifyPassword)
 userRouter.put('/change-password', auth, changePassword)
 userRouter.get('/user-details', auth, userDetails)
 userRouter.get('/user-points', auth, userPoints)
+
+// Analytics route
+userRouter.get('/analytics', auth, getCustomerAnalytics)
 
 export default userRouter

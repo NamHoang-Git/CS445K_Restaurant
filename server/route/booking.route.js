@@ -9,7 +9,8 @@ import {
     confirmBookingController,
     getAvailableTablesForBookingController,
     getCustomerBookingsController,
-    createBookingPaymentSession
+    createBookingPaymentSession,
+    getBookingReportData
 } from "../controllers/booking.controller.js";
 import {
     createBookingWithPreOrder,
@@ -33,5 +34,8 @@ bookingRouter.post('/create-payment-session', createBookingPaymentSession);
 bookingRouter.post('/create-with-preorder', createBookingWithPreOrder);
 bookingRouter.get('/get-with-preorder/:id', getBookingWithPreOrder);
 bookingRouter.post('/create-preorder-payment-session', createBookingWithPreOrderPayment);
+
+// Report route
+bookingRouter.get('/report', auth, getBookingReportData);
 
 export default bookingRouter;

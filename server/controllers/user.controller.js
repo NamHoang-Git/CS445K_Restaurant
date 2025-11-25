@@ -8,6 +8,7 @@ import uploadImageCloudinary from '../utils/uploadImageCloudinary.js';
 import generatedOtp from '../utils/generatedOtp.js';
 import forgotPasswordTemplate from '../utils/forgotPasswordTemplate.js';
 import jwt from 'jsonwebtoken'
+import OrderModel from '../models/order.model.js'
 
 // Register Controller
 export async function registerUserController(req, res) {
@@ -638,5 +639,112 @@ export async function userPoints(req, res) {
             error: true,
             success: false
         })
+    }
+}
+
+// Get customer analytics for reports
+export async function getCustomerAnalytics(req, res) {
+    try {
+        const { startDate, endDate } = req.query;
+
+        // Build query for orders
+        const orderQuery = {};
+        if (startDate) {
+            orderQuery.createdAt = { $gte: new Date(startDate) };
+        }
+        if (endDate) {
+            orderQuery.createdAt = {
+                ...orderQuery.createdAt,
+                $lte: new Date(endDate)
+            };
+        }
+
+        // Get all orders with user info
+        const orders = await OrderModel.find(orderQuery)
+            .populate('userId', 'name email createdAt')
+            .sort({ createdAt: -1 });
+
+        // Calculate customer metrics
+        const customerStats = {};
+
+        orders.forEach(order => {
+            if (!order.userId) return;
+
+            const userId = order.userId._id.toString();
+
+            if (!customerStats[userId]) {
+                customerStats[userId] = {
+                    userId: order.userId._id,
+                    name: order.userId.name,
+                    email: order.userId.email,
+                    orderCount: 0,
+                    totalRevenue: 0,
+                    joinedDate: order.userId.createdAt
+                };
+            }
+
+            customerStats[userId].orderCount += 1;
+            customerStats[userId].totalRevenue += order.totalAmt || 0;
+        });
+
+        // Convert to array and sort
+        const customersArray = Object.values(customerStats);
+
+        // Top customers by order count
+        const topByOrders = [...customersArray]
+            .sort((a, b) => b.orderCount - a.orderCount)
+            .slice(0, 10);
+
+        // Top customers by revenue
+        const topByRevenue = [...customersArray]
+            .sort((a, b) => b.totalRevenue - a.totalRevenue)
+            .slice(0, 10);
+
+        // New vs returning customers
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+        const newCustomers = customersArray.filter(c =>
+            new Date(c.joinedDate) >= thirtyDaysAgo
+        ).length;
+
+        const returningCustomers = customersArray.filter(c =>
+            c.orderCount > 1
+        ).length;
+
+        // Customer growth by month
+        const customerGrowth = {};
+        customersArray.forEach(customer => {
+            const month = new Date(customer.joinedDate).toISOString().slice(0, 7); // YYYY-MM
+            customerGrowth[month] = (customerGrowth[month] || 0) + 1;
+        });
+
+        return res.status(200).json({
+            message: "Lấy phân tích khách hàng thành công",
+            data: {
+                summary: {
+                    totalCustomers: customersArray.length,
+                    newCustomers,
+                    returningCustomers,
+                    avgOrdersPerCustomer: customersArray.length > 0
+                        ? (orders.length / customersArray.length).toFixed(2)
+                        : 0
+                },
+                topByOrders,
+                topByRevenue,
+                customerGrowth: Object.entries(customerGrowth)
+                    .map(([month, count]) => ({ month, count }))
+                    .sort((a, b) => a.month.localeCompare(b.month))
+            },
+            error: false,
+            success: true
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
     }
 }

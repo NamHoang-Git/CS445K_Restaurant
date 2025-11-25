@@ -545,3 +545,109 @@ export async function createBookingPaymentSession(request, response) {
         });
     }
 }
+
+// Get booking report data for analytics
+export async function getBookingReportData(request, response) {
+    try {
+        const { startDate, endDate } = request.query;
+
+        // Build query
+        const query = {};
+        if (startDate) {
+            query.bookingDate = { $gte: new Date(startDate) };
+        }
+        if (endDate) {
+            query.bookingDate = {
+                ...query.bookingDate,
+                $lte: new Date(endDate)
+            };
+        }
+
+        const bookings = await BookingModel.find(query)
+            .populate('tableId', 'tableNumber')
+            .populate('userId', 'name email')
+            .sort({ bookingDate: -1 });
+
+        // Calculate metrics
+        const totalBookings = bookings.length;
+        const cancelledBookings = bookings.filter(b => b.status === 'cancelled').length;
+        const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
+        const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+        const completedBookings = bookings.filter(b => b.status === 'completed').length;
+
+        const cancellationRate = totalBookings > 0
+            ? ((cancelledBookings / totalBookings) * 100).toFixed(2)
+            : 0;
+
+        // Peak hours analysis
+        const hourCounts = {};
+        bookings.forEach(booking => {
+            const hour = booking.bookingTime.split(':')[0];
+            hourCounts[hour] = (hourCounts[hour] || 0) + 1;
+        });
+
+        const peakHours = Object.entries(hourCounts)
+            .sort((a, b) => b[1] - a[1])
+            .slice(0, 5)
+            .map(([hour, count]) => ({
+                hour: `${hour}:00`,
+                count
+            }));
+
+        // Average party size
+        const totalGuests = bookings.reduce((sum, b) => sum + b.numberOfGuests, 0);
+        const avgPartySize = totalBookings > 0
+            ? (totalGuests / totalBookings).toFixed(1)
+            : 0;
+
+        // Bookings by date
+        const bookingsByDate = {};
+        bookings.forEach(booking => {
+            const date = new Date(booking.bookingDate).toISOString().split('T')[0];
+            if (!bookingsByDate[date]) {
+                bookingsByDate[date] = {
+                    date,
+                    count: 0,
+                    guests: 0
+                };
+            }
+            bookingsByDate[date].count += 1;
+            bookingsByDate[date].guests += booking.numberOfGuests;
+        });
+
+        return response.status(200).json({
+            message: "Lấy báo cáo đặt bàn thành công",
+            data: {
+                summary: {
+                    totalBookings,
+                    confirmedBookings,
+                    pendingBookings,
+                    cancelledBookings,
+                    completedBookings,
+                    cancellationRate: parseFloat(cancellationRate),
+                    avgPartySize: parseFloat(avgPartySize)
+                },
+                peakHours,
+                bookingsByDate: Object.values(bookingsByDate).sort((a, b) =>
+                    new Date(a.date) - new Date(b.date)
+                ),
+                statusDistribution: {
+                    pending: pendingBookings,
+                    confirmed: confirmedBookings,
+                    cancelled: cancelledBookings,
+                    completed: completedBookings
+                },
+                hourDistribution: hourCounts
+            },
+            error: false,
+            success: true
+        });
+
+    } catch (error) {
+        return response.status(500).json({
+            message: error.message || error,
+            error: true,
+            success: false
+        });
+    }
+}
