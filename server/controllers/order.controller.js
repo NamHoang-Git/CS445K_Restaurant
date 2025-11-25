@@ -9,6 +9,8 @@ import VoucherModel from "../models/voucher.model.js";
 import BookingModel from "../models/booking.model.js";
 import sendEmail from "../config/sendEmail.js";
 import bookingEmailTemplate from "../utils/bookingEmailTemplate.js";
+import bookingWithPreOrderEmailTemplate from "../utils/bookingWithPreOrderEmailTemplate.js";
+import orderEmailTemplate from "../utils/orderEmailTemplate.js";
 
 export async function CashOnDeliveryOrderController(request, response) {
     const maxRetries = 3;
@@ -266,10 +268,27 @@ export async function CashOnDeliveryOrderController(request, response) {
                                 discountValue: 0,
                                 isFreeShipping: true
                             } : null
-                        }
+                        },
+                        userEmail: user.email // Return email for notification
                     }
                 };
             });
+
+            // Send email notification
+            if (result?.data?.orders?.length > 0 && result?.data?.userEmail) {
+                try {
+                    // Populate delivery address for email template
+                    const populatedOrders = await OrderModel.find({ _id: { $in: result.data.orders.map(o => o._id) } }).populate('delivery_address');
+
+                    await sendEmail({
+                        sendTo: result.data.userEmail,
+                        subject: "Xác nhận đơn hàng - EatEase Restaurant",
+                        html: orderEmailTemplate(populatedOrders)
+                    });
+                } catch (emailError) {
+                    console.error("Failed to send COD order confirmation email:", emailError);
+                }
+            }
 
             return response.status(200).json({
                 message: 'Đặt hàng thành công',
@@ -995,6 +1014,43 @@ export async function webhookStripe(request, response) {
                             }
                         } catch (emailError) {
                             console.error("Failed to send booking confirmation email:", emailError);
+                        }
+                    }
+
+                    // Send email for booking with pre-order
+                    if (stripeSession.metadata?.type === 'booking_with_preorder' && stripeSession.metadata?.bookingId && stripeSession.metadata?.orderId) {
+                        try {
+                            const booking = await BookingModel.findById(stripeSession.metadata.bookingId);
+                            const order = await OrderModel.findById(stripeSession.metadata.orderId);
+
+                            if (booking && order && booking.email) {
+                                await sendEmail({
+                                    sendTo: booking.email,
+                                    subject: "Xác nhận đặt bàn & Món ăn - EatEase Restaurant",
+                                    html: bookingWithPreOrderEmailTemplate(booking, order)
+                                });
+                            }
+                        } catch (emailError) {
+                            console.error("Failed to send booking with pre-order confirmation email:", emailError);
+                        }
+                    }
+
+                    // Send email for standard orders (Order Only)
+                    if (stripeSession.metadata?.tempOrderIds && stripeSession.metadata?.userId) {
+                        try {
+                            const orderIds = JSON.parse(stripeSession.metadata.tempOrderIds);
+                            const orders = await OrderModel.find({ _id: { $in: orderIds } }).populate('delivery_address');
+                            const user = await UserModel.findById(stripeSession.metadata.userId);
+
+                            if (orders.length > 0 && user && user.email) {
+                                await sendEmail({
+                                    sendTo: user.email,
+                                    subject: "Xác nhận đơn hàng - EatEase Restaurant",
+                                    html: orderEmailTemplate(orders)
+                                });
+                            }
+                        } catch (emailError) {
+                            console.error("Failed to send order confirmation email:", emailError);
                         }
                     }
                 }

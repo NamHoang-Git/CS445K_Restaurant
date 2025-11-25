@@ -130,6 +130,10 @@ export async function getAllBookingsController(request, response) {
         const bookings = await BookingModel.find()
             .populate('tableId', 'tableNumber capacity location')
             .populate('userId', 'name email')
+            .populate({
+                path: 'preOrderId',
+                select: 'totalAmt product_details payment_status'
+            })
             .sort({ bookingDate: -1, bookingTime: -1 });
 
         return response.status(200).json({
@@ -155,7 +159,11 @@ export async function getBookingByIdController(request, response) {
 
         const booking = await BookingModel.findById(id)
             .populate('tableId', 'tableNumber capacity location')
-            .populate('userId', 'name email');
+            .populate('userId', 'name email')
+            .populate({
+                path: 'preOrderId',
+                select: 'totalAmt product_details payment_status'
+            });
 
         if (!booking) {
             return response.status(404).json({

@@ -15,20 +15,16 @@ const SuccessPage = () => {
     const navigate = useNavigate();
     const location = useLocation();
     const [isLoaded, setIsLoaded] = useState(false);
-    const [orderId, setOrderId] = useState('');
     const [isBooking, setIsBooking] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const sessionId = params.get('session_id');
-        const orderId = params.get('order_id');
-        const orderIds = params.get('order_ids');
         const bookingId = params.get('booking_id');
 
         if (sessionId && !isLoaded) {
             reloadAfterPayment();
             setIsLoaded(true);
-            setOrderId(orderId || orderIds || '');
             setIsBooking(!!bookingId);
 
             const message = bookingId

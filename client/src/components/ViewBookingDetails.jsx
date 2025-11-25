@@ -162,6 +162,61 @@ const ViewBookingDetails = ({ close, data }) => {
                         </div>
                     </div>
 
+                    {data.hasPreOrder && data.preOrderId && (
+                        <>
+                            <Divider />
+                            <div>
+                                <h3 className="font-semibold text-base mb-3">
+                                    Thông tin đặt món trước
+                                </h3>
+                                <div className="space-y-3">
+                                    <div className="flex justify-between items-center text-sm">
+                                        <div className="flex items-center gap-2 flex-1 pr-4">
+                                            <span className="font-medium">
+                                                {data.preOrderId.product_details
+                                                    ?.name || 'Combo món ăn'}
+                                            </span>
+                                        </div>
+                                        <span className="font-medium whitespace-nowrap">
+                                            {data.preOrderTotal?.toLocaleString(
+                                                'vi-VN'
+                                            )}
+                                            đ
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center pt-2 border-t border-dashed mt-2">
+                                        <span className="font-bold">
+                                            Tổng tiền món:
+                                        </span>
+                                        <span className="font-bold text-purple-600">
+                                            {data.preOrderTotal?.toLocaleString(
+                                                'vi-VN'
+                                            )}
+                                            đ
+                                        </span>
+                                    </div>
+                                    <div className="flex justify-between items-center">
+                                        <span className="text-gray-500">
+                                            Trạng thái thanh toán:
+                                        </span>
+                                        <span
+                                            className={`font-medium ${
+                                                data.preOrderId
+                                                    .payment_status ===
+                                                'Đã thanh toán'
+                                                    ? 'text-green-600'
+                                                    : 'text-yellow-600'
+                                            }`}
+                                        >
+                                            {data.preOrderId.payment_status ||
+                                                'Chờ thanh toán'}
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                        </>
+                    )}
+
                     {data.specialRequests && (
                         <>
                             <Divider />

@@ -56,6 +56,9 @@ const BookingManagementPage = () => {
                     depositAmount: item.depositAmount || 0,
                     depositPaid: item.depositPaid,
                     specialRequests: item.specialRequests || '',
+                    hasPreOrder: item.hasPreOrder,
+                    preOrderId: item.preOrderId,
+                    preOrderTotal: item.preOrderTotal,
                     createdAt: format(
                         new Date(item.createdAt),
                         'dd/MM/yyyy HH:mm'
@@ -146,6 +149,16 @@ const BookingManagementPage = () => {
             label: 'Tên khách',
             type: 'string',
             sortable: true,
+            format: (value, row) => (
+                <div className="flex flex-col">
+                    <span>{value}</span>
+                    {row.hasPreOrder && (
+                        <span className="text-[10px] bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full w-fit mt-1">
+                            + Đặt món
+                        </span>
+                    )}
+                </div>
+            ),
         },
         { key: 'phone', label: 'Số ĐT', type: 'string', sortable: true },
         { key: 'tableNumber', label: 'Số bàn', type: 'string', sortable: true },
@@ -171,17 +184,23 @@ const BookingManagementPage = () => {
         },
         {
             key: 'depositAmount',
-            label: 'Cọc',
+            label: 'Thanh toán',
             type: 'string',
             sortable: true,
             format: (value, row) => (
                 <div className="flex flex-col">
-                    <span>
+                    <span className="text-xs text-gray-500">
+                        Cọc:{' '}
                         {value > 0 ? value.toLocaleString('vi-VN') + 'đ' : '-'}
                     </span>
-                    {value > 0 && (
+                    {row.hasPreOrder && (
+                        <span className="text-xs text-purple-600 font-medium">
+                            Món: {row.preOrderTotal?.toLocaleString('vi-VN')}đ
+                        </span>
+                    )}
+                    {(value > 0 || row.hasPreOrder) && (
                         <span
-                            className={`text-xs ${
+                            className={`text-xs mt-1 ${
                                 row.depositPaid
                                     ? 'text-green-600'
                                     : 'text-yellow-600'
