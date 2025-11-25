@@ -9,6 +9,7 @@ import {
     getAllOrdersController,
     updateOrderStatusController
 } from '../controllers/order.controller.js';
+import { cleanupCancelledPayment, cleanupByIds } from '../controllers/cancelPayment.controller.js';
 
 const orderRouter = Router();
 
@@ -21,6 +22,9 @@ orderRouter.get('/webhook-test', (req, res) => {
 });
 orderRouter.get('/order-list', auth, getOrderDetailsController);
 orderRouter.get('/all-orders', auth, getAllOrdersController);
+// Cleanup cancelled payments
+orderRouter.post('/cleanup-cancelled', cleanupCancelledPayment);
+orderRouter.post('/cleanup-by-ids', cleanupByIds);
 // Update order status
 orderRouter.put('/update-status/:orderId', auth, (req, res, next) => {
     console.log('Update status route hit:', {

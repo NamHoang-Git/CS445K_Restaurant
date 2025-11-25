@@ -3,12 +3,54 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { FaTimesCircle, FaShoppingBag, FaHome } from 'react-icons/fa';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import SummaryApi from '../common/SummaryApi';
+import Axios from '../utils/Axios';
 
 const Cancel = () => {
     const navigate = useNavigate();
     const location = useLocation();
+    const [isBooking, setIsBooking] = React.useState(false);
 
     useEffect(() => {
+        const params = new URLSearchParams(location.search);
+        const bookingId = params.get('booking_id');
+        const orderId = params.get('order_id');
+        const orderIdsParam = params.get('order_ids');
+
+        setIsBooking(!!bookingId);
+
+        // Cleanup cancelled payment immediately
+        const cleanupCancelledPayment = async () => {
+            try {
+                const ids = {};
+
+                if (bookingId) ids.bookingIds = [bookingId];
+
+                if (orderId) {
+                    ids.orderIds = [orderId];
+                } else if (orderIdsParam) {
+                    ids.orderIds = orderIdsParam.split(',');
+                }
+
+                // Only call API if we have IDs to clean up
+                if (
+                    (ids.bookingIds && ids.bookingIds.length > 0) ||
+                    (ids.orderIds && ids.orderIds.length > 0)
+                ) {
+                    await Axios({
+                        ...SummaryApi.cleanup_by_ids,
+                        data: ids,
+                    });
+                    console.log('Cleaned up cancelled payment:', ids);
+                }
+            } catch (error) {
+                console.error('Failed to cleanup cancelled payment:', error);
+                // Don't show error to user, just log it
+            }
+        };
+
+        cleanupCancelledPayment();
+
         toast.error('Thanh toán đã bị hủy', {
             duration: 4000,
             style: {
@@ -16,7 +58,7 @@ const Cancel = () => {
                 color: '#fff',
             },
         });
-    }, []);
+    }, [location]);
 
     const containerVariants = {
         hidden: { opacity: 0 },
@@ -59,13 +101,15 @@ const Cancel = () => {
                         className="text-xl sm:text-3xl font-bold text-white mb-2"
                         variants={itemVariants}
                     >
-                        Đơn Hàng Đã Bị Hủy
+                        {isBooking ? 'Đặt Bàn Đã Bị Hủy' : 'Đơn Hàng Đã Bị Hủy'}
                     </motion.h1>
                     <motion.p
                         className="text-red-100 sm:text-lg text-base"
                         variants={itemVariants}
                     >
-                        Rất tiếc, đơn hàng của bạn đã bị hủy
+                        {isBooking
+                            ? 'Rất tiếc, đặt bàn của bạn đã bị hủy'
+                            : 'Rất tiếc, đơn hàng của bạn đã bị hủy'}
                     </motion.p>
                 </div>
 
@@ -76,9 +120,9 @@ const Cancel = () => {
                 >
                     <div className="bg-red-100/90 rounded-e-lg border-l-4 border-red-500 p-4">
                         <p className="text-gray-700 sm:text-base text-xs">
-                            Đơn hàng của bạn đã bị hủy. Nếu đây là sự nhầm lẫn,
-                            vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ của
-                            chúng tôi.
+                            {isBooking
+                                ? 'Đặt bàn của bạn đã bị hủy. Nếu đây là sự nhầm lẫn, vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ của chúng tôi.'
+                                : 'Đơn hàng của bạn đã bị hủy. Nếu đây là sự nhầm lẫn, vui lòng thử lại hoặc liên hệ với bộ phận hỗ trợ của chúng tôi.'}
                         </p>
                     </div>
 
@@ -87,11 +131,19 @@ const Cancel = () => {
                             whileHover={{ scale: 1.03 }}
                             whileTap={{ scale: 0.98 }}
                             className="flex flex-col items-center justify-center p-4 bg-gray-100 rounded-lg border border-gray-200 hover:bg-gray-200 transition-colors"
-                            onClick={() => navigate('/cart')}
+                            onClick={() =>
+                                navigate(
+                                    isBooking
+                                        ? '/booking-with-preorder'
+                                        : '/cart'
+                                )
+                            }
                         >
                             <FaShoppingBag className="text-gray-600 text-2xl mb-2" />
                             <span className="text-sm font-medium text-gray-700">
-                                Quay lại giỏ hàng
+                                {isBooking
+                                    ? 'Thử đặt lại'
+                                    : 'Quay lại giỏ hàng'}
                             </span>
                         </motion.button>
 

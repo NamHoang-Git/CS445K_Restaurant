@@ -33,6 +33,7 @@ import ProductManagementPage from '../pages/ProductManagementPage';
 import TableManagementPage from '../pages/TableManagementPage';
 import BookingManagementPage from '../pages/BookingManagementPage';
 import BookingPage from '../pages/BookingPage';
+import BookingWithPreOrderPage from '../pages/BookingWithPreOrderPage';
 import BookingSuccessPage from '../pages/BookingSuccessPage';
 import EmployeeManagementPage from '../pages/EmployeeManagementPage';
 import EmployeeDashboard from '../pages/EmployeeDashboard';
@@ -57,6 +58,10 @@ const router = createBrowserRouter([
             {
                 path: 'booking',
                 element: <BookingPage />,
+            },
+            {
+                path: 'booking-with-preorder',
+                element: <BookingWithPreOrderPage />,
             },
             {
                 path: 'booking/success',
@@ -241,14 +246,6 @@ const router = createBrowserRouter([
                 ],
             },
             {
-                path: ':category',
-                element: <ProductListPage />,
-            },
-            {
-                path: 'product/:product',
-                element: <ProductDisplayPage />,
-            },
-            {
                 path: 'cart',
                 element: <CartPage />,
             },
@@ -275,6 +272,14 @@ const router = createBrowserRouter([
                         <Cancel />
                     </ProtectedRoute>
                 ),
+            },
+            {
+                path: ':category',
+                element: <ProductListPage />,
+            },
+            {
+                path: 'product/:product',
+                element: <ProductDisplayPage />,
             },
         ],
     },

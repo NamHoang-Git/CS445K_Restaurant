@@ -16,27 +16,32 @@ const SuccessPage = () => {
     const location = useLocation();
     const [isLoaded, setIsLoaded] = useState(false);
     const [orderId, setOrderId] = useState('');
+    const [isBooking, setIsBooking] = useState(false);
 
     useEffect(() => {
         const params = new URLSearchParams(location.search);
         const sessionId = params.get('session_id');
         const orderId = params.get('order_id');
+        const orderIds = params.get('order_ids');
+        const bookingId = params.get('booking_id');
 
         if (sessionId && !isLoaded) {
             reloadAfterPayment();
             setIsLoaded(true);
-            setOrderId(orderId || '');
+            setOrderId(orderId || orderIds || '');
+            setIsBooking(!!bookingId);
 
-            toast.success(
-                'Thanh toán thành công! Đơn hàng của bạn đã được cập nhật.',
-                {
-                    duration: 4000,
-                    style: {
-                        background: '#4CAF50',
-                        color: '#fff',
-                    },
-                }
-            );
+            const message = bookingId
+                ? 'Thanh toán thành công! Đặt bàn và món ăn của bạn đã được xác nhận.'
+                : 'Thanh toán thành công! Đơn hàng của bạn đã được cập nhật.';
+
+            toast.success(message, {
+                duration: 4000,
+                style: {
+                    background: '#4CAF50',
+                    color: '#fff',
+                },
+            });
         } else if (!sessionId) {
             navigate('/');
         }
@@ -82,13 +87,17 @@ const SuccessPage = () => {
                         className="text-xl sm:text-3xl font-bold text-white mb-2"
                         variants={itemVariants}
                     >
-                        Đặt Hàng Thành Công!
+                        {isBooking
+                            ? 'Đặt Bàn Thành Công!'
+                            : 'Đặt Hàng Thành Công!'}
                     </motion.h1>
                     <motion.p
                         className="text-green-100 sm:text-lg text-base"
                         variants={itemVariants}
                     >
-                        Cảm ơn quý khách đã mua sắm tại TechSpace
+                        {isBooking
+                            ? 'Cảm ơn quý khách đã đặt bàn tại nhà hàng'
+                            : 'Cảm ơn quý khách đã đặt món tại nhà hàng'}
                     </motion.p>
                 </div>
 
@@ -99,8 +108,9 @@ const SuccessPage = () => {
                 >
                     <div className="bg-green-100/90 rounded-e-lg border-l-4 border-green-500 p-4">
                         <p className="text-gray-700 sm:text-base text-xs">
-                            Đơn hàng của bạn đã được xác nhận và đang được xử
-                            lý.
+                            {isBooking
+                                ? 'Đặt bàn và món ăn của bạn đã được xác nhận. Vui lòng đến đúng giờ đã đặt.'
+                                : 'Đơn hàng của bạn đã được xác nhận và đang được xử lý.'}
                         </p>
                     </div>
 
@@ -113,7 +123,7 @@ const SuccessPage = () => {
                         >
                             <FaListAlt className="text-blue-500 text-2xl mb-2" />
                             <span className="text-sm font-medium text-gray-700">
-                                Xem đơn hàng
+                                {isBooking ? 'Xem đặt bàn' : 'Xem đơn hàng'}
                             </span>
                         </motion.button>
 
@@ -125,7 +135,9 @@ const SuccessPage = () => {
                         >
                             <FaShoppingBag className="text-purple-500 text-2xl mb-2" />
                             <span className="text-sm font-medium text-gray-700">
-                                Tiếp tục mua sắm
+                                {isBooking
+                                    ? 'Đặt bàn khác'
+                                    : 'Tiếp tục mua sắm'}
                             </span>
                         </motion.button>
                     </div>

@@ -303,6 +303,29 @@ const SummaryApi = {
         url: '/api/booking/create-payment-session',
         method: 'post'
     },
+    // Booking with pre-order
+    create_booking_with_preorder: {
+        url: '/api/booking/create-with-preorder',
+        method: 'post'
+    },
+    get_booking_with_preorder: {
+        url: '/api/booking/get-with-preorder/:id',
+        method: 'get'
+    },
+    create_preorder_payment_session: {
+        url: '/api/booking/create-preorder-payment-session',
+        method: 'post'
+    },
+
+    // Cleanup cancelled payments
+    cleanup_cancelled_payment: {
+        url: '/api/order/cleanup-cancelled',
+        method: 'post'
+    },
+    cleanup_by_ids: {
+        url: '/api/order/cleanup-by-ids',
+        method: 'post'
+    },
 
     // Employee Management
     get_all_employees: {

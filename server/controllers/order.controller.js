@@ -760,8 +760,8 @@ export async function paymentController(request, response) {
                 }
             },
             line_items,
-            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/cancel`
+            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}&order_ids=${tempOrder.map(o => o._id).join(',')}`,
+            cancel_url: `${process.env.FRONTEND_URL}/cancel?order_ids=${tempOrder.map(o => o._id).join(',')}`
         };
 
         // Commit the transaction before creating the Stripe session
@@ -861,7 +861,34 @@ export async function webhookStripe(request, response) {
 
                 try {
                     await dbSession.withTransaction(async () => {
-                        const { userId, tempOrderIds, pointsToUse: pointsToUseStr, orderTotal, type, bookingId } = stripeSession.metadata || {};
+                        const { userId, tempOrderIds, pointsToUse: pointsToUseStr, orderTotal, type, bookingId, orderId } = stripeSession.metadata || {};
+
+                        // Handle Booking with Pre-order
+                        if (type === 'booking_with_preorder' && bookingId && orderId) {
+                            const booking = await BookingModel.findById(bookingId).session(dbSession);
+                            const order = await OrderModel.findById(orderId).session(dbSession);
+
+                            if (booking && order) {
+                                // Update booking
+                                if (!booking.depositPaid) {
+                                    booking.depositPaid = true;
+                                    booking.paymentIntentId = stripeSession.payment_intent;
+                                    booking.status = 'confirmed';
+                                    await booking.save({ session: dbSession });
+                                }
+
+                                // Update order to paid
+                                if (order.payment_status !== 'Đã thanh toán') {
+                                    order.payment_status = 'Đã thanh toán';
+                                    order.paymentId = stripeSession.payment_intent;
+                                    order.invoice_receipt = stripeSession.id;
+                                    await order.save({ session: dbSession });
+                                }
+
+                                console.log(`Booking ${bookingId} and Order ${orderId} updated successfully`);
+                            }
+                            return; // Exit after handling booking with pre-order
+                        }
 
                         // Handle Booking Deposit
                         if (type === 'booking_deposit' && bookingId) {
@@ -973,6 +1000,48 @@ export async function webhookStripe(request, response) {
                 }
                 break;
             }
+
+            case 'checkout.session.expired':
+            case 'checkout.session.async_payment_failed': {
+                // Handle cancelled/expired checkout sessions
+                const stripeSession = event.data.object;
+                const dbSession = await mongoose.startSession();
+
+                try {
+                    await dbSession.withTransaction(async () => {
+                        const { type, bookingId, orderId, tempOrderIds } = stripeSession.metadata || {};
+
+                        // Handle Booking with Pre-order cancellation
+                        if (type === 'booking_with_preorder' && bookingId && orderId) {
+                            // Delete the booking and order since payment was cancelled
+                            await BookingModel.findByIdAndDelete(bookingId).session(dbSession);
+                            await OrderModel.findByIdAndDelete(orderId).session(dbSession);
+                            console.log(`Deleted cancelled booking ${bookingId} and order ${orderId}`);
+                            return;
+                        }
+
+                        // Handle Booking Deposit cancellation
+                        if (type === 'booking_deposit' && bookingId) {
+                            await BookingModel.findByIdAndDelete(bookingId).session(dbSession);
+                            console.log(`Deleted cancelled booking ${bookingId}`);
+                            return;
+                        }
+
+                        // Handle regular Order cancellation
+                        if (tempOrderIds) {
+                            const orderIds = JSON.parse(tempOrderIds);
+                            await OrderModel.deleteMany({ _id: { $in: orderIds } }).session(dbSession);
+                            console.log(`Deleted ${orderIds.length} cancelled orders`);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Failed to handle cancelled checkout:', error);
+                } finally {
+                    await dbSession.endSession();
+                }
+                break;
+            }
+
             default:
                 console.log(`Unhandled event type: ${event.type}`);
                 break;

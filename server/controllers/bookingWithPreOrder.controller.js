@@ -157,9 +157,12 @@ export async function createBookingWithPreOrder(request, response) {
         const order = new OrderModel({
             userId: userId || null,
             orderId: `ORD-${Date.now()}`,
-            productId: validatedItems.map(item => item.productId),
-            product_details: validatedItems.map(item => item.product_details),
-            quantity: validatedItems.map(item => item.quantity),
+            productId: validatedItems[0].productId, // First product
+            product_details: {
+                name: validatedItems.map(item => item.product_details.name).join(', '),
+                image: validatedItems.map(item => item.product_details.image)
+            },
+            quantity: validatedItems.reduce((sum, item) => sum + item.quantity, 0), // Total quantity
             totalAmt: finalPreOrderTotal,
             subTotalAmt: preOrderTotal,
             payment_status: 'pending',
@@ -167,6 +170,11 @@ export async function createBookingWithPreOrder(request, response) {
             orderType: 'pre_order',
             bookingId: booking._id,
             isPreOrder: true,
+            customerContact: {
+                name: customerName,
+                email: email || null,
+                phone: phone
+            },
             invoice_receipt: ""
         });
 
@@ -303,9 +311,10 @@ export async function createBookingWithPreOrderPayment(request, response) {
             mode: 'payment',
             payment_method_types: ['card'],
             billing_address_collection: 'auto',
+            customer_email: booking.email || undefined, // Pre-fill email if available
             line_items: line_items,
-            success_url: `${process.env.FRONTEND_URL}/booking-success?session_id={CHECKOUT_SESSION_ID}`,
-            cancel_url: `${process.env.FRONTEND_URL}/booking-cancel`,
+            success_url: `${process.env.FRONTEND_URL}/success?session_id={CHECKOUT_SESSION_ID}&booking_id=${bookingId}&order_id=${orderId}`,
+            cancel_url: `${process.env.FRONTEND_URL}/cancel?booking_id=${bookingId}&order_id=${orderId}`,
             metadata: {
                 bookingId: bookingId.toString(),
                 orderId: orderId.toString(),
