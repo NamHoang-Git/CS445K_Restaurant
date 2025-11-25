@@ -11,6 +11,11 @@ import {
     getCustomerBookingsController,
     createBookingPaymentSession
 } from "../controllers/booking.controller.js";
+import {
+    createBookingWithPreOrder,
+    getBookingWithPreOrder,
+    createBookingWithPreOrderPayment
+} from "../controllers/bookingWithPreOrder.controller.js";
 
 const bookingRouter = Router();
 
@@ -23,5 +28,10 @@ bookingRouter.patch('/confirm', auth, confirmBookingController);
 bookingRouter.post('/available-tables', getAvailableTablesForBookingController);
 bookingRouter.post('/customer-bookings', getCustomerBookingsController);
 bookingRouter.post('/create-payment-session', createBookingPaymentSession);
+
+// Booking with pre-order routes
+bookingRouter.post('/create-with-preorder', createBookingWithPreOrder);
+bookingRouter.get('/get-with-preorder/:id', getBookingWithPreOrder);
+bookingRouter.post('/create-preorder-payment-session', createBookingWithPreOrderPayment);
 
 export default bookingRouter;

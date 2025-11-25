@@ -83,6 +83,20 @@ const bookingSchema = new mongoose.Schema({
         type: String,
         enum: ['customer', 'admin'],
         default: 'customer'
+    },
+    // Pre-order integration fields
+    preOrderId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'order',
+        default: null
+    },
+    hasPreOrder: {
+        type: Boolean,
+        default: false
+    },
+    preOrderTotal: {
+        type: Number,
+        default: 0
     }
 }, {
     timestamps: true

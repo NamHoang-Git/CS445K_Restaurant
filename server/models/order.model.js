@@ -170,6 +170,16 @@ const orderSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'voucher',
         default: null
+    },
+    // Booking integration fields
+    bookingId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'booking',
+        default: null
+    },
+    isPreOrder: {
+        type: Boolean,
+        default: false
     }
 }, {
     timestamps: true
