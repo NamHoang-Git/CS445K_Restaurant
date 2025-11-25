@@ -92,16 +92,18 @@ const CartPage = () => {
 
     const totalPrice = cart
         .filter((item) => selectedItems.includes(item._id))
-        .reduce(
-            (acc, item) =>
-                acc +
-                pricewithDiscount(
-                    item.productId?.price || 0,
-                    item.productId?.discount || 0
-                ) *
-                    (item.quantity || 1),
-            0
-        );
+        .reduce((acc, item) => {
+            const basePrice = pricewithDiscount(
+                item.productId?.price || 0,
+                item.productId?.discount || 0
+            );
+            const optionsPrice =
+                item.selectedOptions?.reduce(
+                    (sum, opt) => sum + (opt.priceModifier || 0),
+                    0
+                ) || 0;
+            return acc + (basePrice + optionsPrice) * (item.quantity || 1);
+        }, 0);
 
     const originalTotalPrice = cart
         .filter((item) => selectedItems.includes(item._id))
@@ -188,7 +190,7 @@ const CartPage = () => {
             header: 'Sản phẩm',
             accessorKey: 'productId.name',
             cell: ({ row }) => (
-                <div className="flex items-center gap-2 sm:gap-4 sm:h-16 h-10">
+                <div className="flex items-center gap-2 sm:gap-4 sm:h-auto h-auto py-2">
                     <img
                         onClick={() => {
                             const product = row.original.productId;
@@ -200,14 +202,41 @@ const CartPage = () => {
                         }}
                         src={row.original.productId?.image?.[0] || ''}
                         alt={row.original.productId?.name || ''}
-                        className="sm:w-16 w-10 h-full flex-shrink-0 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
+                        className="sm:w-16 w-10 h-16 flex-shrink-0 object-cover rounded cursor-pointer hover:opacity-80 transition-opacity"
                         onError={(e) => {
                             e.target.src = '/placeholder-image.jpg';
                         }}
                     />
-                    <p className="font-semibold w-full line-clamp-2">
-                        {row.original.productId?.name || 'Tên không xác định'}
-                    </p>
+                    <div className="flex flex-col gap-1 w-full">
+                        <p className="font-semibold w-full line-clamp-2">
+                            {row.original.productId?.name ||
+                                'Tên không xác định'}
+                        </p>
+                        {/* Display Options */}
+                        {row.original.selectedOptions &&
+                            row.original.selectedOptions.length > 0 && (
+                                <div className="text-xs text-gray-300">
+                                    {row.original.selectedOptions.map(
+                                        (opt, idx) => (
+                                            <span key={idx} className="block">
+                                                {opt.optionName}:{' '}
+                                                {opt.choiceName}
+                                                {opt.priceModifier > 0 &&
+                                                    ` (+${DisplayPriceInVND(
+                                                        opt.priceModifier
+                                                    )})`}
+                                            </span>
+                                        )
+                                    )}
+                                </div>
+                            )}
+                        {/* Display Notes */}
+                        {row.original.notes && (
+                            <p className="text-xs text-gray-400 italic">
+                                Ghi chú: {row.original.notes}
+                            </p>
+                        )}
+                    </div>
                 </div>
             ),
             meta: { className: 'text-left max-w-48' },

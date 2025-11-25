@@ -8,11 +8,7 @@ import SummaryApi from '../common/SummaryApi';
 import toast from 'react-hot-toast';
 import { loadStripe } from '@stripe/stripe-js';
 import { DisplayPriceInVND } from '../utils/DisplayPriceInVND';
-import AddAddress from '../components/AddAddress';
 import Loading from '../components/Loading';
-import { MdDelete, MdEdit } from 'react-icons/md';
-import AxiosToastError from '../utils/AxiosToastError';
-import EditAddressDetails from '../components/EditAddressDetails';
 import { useGlobalContext } from '../provider/GlobalProvider';
 import Divider from '../components/Divider';
 import { Card, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,10 +18,7 @@ import { Input } from '@/components/ui/input';
 
 const CheckoutPage = () => {
     const dispatch = useDispatch();
-    const { fetchAddress, reloadAfterPayment } = useGlobalContext();
-    const [openAddress, setOpenAddress] = useState(false);
-    const [openEdit, setOpenEdit] = useState(false);
-    const [editData, setEditData] = useState({});
+    const { reloadAfterPayment } = useGlobalContext();
     const [showConfirmModal, setShowConfirmModal] = useState({
         show: false,
         type: '',
@@ -42,12 +35,11 @@ const CheckoutPage = () => {
     const [maxPointsToUse, setMaxPointsToUse] = useState(0);
     const [showVouchers, setShowVouchers] = useState(false);
     const [selectedVouchers, setSelectedVouchers] = useState({
-        freeShipping: null,
         regular: null,
     });
     const userPoints = useSelector((state) => state.user.rewardsPoint || 0);
+    const user = useSelector((state) => state.user);
     const pointsValue = 100; // 1 point = 100 VND
-    const shippingCost = 30000; // Lấy từ API hoặc config
 
     const [availableVouchers, setAvailableVouchers] = useState({
         active: [],
@@ -166,13 +158,6 @@ const CheckoutPage = () => {
         }
     }, [selectedItems, cartItemsList, calculateTotal]);
 
-    // Sort addressList
-    const sortedAddressList = [...addressList].sort((a, b) => {
-        if (a.isDefault && !b.isDefault) return -1;
-        if (!a.isDefault && b.isDefault) return 1;
-        return new Date(b.createdAt) - new Date(a.createdAt);
-    });
-
     useEffect(() => {
         if (addressList.length > 0) {
             const defaultIndex = addressList.findIndex(
@@ -207,15 +192,14 @@ const CheckoutPage = () => {
         selectedItems.includes(item._id)
     );
 
-    const filteredTotalPrice =
-        filteredItems.reduce(
-            (acc, item) =>
-                acc +
-                (item.productId?.price || 0) *
-                    (item.quantity || 1) *
-                    (1 - (item.productId?.discount || 0) / 100),
-            0
-        ) + (selectedVouchers.freeShipping ? 0 : shippingCost);
+    const filteredTotalPrice = filteredItems.reduce(
+        (acc, item) =>
+            acc +
+            (item.productId?.price || 0) *
+                (item.quantity || 1) *
+                (1 - (item.productId?.discount || 0) / 100),
+        0
+    );
 
     // Handle apply voucher
     const handleApplyVoucher = async () => {
@@ -334,11 +318,6 @@ const CheckoutPage = () => {
     const calculateVoucherDiscount = useCallback(() => {
         let totalDiscount = 0;
 
-        // Calculate free shipping discount if any
-        if (selectedVouchers.freeShipping) {
-            totalDiscount += shippingCost;
-        }
-
         // Calculate regular voucher discount if any
         if (selectedVouchers.regular) {
             const { discountType, discount, maxDiscount } =
@@ -359,13 +338,11 @@ const CheckoutPage = () => {
         }
 
         return totalDiscount;
-    }, [selectedVouchers, filteredTotalPrice, shippingCost]);
+    }, [selectedVouchers, filteredTotalPrice]);
 
     const handleSelectVoucher = useCallback((voucher) => {
         setSelectedVouchers((prev) => {
-            const voucherType = voucher.isFreeShipping
-                ? 'freeShipping'
-                : 'regular';
+            const voucherType = 'regular';
 
             // Create a new vouchers object first
             const newVouchers = { ...prev };
@@ -381,9 +358,7 @@ const CheckoutPage = () => {
             newVouchers[voucherType] = voucher;
 
             // Show success message
-            if (voucher.isFreeShipping) {
-                toast.success('Áp dụng mã miễn phí vận chuyển thành công!');
-            } else if (voucher.discountType === 'percentage') {
+            if (voucher.discountType === 'percentage') {
                 toast.success(
                     `Áp dụng giảm giá ${voucher.discount}% thành công!`
                 );
@@ -426,26 +401,27 @@ const CheckoutPage = () => {
         0
     );
 
-    const handleDisableAddress = async (id) => {
-        try {
-            const response = await Axios({
-                ...SummaryApi.delete_address,
-                data: { _id: id },
-            });
-            if (response.data.success) {
-                toast.success('Địa chỉ đã được xóa');
-                if (fetchAddress) {
-                    fetchAddress();
-                }
-            }
-        } catch (error) {
-            AxiosToastError(error);
-        }
-    };
-
     const handleCashOnDelivery = async () => {
-        if (!addressList[selectAddress]) {
-            toast.error('Vui lòng chọn địa chỉ.');
+        if (orderType === 'pre_order') {
+            // Validate customer contact for pre-orders
+            if (
+                !customerContact.name ||
+                !customerContact.email ||
+                !customerContact.phone
+            ) {
+                toast.error('Vui lòng điền đầy đủ thông tin liên hệ.');
+                return;
+            }
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(customerContact.email)) {
+                toast.error('Email không hợp lệ.');
+                return;
+            }
+        }
+
+        if (orderType === 'dine_in' && !tableNumber) {
+            toast.error('Vui lòng chọn bàn.');
             return;
         }
 
@@ -487,13 +463,22 @@ const CheckoutPage = () => {
                 ...SummaryApi.cash_on_delivery_order,
                 data: {
                     list_items: formattedItems,
-                    addressId: addressList[selectAddress]?._id,
+                    addressId:
+                        orderType === 'pre_order' && addressList[selectAddress]
+                            ? addressList[selectAddress]?._id
+                            : null,
+                    customerContact:
+                        orderType === 'pre_order' && !addressList[selectAddress]
+                            ? customerContact
+                            : null,
                     subTotalAmt: filteredTotalPrice,
                     totalAmt: finalTotal,
                     pointsToUse: actualPointsToUse,
                     voucherCode: selectedVouchers.regular?.code || '',
                     freeShippingVoucherCode:
                         selectedVouchers.freeShipping?.code || '',
+                    orderType: orderType,
+                    tableNumber: orderType === 'dine_in' ? tableNumber : null,
                 },
             });
 
@@ -518,7 +503,9 @@ const CheckoutPage = () => {
                 navigate('/success', { state: { text: 'Order' } });
             }
         } catch (error) {
-            AxiosToastError(error);
+            toast.error(
+                error.response?.data?.message || 'Có lỗi xảy ra khi đặt hàng'
+            );
         } finally {
             setLoading(false);
             setShowConfirmModal({ show: false, type: '' });
@@ -526,8 +513,26 @@ const CheckoutPage = () => {
     };
 
     const handleOnlinePayment = async () => {
-        if (!addressList[selectAddress]) {
-            toast.error('Vui lòng chọn địa chỉ.');
+        if (orderType === 'pre_order') {
+            // Validate customer contact for pre-orders
+            if (
+                !customerContact.name ||
+                !customerContact.email ||
+                !customerContact.phone
+            ) {
+                toast.error('Vui lòng điền đầy đủ thông tin liên hệ.');
+                return;
+            }
+            // Basic email validation
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+            if (!emailRegex.test(customerContact.email)) {
+                toast.error('Email không hợp lệ.');
+                return;
+            }
+        }
+
+        if (orderType === 'dine_in' && !tableNumber) {
+            toast.error('Vui lòng chọn bàn.');
             return;
         }
 
@@ -585,13 +590,22 @@ const CheckoutPage = () => {
                 ...SummaryApi.payment_url,
                 data: {
                     list_items: formattedItems,
-                    addressId: addressList[selectAddress]?._id,
+                    addressId:
+                        orderType === 'pre_order' && addressList[selectAddress]
+                            ? addressList[selectAddress]?._id
+                            : null,
+                    customerContact:
+                        orderType === 'pre_order' && !addressList[selectAddress]
+                            ? customerContact
+                            : null,
                     subTotalAmt: filteredTotalPrice,
                     totalAmt: amountInVND, // Send the rounded amount
                     pointsToUse: actualPointsToUse,
                     voucherCode: selectedVouchers.regular?.code || '',
                     freeShippingVoucherCode:
                         selectedVouchers.freeShipping?.code || '',
+                    orderType: orderType,
+                    tableNumber: orderType === 'dine_in' ? tableNumber : null,
                 },
             });
 
@@ -623,6 +637,51 @@ const CheckoutPage = () => {
         .filter((item) => selectedItems.includes(item._id))
         .some((item) => item.productId?.discount > 0);
 
+    const [orderType, setOrderType] = useState('dine_in');
+    const [tableNumber, setTableNumber] = useState('');
+    const [customerContact, setCustomerContact] = useState({
+        name: '',
+        email: '',
+        phone: '',
+    });
+    const [availableTables, setAvailableTables] = useState([]);
+    const [loadingTables, setLoadingTables] = useState(false);
+
+    // Auto-fill contact form with user data when component mounts or user changes
+    useEffect(() => {
+        if (user && user._id) {
+            setCustomerContact({
+                name: user.name || '',
+                email: user.email || '',
+                phone: user.mobile || '',
+            });
+        }
+    }, [user]);
+
+    // Fetch available tables when orderType is dine_in
+    useEffect(() => {
+        const fetchAvailableTables = async () => {
+            if (orderType === 'dine_in') {
+                try {
+                    setLoadingTables(true);
+                    const response = await Axios({
+                        ...SummaryApi.get_available_tables,
+                    });
+                    if (response.data.success) {
+                        setAvailableTables(response.data.data || []);
+                    }
+                } catch (error) {
+                    console.error('Error fetching tables:', error);
+                    toast.error('Không thể tải danh sách bàn');
+                } finally {
+                    setLoadingTables(false);
+                }
+            }
+        };
+
+        fetchAvailableTables();
+    }, [orderType]);
+
     return (
         <section className="container mx-auto min-h-[80vh] px-2 py-6 text-white">
             <Card
@@ -637,135 +696,169 @@ const CheckoutPage = () => {
             </Card>
             <div className="h-full flex flex-col lg:flex-row w-full gap-5 liquid-glass shadow rounded-lg sm:p-5 p-2">
                 <div className="w-full flex flex-col gap-3">
-                    <h3 className="sm:text-lg text-sm font-bold">
-                        Chọn địa chỉ giao hàng
-                    </h3>
-                    <Divider />
-                    <div className="rounded-md grid gap-4 overflow-auto max-h-[calc(100vh/2)]">
-                        {sortedAddressList.map((address, index) => (
-                            <label
-                                key={index}
-                                htmlFor={'address' + index}
-                                className={!address.status ? 'hidden' : ''}
-                            >
-                                <div
-                                    className="liquid-glass border border-secondary-100 rounded-md px-2 sm:px-4 py-3 hover:bg-base-100/50
-                                shadow-md cursor-pointer"
-                                >
-                                    <div className="flex justify-between sm:items-start items-end gap-4">
-                                        <div className="flex items-baseline gap-2 sm:gap-3">
-                                            <input
-                                                id={'address' + index}
-                                                type="radio"
-                                                checked={
-                                                    selectAddress ===
-                                                    addressList.findIndex(
-                                                        (addr) =>
-                                                            addr._id ===
-                                                            address._id
-                                                    )
-                                                }
-                                                onChange={() =>
-                                                    setSelectAddress(
-                                                        addressList.findIndex(
-                                                            (addr) =>
-                                                                addr._id ===
-                                                                address._id
-                                                        )
-                                                    )
-                                                }
-                                                name="address"
-                                            />
-                                            <div className="flex flex-col gap-1 text-[10px] sm:text-base text-justify">
-                                                <p>
-                                                    Địa chỉ:{' '}
-                                                    {address.address_line}
-                                                </p>
-                                                <p>Thành phố: {address.city}</p>
-                                                <p>
-                                                    Quận / Huyện:{' '}
-                                                    {address.district}
-                                                </p>
-                                                <p>
-                                                    Phường / Xã: {address.ward}
-                                                </p>
-                                                <p>
-                                                    Quốc gia: {address.country}
-                                                </p>
-                                                <p>
-                                                    Số điện thoại:{' '}
-                                                    {address.mobile}
-                                                </p>
-                                            </div>
-                                            {address.isDefault && (
-                                                <span className="text-rose-500 text-[10px] sm:text-lg font-bold">
-                                                    (*)
-                                                </span>
-                                            )}
-                                        </div>
-                                        <div className="sm:flex hidden items-center gap-3">
-                                            <button
-                                                onClick={() => {
-                                                    setOpenEdit(true);
-                                                    setEditData(address);
-                                                }}
-                                                className="shadow-md shadow-secondary-100 rounded hover:opacity-80 p-[3px] text-white liquid-glass"
-                                            >
-                                                <MdEdit size={18} />
-                                            </button>
-                                            {!address.isDefault && (
-                                                <>
-                                                    <div className="w-[2px] h-4 bg-secondary-100"></div>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDisableAddress(
-                                                                address._id
-                                                            )
-                                                        }
-                                                        className="shadow-md shadow-secondary-100 rounded hover:opacity-80 p-[3px] text-rose-400 liquid-glass"
-                                                    >
-                                                        <MdDelete size={18} />
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                        <div className="flex sm:hidden items-center gap-2">
-                                            <button
-                                                onClick={() => {
-                                                    setOpenEdit(true);
-                                                    setEditData(address);
-                                                }}
-                                                className="shadow-md shadow-secondary-100 rounded hover:opacity-80 p-[1px] text-white liquid-glass"
-                                            >
-                                                <MdEdit size={15} />
-                                            </button>
-                                            {!address.isDefault && (
-                                                <>
-                                                    <div className="w-[2px] h-4 bg-secondary-100"></div>
-                                                    <button
-                                                        onClick={() =>
-                                                            handleDisableAddress(
-                                                                address._id
-                                                            )
-                                                        }
-                                                    >
-                                                        <MdDelete size={15} />
-                                                    </button>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                </div>
+                    {/* Order Type Selection */}
+                    <div className="liquid-glass p-4 rounded-lg mb-4">
+                        <h3 className="sm:text-lg text-sm font-bold mb-3">
+                            Loại đơn hàng
+                        </h3>
+                        <div className="flex flex-wrap gap-4">
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="orderType"
+                                    value="dine_in"
+                                    checked={orderType === 'dine_in'}
+                                    onChange={(e) =>
+                                        setOrderType(e.target.value)
+                                    }
+                                    className="accent-lime-300 w-5 h-5"
+                                />
+                                <span>Tại bàn</span>
                             </label>
-                        ))}
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="orderType"
+                                    value="takeaway"
+                                    checked={orderType === 'takeaway'}
+                                    onChange={(e) =>
+                                        setOrderType(e.target.value)
+                                    }
+                                    className="accent-lime-300 w-5 h-5"
+                                />
+                                <span>Mang về</span>
+                            </label>
+                            <label className="flex items-center gap-2 cursor-pointer">
+                                <input
+                                    type="radio"
+                                    name="orderType"
+                                    value="pre_order"
+                                    checked={orderType === 'pre_order'}
+                                    onChange={(e) =>
+                                        setOrderType(e.target.value)
+                                    }
+                                    className="accent-lime-300 w-5 h-5"
+                                />
+                                <span>Đặt trước online</span>
+                            </label>
+                        </div>
+
+                        {/* Table Selection for Dine-in */}
+                        {orderType === 'dine_in' && (
+                            <div className="mt-4">
+                                <label className="block mb-2 font-semibold">
+                                    Chọn bàn:{' '}
+                                    <span className="text-rose-500">*</span>
+                                </label>
+                                {loadingTables ? (
+                                    <div className="w-full p-2 rounded bg-white/10 border border-gray-500 text-gray-400">
+                                        Đang tải danh sách bàn...
+                                    </div>
+                                ) : availableTables.length === 0 ? (
+                                    <div className="w-full p-2 rounded bg-white/10 border border-red-500 text-red-400">
+                                        Hiện không có bàn trống
+                                    </div>
+                                ) : (
+                                    <select
+                                        value={tableNumber}
+                                        onChange={(e) =>
+                                            setTableNumber(e.target.value)
+                                        }
+                                        className="w-full p-2 rounded bg-white/10 border border-gray-500 text-white focus:border-lime-300 outline-none"
+                                    >
+                                        <option
+                                            value=""
+                                            className="bg-gray-800"
+                                        >
+                                            -- Chọn bàn --
+                                        </option>
+                                        {availableTables.map((table) => (
+                                            <option
+                                                key={table._id}
+                                                value={table.tableNumber}
+                                                className="bg-gray-800"
+                                            >
+                                                {table.tableNumber} -{' '}
+                                                {table.capacity} người
+                                                {table.location
+                                                    ? ` (${table.location})`
+                                                    : ''}
+                                            </option>
+                                        ))}
+                                    </select>
+                                )}
+                            </div>
+                        )}
                     </div>
-                    <div
-                        onClick={() => setOpenAddress(true)}
-                        className="mt-2 sm:h-14 h-12 bg-base-100 border-[3px] border-dashed border-lime-300 text-white
-                    flex justify-center items-center cursor-pointer transition-all sm:text-base text-xs hover:opacity-80"
-                    >
-                        Thêm địa chỉ
-                    </div>
+
+                    {/* Customer Contact Form - Only for Pre-order */}
+                    {orderType === 'pre_order' && (
+                        <>
+                            <h3 className="sm:text-lg text-sm font-bold">
+                                Thông tin liên hệ
+                            </h3>
+                            <Divider />
+
+                            <div className="liquid-glass rounded-md p-4 space-y-4">
+                                <div>
+                                    <label className="block mb-2 font-semibold text-sm">
+                                        Họ và tên:{' '}
+                                        <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={customerContact.name}
+                                        onChange={(e) =>
+                                            setCustomerContact((prev) => ({
+                                                ...prev,
+                                                name: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="Nhập họ và tên của bạn"
+                                        className="w-full p-2 rounded bg-white/10 border border-gray-500 text-white focus:border-lime-300 outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block mb-2 font-semibold text-sm">
+                                        Email:{' '}
+                                        <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={customerContact.email}
+                                        onChange={(e) =>
+                                            setCustomerContact((prev) => ({
+                                                ...prev,
+                                                email: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="Nhập email của bạn"
+                                        className="w-full p-2 rounded bg-white/10 border border-gray-500 text-white focus:border-lime-300 outline-none"
+                                    />
+                                </div>
+
+                                <div>
+                                    <label className="block mb-2 font-semibold text-sm">
+                                        Số điện thoại:{' '}
+                                        <span className="text-rose-500">*</span>
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        value={customerContact.phone}
+                                        onChange={(e) =>
+                                            setCustomerContact((prev) => ({
+                                                ...prev,
+                                                phone: e.target.value,
+                                            }))
+                                        }
+                                        placeholder="Nhập số điện thoại của bạn"
+                                        className="w-full p-2 rounded bg-white/10 border border-gray-500 text-white focus:border-lime-300 outline-none"
+                                    />
+                                </div>
+                            </div>
+                        </>
+                    )}
                 </div>
                 <div className="w-full liquid-glass flex flex-col gap-3 shadow-md px-2 pt-2 pb-4 rounded-lg">
                     <h3 className="sm:text-lg text-sm font-bold px-2 py-3">
@@ -920,8 +1013,7 @@ const CheckoutPage = () => {
                                         )}
                                         <span className="text-red-darker font-bold">
                                             {DisplayPriceInVND(
-                                                filteredTotalPrice -
-                                                    shippingCost
+                                                filteredTotalPrice
                                             )}
                                         </span>
                                     </p>
@@ -931,29 +1023,6 @@ const CheckoutPage = () => {
                                     <p className="flex items-center gap-2">
                                         {filteredTotalQty} sản phẩm
                                     </p>
-                                </div>
-                                <div className="flex gap-4 justify-between">
-                                    <p>Phí vận chuyển</p>
-                                    <div className="flex items-center gap-2">
-                                        {selectedVouchers?.freeShipping ? (
-                                            <div className="flex items-center">
-                                                <span className="line-through text-gray-400 mr-2">
-                                                    {DisplayPriceInVND(
-                                                        shippingCost
-                                                    )}
-                                                </span>
-                                                <span className="text-green-600 font-medium">
-                                                    Miễn phí
-                                                </span>
-                                            </div>
-                                        ) : (
-                                            <span className="italic">
-                                                {DisplayPriceInVND(
-                                                    shippingCost
-                                                )}
-                                            </span>
-                                        )}
-                                    </div>
                                 </div>
                             </div>
                             <div>
@@ -2012,21 +2081,6 @@ const CheckoutPage = () => {
                                 <p>{DisplayPriceInVND(filteredTotalPrice)}</p>
                             </div>
 
-                            <div className="flex justify-between sm:text-sm text-xs">
-                                <p>Phí vận chuyển:</p>
-                                {selectedVouchers?.freeShipping ? (
-                                    <div className="flex items-center">
-                                        <span className="line-through text-gray-400 mr-2">
-                                            {DisplayPriceInVND(shippingCost)}
-                                        </span>
-                                        <span className="text-green-600 font-semibold">
-                                            Miễn phí
-                                        </span>
-                                    </div>
-                                ) : (
-                                    <p>{DisplayPriceInVND(shippingCost)}</p>
-                                )}
-                            </div>
                             {selectedVouchers && voucherDiscount > 0 && (
                                 <div className="flex justify-between sm:text-sm text-xs">
                                     <p className="">Giảm giá:</p>
@@ -2105,32 +2159,27 @@ const CheckoutPage = () => {
                                 </Button>
                             </GlareHover>
 
-                            <GlareHover
-                                glareColor="#ffffff"
-                                glareOpacity={0.3}
-                                glareAngle={-30}
-                                glareSize={300}
-                                transitionDuration={800}
-                                playOnce={false}
-                            >
-                                <Button
-                                    className="py-2 px-4 font-semibold text-white hover:bg-transparent rounded transition-all w-full"
-                                    onClick={handleCashOnDelivery}
+                            {orderType !== 'pre_order' && (
+                                <GlareHover
+                                    glareColor="#ffffff"
+                                    glareOpacity={0.3}
+                                    glareAngle={-30}
+                                    glareSize={300}
+                                    transitionDuration={800}
+                                    playOnce={false}
                                 >
-                                    Thanh toán khi nhận hàng
-                                </Button>
-                            </GlareHover>
+                                    <Button
+                                        className="py-2 px-4 font-semibold text-white hover:bg-transparent rounded transition-all w-full"
+                                        onClick={handleCashOnDelivery}
+                                    >
+                                        Thanh toán tiền mặt
+                                    </Button>
+                                </GlareHover>
+                            )}
                         </div>
                     </div>
                 </div>
             </div>
-            {openAddress && <AddAddress close={() => setOpenAddress(false)} />}
-            {openEdit && (
-                <EditAddressDetails
-                    data={editData}
-                    close={() => setOpenEdit(false)}
-                />
-            )}
             {showConfirmModal.show && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-2">
                     <div className="p-6 rounded-lg shadow-lg max-w-md w-full liquid-glass">
@@ -2140,7 +2189,7 @@ const CheckoutPage = () => {
                         <p className=" mb-6 text-sm">
                             Bạn có chắc chắn muốn đặt hàng với phương thức{' '}
                             {showConfirmModal.type === 'cash'
-                                ? 'thanh toán khi nhận hàng'
+                                ? 'thanh toán tiền mặt'
                                 : 'thanh toán online'}{' '}
                             không?
                         </p>

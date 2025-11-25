@@ -99,41 +99,72 @@ const ProductDisplayPage = () => {
         }
     };
 
+    const [selectedOptions, setSelectedOptions] = useState([]);
+    const [notes, setNotes] = useState('');
+
+    const handleOptionChange = (
+        optionName,
+        choiceName,
+        priceModifier,
+        type
+    ) => {
+        if (type === 'radio') {
+            setSelectedOptions((prev) => {
+                const filtered = prev.filter(
+                    (item) => item.optionName !== optionName
+                );
+                return [...filtered, { optionName, choiceName, priceModifier }];
+            });
+        } else {
+            // Checkbox logic can be added here if needed
+        }
+    };
+
+    const calculateTotalPrice = () => {
+        let total = pricewithDiscount(data.price, data.discount);
+        selectedOptions.forEach((opt) => {
+            total += opt.priceModifier || 0;
+        });
+        return total;
+    };
+
     const redirectToCartPage = async () => {
         if (!user?._id) {
             navigate('/login');
             return;
         }
 
-        // Kiểm tra xem sản phẩm đã có trong giỏ hàng chưa
-        const isProductInCart = cart.some(
-            (item) => item.productId._id === productId
-        );
-
-        if (isProductInCart) {
-            // Chuyển đến CartPage và truyền productId để chọn
-            navigate('/cart', { state: { selectedProductId: productId } });
-        } else {
-            try {
-                const response = await Axios({
-                    ...SummaryApi.add_to_cart,
-                    data: {
-                        productId: productId, // Thêm sản phẩm vào giỏ hàng
-                    },
-                });
-                if (response.data.success) {
-                    toast.success('Đã thêm sản phẩm vào giỏ hàng');
-                    await fetchCart();
-                    // Chuyển đến CartPage và truyền productId để chọn
-                    navigate('/cart', {
-                        state: { selectedProductId: productId },
-                    });
-                } else {
-                    toast.error(response.data.message);
-                }
-            } catch (error) {
-                AxiosToastError(error);
+        // Validate required options
+        if (data.options && data.options.length > 0) {
+            const missingOptions = data.options.filter(
+                (opt) =>
+                    opt.type === 'radio' &&
+                    !selectedOptions.find((sel) => sel.optionName === opt.name)
+            );
+            if (missingOptions.length > 0) {
+                toast.error(`Vui lòng chọn ${missingOptions[0].name}`);
+                return;
             }
+        }
+
+        try {
+            const response = await Axios({
+                ...SummaryApi.add_to_cart,
+                data: {
+                    productId: productId,
+                    notes: notes,
+                    selectedOptions: selectedOptions,
+                },
+            });
+            if (response.data.success) {
+                toast.success('Đã thêm món vào giỏ hàng');
+                await fetchCart();
+                navigate('/cart');
+            } else {
+                toast.error(response.data.message);
+            }
+        } catch (error) {
+            AxiosToastError(error);
         }
     };
 
@@ -425,6 +456,72 @@ const ProductDisplayPage = () => {
                     </div>
 
                     <div className="w-fit">
+                        {/* Options Section */}
+                        {data.options && data.options.length > 0 && (
+                            <div className="mb-6">
+                                {data.options.map((option, idx) => (
+                                    <div key={idx} className="mb-4">
+                                        <h3 className="font-semibold mb-2 text-white">
+                                            {option.name}
+                                        </h3>
+                                        <div className="flex flex-wrap gap-3">
+                                            {option.choices.map(
+                                                (choice, cIdx) => (
+                                                    <label
+                                                        key={cIdx}
+                                                        className="cursor-pointer"
+                                                    >
+                                                        <input
+                                                            type="radio"
+                                                            name={option.name}
+                                                            className="peer sr-only"
+                                                            onChange={() =>
+                                                                handleOptionChange(
+                                                                    option.name,
+                                                                    choice.name,
+                                                                    choice.priceModifier,
+                                                                    option.type
+                                                                )
+                                                            }
+                                                            checked={selectedOptions.find(
+                                                                (s) =>
+                                                                    s.optionName ===
+                                                                        option.name &&
+                                                                    s.choiceName ===
+                                                                        choice.name
+                                                            )}
+                                                        />
+                                                        <div className="px-4 py-2 rounded-lg border border-gray-600 peer-checked:border-lime-300 peer-checked:bg-lime-300/20 peer-checked:text-lime-300 text-gray-300 transition-all">
+                                                            {choice.name}{' '}
+                                                            {choice.priceModifier >
+                                                                0 &&
+                                                                `(+${DisplayPriceInVND(
+                                                                    choice.priceModifier
+                                                                )})`}
+                                                        </div>
+                                                    </label>
+                                                )
+                                            )}
+                                        </div>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Notes Section */}
+                        <div className="mb-6">
+                            <h3 className="font-semibold mb-2 text-white">
+                                Ghi chú cho món ăn
+                            </h3>
+                            <textarea
+                                className="w-full p-3 rounded-lg bg-white/10 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-lime-300"
+                                rows="3"
+                                placeholder="Ví dụ: Không hành, ít đá..."
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                            ></textarea>
+                        </div>
+
                         {data.stock === 0 ? (
                             <p className="md:text-2xl text-lg font-bold text-rose-600 my-2">
                                 Hết hàng

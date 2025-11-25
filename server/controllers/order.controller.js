@@ -21,12 +21,23 @@ export async function CashOnDeliveryOrderController(request, response) {
         try {
             const result = await session.withTransaction(async () => {
                 const userId = request.userId;
-                const { list_items, totalAmt, addressId, subTotalAmt, pointsToUse = 0, voucherCode, freeShippingVoucherCode } = request.body;
+                const { list_items, totalAmt, addressId, customerContact, subTotalAmt, pointsToUse = 0, voucherCode, freeShippingVoucherCode, orderType = 'dine_in' } = request.body;
 
-                // Validate input
-                if (!list_items?.length || !addressId || !subTotalAmt || !totalAmt) {
+                // Validate input based on order type
+                if (!list_items?.length || !subTotalAmt || !totalAmt) {
                     throw new Error("Vui lòng điền đầy đủ các trường bắt buộc.");
                 }
+
+                // For pre-orders, require either addressId or customerContact
+                if (orderType === 'pre_order') {
+                    if (!addressId && !customerContact) {
+                        throw new Error("Vui lòng cung cấp thông tin liên hệ hoặc địa chỉ.");
+                    }
+                    if (customerContact && (!customerContact.name || !customerContact.email || !customerContact.phone)) {
+                        throw new Error("Vui lòng điền đầy đủ thông tin liên hệ (tên, email, số điện thoại).");
+                    }
+                }
+
 
                 const user = await UserModel.findById(userId).session(session);
                 if (!user) {
@@ -146,13 +157,14 @@ export async function CashOnDeliveryOrderController(request, response) {
                         },
                         quantity: item.quantity,
                         payment_status: 'Đang chờ thanh toán',
-                        delivery_address: addressId,
+                        delivery_address: addressId || null,
+                        customerContact: customerContact || null,
                         subTotalAmt: itemSubTotal,
                         totalAmt: itemTotal,
                         status: 'pending',
                         // Restaurant specific fields
                         tableNumber: request.body.tableNumber || null,
-                        orderType: request.body.orderType || 'delivery',
+                        orderType: request.body.orderType || 'dine_in',
                         // Voucher information
                         voucherCode: regularVoucher?.code || null,
                         voucherDiscount: discountAmount,
@@ -329,14 +341,33 @@ export async function paymentController(request, response) {
 
     try {
         const userId = request.userId;
-        const { list_items, totalAmt, addressId, subTotalAmt, pointsToUse = 0, voucherCode, freeShippingVoucherCode } = request.body;
+        const { list_items, totalAmt, addressId, customerContact, subTotalAmt, pointsToUse = 0, voucherCode, freeShippingVoucherCode, orderType = 'dine_in' } = request.body;
 
-        if (!list_items?.length || !addressId || !subTotalAmt || !totalAmt) {
+        // Validate input based on order type
+        if (!list_items?.length || !subTotalAmt || !totalAmt) {
             return response.status(400).json({
                 message: "Vui lòng điền đầy đủ các trường bắt buộc.",
                 error: true,
                 success: false
             });
+        }
+
+        // For pre-orders, require either addressId or customerContact
+        if (orderType === 'pre_order') {
+            if (!addressId && !customerContact) {
+                return response.status(400).json({
+                    message: "Vui lòng cung cấp thông tin liên hệ hoặc địa chỉ.",
+                    error: true,
+                    success: false
+                });
+            }
+            if (customerContact && (!customerContact.name || !customerContact.email || !customerContact.phone)) {
+                return response.status(400).json({
+                    message: "Vui lòng điền đầy đủ thông tin liên hệ (tên, email, số điện thoại).",
+                    error: true,
+                    success: false
+                });
+            }
         }
 
         const user = await UserModel.findById(userId).session(session);
@@ -517,7 +548,8 @@ export async function paymentController(request, response) {
                             },
                             quantity: item.quantity,
                             payment_status: 'Đã thanh toán', // Paid with points
-                            delivery_address: addressId,
+                            delivery_address: addressId || null,
+                            customerContact: customerContact || null,
                             subTotalAmt: itemSubTotal,
                             totalAmt: Math.max(0, itemTotal),
                             status: 'pending',
@@ -637,7 +669,8 @@ export async function paymentController(request, response) {
                     quantity: quantity,
                     paymentId: '',
                     payment_status: 'Chờ thanh toán',
-                    delivery_address: addressId,
+                    delivery_address: addressId || null,
+                    customerContact: customerContact || null,
                     subTotalAmt: subTotal,
                     totalAmt: subTotal, // For individual items, totalAmt is same as subTotal
                     status: 'pending',
@@ -707,7 +740,10 @@ export async function paymentController(request, response) {
             customer_email: user.email,
             metadata: {
                 userId: userId.toString(),
-                addressId: addressId.toString(),
+                addressId: addressId ? addressId.toString() : '',
+                customerContactName: customerContact?.name || '',
+                customerContactEmail: customerContact?.email || '',
+                customerContactPhone: customerContact?.phone || '',
                 tempOrderIds: JSON.stringify(tempOrder.map(o => o._id.toString())),
                 orderTotal: Math.round(finalTotal).toString(), // Ensure we're sending a rounded number
                 pointsToUse: pointsToUse.toString(),
@@ -717,10 +753,10 @@ export async function paymentController(request, response) {
             payment_intent_data: {
                 metadata: {
                     userId: userId.toString(),
-                    addressId: addressId.toString(),
+                    addressId: addressId ? addressId.toString() : '',
                     orderTotal: Math.round(finalTotal).toString(),
                     tableNumber: (request.body.tableNumber || '').toString(),
-                    orderType: (request.body.orderType || 'delivery').toString()
+                    orderType: (request.body.orderType || 'dine_in').toString()
                 }
             },
             line_items,

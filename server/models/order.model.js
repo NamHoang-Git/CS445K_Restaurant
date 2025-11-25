@@ -35,8 +35,21 @@ const orderSchema = new mongoose.Schema({
     delivery_address: {
         type: mongoose.Schema.ObjectId,
         ref: "address",
-        required: function () {
-            return this.orderType === 'delivery';
+        default: null
+    },
+    // Customer contact information for pre-orders (instead of delivery_address)
+    customerContact: {
+        name: {
+            type: String,
+            default: null
+        },
+        email: {
+            type: String,
+            default: null
+        },
+        phone: {
+            type: String,
+            default: null
         }
     },
     // New fields for restaurant
@@ -46,8 +59,8 @@ const orderSchema = new mongoose.Schema({
     },
     orderType: {
         type: String,
-        enum: ['dine_in', 'takeaway', 'delivery'],
-        default: 'delivery'
+        enum: ['dine_in', 'takeaway', 'pre_order'], // Removed 'delivery', added 'pre_order'
+        default: 'dine_in'
     },
     is_deleted: {
         type: Boolean,
