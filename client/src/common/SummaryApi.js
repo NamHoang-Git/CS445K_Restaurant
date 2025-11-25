@@ -413,6 +413,16 @@ const SummaryApi = {
     update_performance_metrics: {
         url: '/api/performance/update',
         method: 'post'
+    },
+
+    // Reports & Analytics
+    booking_report: {
+        url: '/api/booking/report',
+        method: 'get'
+    },
+    customer_analytics: {
+        url: '/api/user/analytics',
+        method: 'get'
     }
 }
 
