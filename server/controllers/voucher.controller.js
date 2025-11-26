@@ -5,12 +5,8 @@ export const addVoucerController = async (req, res) => {
         const { code, name, description, discountType, discountValue, minOrderValue,
             maxDiscount, startDate, endDate, usageLimit, isActive, isFreeShipping, applyForAllProducts, products, categories } = req.body;
 
-        // Validate free shipping voucher
-        if (discountType === 'free_shipping') {
-            // For free shipping, we don't need discountValue
-            delete req.body.discountValue;
-            delete req.body.maxDiscount; // Free shipping doesn't need max discount
-        } else if (discountType === 'percentage' && !maxDiscount) {
+        // Validate percentage discount
+        if (discountType === 'percentage' && !maxDiscount) {
             return res.status(400).json({
                 message: "Vui lòng nhập giảm giá tối đa cho loại giảm giá phần trăm",
                 error: true,
@@ -38,18 +34,15 @@ export const addVoucerController = async (req, res) => {
             endDate,
             usageLimit: usageLimit || null,
             isActive: isActive !== undefined ? isActive : true,
-            isFreeShipping: discountType === 'free_shipping',
             applyForAllProducts: applyForAllProducts || false,
             products: applyForAllProducts ? [] : (products || []),
             categories: applyForAllProducts ? [] : (categories || [])
         };
 
-        // Only add discountValue and maxDiscount if not free shipping
-        if (discountType !== 'free_shipping') {
-            voucherData.discountValue = discountValue;
-            if (discountType === 'percentage') {
-                voucherData.maxDiscount = maxDiscount;
-            }
+        // Add discountValue and maxDiscount
+        voucherData.discountValue = discountValue;
+        if (discountType === 'percentage') {
+            voucherData.maxDiscount = maxDiscount;
         }
 
         const addVoucher = new VoucherModel(voucherData);
@@ -528,7 +521,7 @@ export const bulkUpdateVouchersStatusController = async (req, res) => {
     }
 }
 
-// Get best voucher combination for maximum savings
+// Get best voucher for maximum savings
 export const getBestVoucherController = async (req, res) => {
     try {
         const { orderAmount, productIds = [], cartItems = [], userId } = req.body;
@@ -542,7 +535,6 @@ export const getBestVoucherController = async (req, res) => {
         }
 
         const currentDate = new Date();
-        const shippingCost = 30000; // Standard shipping cost
 
         // Calculate actual total
         let actualTotal = parseFloat(orderAmount);
@@ -568,7 +560,7 @@ export const getBestVoucherController = async (req, res) => {
             ]
         });
 
-        // Filter applicable vouchers
+        // Filter applicable vouchers (only non-free shipping vouchers are considered for "best discount")
         const applicableVouchers = vouchers.filter(voucher => {
             // Check minimum order value
             if (actualTotal < voucher.minOrderValue) return false;
@@ -587,12 +579,8 @@ export const getBestVoucherController = async (req, res) => {
             );
         });
 
-        // Separate into regular and free shipping vouchers
-        const regularVouchers = applicableVouchers.filter(v => !v.isFreeShipping);
-        const freeShippingVouchers = applicableVouchers.filter(v => v.isFreeShipping);
-
-        // Calculate discount for each regular voucher
-        const vouchersWithDiscount = regularVouchers.map(voucher => {
+        // Calculate discount for each voucher
+        const vouchersWithDiscount = applicableVouchers.map(voucher => {
             let discount = 0;
             if (voucher.discountType === 'percentage') {
                 const percentageDiscount = (actualTotal * voucher.discountValue) / 100;
@@ -612,53 +600,12 @@ export const getBestVoucherController = async (req, res) => {
         // Sort by discount amount (highest first)
         vouchersWithDiscount.sort((a, b) => b.calculatedDiscount - a.calculatedDiscount);
 
-        // Find best combination
-        let bestCombination = null;
-        let maxSavings = 0;
-
-        // Option 1: Best regular voucher only
-        if (vouchersWithDiscount.length > 0) {
-            const bestRegular = vouchersWithDiscount[0];
-            if (bestRegular.calculatedDiscount > maxSavings) {
-                maxSavings = bestRegular.calculatedDiscount;
-                bestCombination = {
-                    regular: bestRegular,
-                    freeShipping: null,
-                    totalSavings: bestRegular.calculatedDiscount
-                };
-            }
-        }
-
-        // Option 2: Best regular voucher + free shipping
-        if (vouchersWithDiscount.length > 0 && freeShippingVouchers.length > 0) {
-            const bestRegular = vouchersWithDiscount[0];
-            const totalSavings = bestRegular.calculatedDiscount + shippingCost;
-
-            if (totalSavings > maxSavings) {
-                maxSavings = totalSavings;
-                bestCombination = {
-                    regular: bestRegular,
-                    freeShipping: freeShippingVouchers[0].toObject(),
-                    totalSavings: totalSavings
-                };
-            }
-        }
-
-        // Option 3: Free shipping only
-        if (freeShippingVouchers.length > 0 && shippingCost > maxSavings) {
-            maxSavings = shippingCost;
-            bestCombination = {
-                regular: null,
-                freeShipping: freeShippingVouchers[0].toObject(),
-                totalSavings: shippingCost
-            };
-        }
+        // Get best voucher
+        const bestVoucher = vouchersWithDiscount.length > 0 ? vouchersWithDiscount[0] : null;
 
         // Prepare alternatives (top 3 other options)
         const alternatives = [];
-
-        // Add top regular vouchers as alternatives
-        for (let i = 1; i < Math.min(3, vouchersWithDiscount.length); i++) {
+        for (let i = 1; i < Math.min(4, vouchersWithDiscount.length); i++) {
             alternatives.push({
                 voucher: vouchersWithDiscount[i],
                 savings: vouchersWithDiscount[i].calculatedDiscount,
@@ -669,10 +616,12 @@ export const getBestVoucherController = async (req, res) => {
         return res.json({
             message: 'Tìm mã giảm giá tốt nhất thành công',
             data: {
-                bestCombination,
+                bestCombination: bestVoucher ? {
+                    regular: bestVoucher,
+                    totalSavings: bestVoucher.calculatedDiscount
+                } : null,
                 alternatives,
-                currentOrderTotal: actualTotal,
-                shippingCost
+                currentOrderTotal: actualTotal
             },
             error: false,
             success: true

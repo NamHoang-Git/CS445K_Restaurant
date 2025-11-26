@@ -305,9 +305,6 @@ const EditVoucher = ({
                                         <option value="fixed">
                                             Số tiền cố định (VND)
                                         </option>
-                                        <option value="free_shipping">
-                                            Miễn phí vận chuyển
-                                        </option>
                                     </select>
                                 </div>
 

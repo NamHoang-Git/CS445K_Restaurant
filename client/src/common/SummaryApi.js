@@ -423,6 +423,20 @@ const SummaryApi = {
     customer_analytics: {
         url: '/api/user/analytics',
         method: 'get'
+    },
+
+    // Voucher APIs
+    get_available_vouchers: {
+        url: '/api/voucher/available',
+        method: 'post'
+    },
+    apply_voucher: {
+        url: '/api/voucher/apply',
+        method: 'post'
+    },
+    get_best_voucher: {
+        url: '/api/voucher/best',
+        method: 'post'
     }
 }
 
