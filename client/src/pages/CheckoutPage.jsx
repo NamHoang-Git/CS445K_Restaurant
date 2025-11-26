@@ -116,6 +116,7 @@ const CheckoutPage = () => {
                         orderAmount: discountedTotal,
                         productIds,
                         cartItems: cartItemsData,
+                        userId: user?._id,
                     }
                 );
 
@@ -133,6 +134,23 @@ const CheckoutPage = () => {
                         } else {
                             upcomingVouchers.push(voucher);
                         }
+                    });
+
+                    // Sort vouchers: first-time customer vouchers first
+                    activeVouchers.sort((a, b) => {
+                        if (a.isFirstTimeCustomer && !b.isFirstTimeCustomer)
+                            return -1;
+                        if (!a.isFirstTimeCustomer && b.isFirstTimeCustomer)
+                            return 1;
+                        return 0;
+                    });
+
+                    upcomingVouchers.sort((a, b) => {
+                        if (a.isFirstTimeCustomer && !b.isFirstTimeCustomer)
+                            return -1;
+                        if (!a.isFirstTimeCustomer && b.isFirstTimeCustomer)
+                            return 1;
+                        return 0;
                     });
 
                     // Store both active and upcoming vouchers in state
@@ -163,7 +181,7 @@ const CheckoutPage = () => {
         } else {
             setAvailableVouchers([]);
         }
-    }, [selectedItems, cartItemsList, calculateTotal]);
+    }, [selectedItems, cartItemsList, calculateTotal, user?._id]);
 
     // Fetch best voucher suggestion
     const fetchBestVoucher = useCallback(async () => {
@@ -207,7 +225,7 @@ const CheckoutPage = () => {
                 orderAmount: discountedTotal,
                 productIds,
                 cartItems: cartItemsData,
-                userId: user._id,
+                userId: user?._id,
             });
 
             if (response.data.success) {
@@ -301,6 +319,7 @@ const CheckoutPage = () => {
                 code: voucherCode.trim(),
                 orderAmount: calculateTotal(),
                 productIds: filteredItems.map((item) => item.productId._id),
+                userId: user?._id,
             });
 
             if (response.data.success) {
@@ -1374,6 +1393,8 @@ const CheckoutPage = () => {
                                                                                             ?.id ===
                                                                                         voucher.id
                                                                                             ? 'border-pink-500 bg-pink-50'
+                                                                                            : voucher.isFirstTimeCustomer
+                                                                                            ? 'border-blue-400 bg-blue-50 hover:border-blue-500 shadow-md'
                                                                                             : 'border-gray-200 hover:border-pink-300'
                                                                                     }`}
                                                                                     onClick={() =>
@@ -1396,6 +1417,13 @@ const CheckoutPage = () => {
                                                                                                 {
                                                                                                     voucher.name
                                                                                                 }
+                                                                                                {voucher.isFirstTimeCustomer && (
+                                                                                                    <span className="ml-2 inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-gradient-to-r from-blue-500 to-blue-600 text-white shadow-sm animate-pulse">
+                                                                                                        ✨
+                                                                                                        Khách
+                                                                                                        mới
+                                                                                                    </span>
+                                                                                                )}
                                                                                             </p>
                                                                                             <div className="">
                                                                                                 <p className="flex gap-1">

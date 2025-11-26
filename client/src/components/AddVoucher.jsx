@@ -36,17 +36,18 @@ const AddVoucher = ({ onClose, fetchVoucher }) => {
         applyForAllProducts: true,
         products: [],
         categories: [],
+        isFirstTimeCustomer: false,
     });
 
     const [loading, setLoading] = useState(false);
 
     const handleOnChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
 
         setFormData((prev) => {
             return {
                 ...prev,
-                [name]: value,
+                [name]: type === 'checkbox' ? checked : value,
             };
         });
     };
@@ -519,6 +520,23 @@ const AddVoucher = ({ onClose, fetchVoucher }) => {
                                     className="ml-2 block text-sm"
                                 >
                                     Áp dụng cho tất cả sản phẩm
+                                </label>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="isFirstTimeCustomer"
+                                    name="isFirstTimeCustomer"
+                                    checked={formData.isFirstTimeCustomer}
+                                    onChange={handleOnChange}
+                                    className="h-4 w-4 focus:ring-secondary-200 text-secondary-200
+                                    font-semibold border-gray-300 rounded mb-[3px]"
+                                />
+                                <label
+                                    htmlFor="isFirstTimeCustomer"
+                                    className="ml-2 block text-sm"
+                                >
+                                    Chỉ dành cho khách hàng mới
                                 </label>
                             </div>
 

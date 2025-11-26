@@ -70,17 +70,18 @@ const EditVoucher = ({
         applyForAllProducts: voucherData?.applyForAllProducts ?? true,
         products: voucherData?.products ? [...voucherData.products] : [],
         categories: voucherData?.categories ? [...voucherData.categories] : [],
+        isFirstTimeCustomer: voucherData?.isFirstTimeCustomer ?? false,
     });
 
     const [loading, setLoading] = useState(false);
 
     const handleOnChange = (e) => {
-        const { name, value } = e.target;
+        const { name, value, type, checked } = e.target;
 
         setEditFormData((prev) => {
             return {
                 ...prev,
-                [name]: value,
+                [name]: type === 'checkbox' ? checked : value,
             };
         });
     };
@@ -559,6 +560,23 @@ const EditVoucher = ({
                                     className="ml-2 block text-sm"
                                 >
                                     Áp dụng cho tất cả sản phẩm
+                                </label>
+                            </div>
+                            <div className="flex items-center">
+                                <input
+                                    type="checkbox"
+                                    id="isFirstTimeCustomer"
+                                    name="isFirstTimeCustomer"
+                                    checked={editFormData.isFirstTimeCustomer}
+                                    onChange={handleOnChange}
+                                    className="h-4 w-4 focus:ring-secondary-200 text-secondary-200
+                                    font-semibold border-gray-300 rounded mb-[3px]"
+                                />
+                                <label
+                                    htmlFor="isFirstTimeCustomer"
+                                    className="ml-2 block text-sm"
+                                >
+                                    Chỉ dành cho khách hàng mới
                                 </label>
                             </div>
 

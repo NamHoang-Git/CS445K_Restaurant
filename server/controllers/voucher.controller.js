@@ -1,9 +1,17 @@
 import VoucherModel from '../models/voucher.model.js';
+import OrderModel from '../models/order.model.js';
+
+// Helper to check if user is first time customer
+const checkFirstTimeCustomer = async (userId) => {
+    if (!userId) return false;
+    const orderCount = await OrderModel.countDocuments({ userId });
+    return orderCount === 0;
+};
 
 export const addVoucerController = async (req, res) => {
     try {
         const { code, name, description, discountType, discountValue, minOrderValue,
-            maxDiscount, startDate, endDate, usageLimit, isActive, isFreeShipping, applyForAllProducts, products, categories } = req.body;
+            maxDiscount, startDate, endDate, usageLimit, isActive, isFirstTimeCustomer, applyForAllProducts, products, categories } = req.body;
 
         // Validate percentage discount
         if (discountType === 'percentage' && !maxDiscount) {
@@ -34,7 +42,8 @@ export const addVoucerController = async (req, res) => {
             endDate,
             usageLimit: usageLimit || null,
             isActive: isActive !== undefined ? isActive : true,
-            applyForAllProducts: applyForAllProducts || false,
+            isFirstTimeCustomer: isFirstTimeCustomer || false,
+            applyForAllProducts: applyForAllProducts !== undefined ? applyForAllProducts : true,
             products: applyForAllProducts ? [] : (products || []),
             categories: applyForAllProducts ? [] : (categories || [])
         };
@@ -95,7 +104,7 @@ export const getAllVoucherController = async (req, res) => {
 export const updateVoucherController = async (req, res) => {
     try {
         const { _id, code, name, description, discountType, discountValue, minOrderValue,
-            maxDiscount, startDate, endDate, usageLimit, isActive, isFreeShipping, applyForAllProducts, products, categories } = req.body
+            maxDiscount, startDate, endDate, usageLimit, isActive, isFirstTimeCustomer, applyForAllProducts, products, categories } = req.body
 
         const check = await VoucherModel.findById(_id)
 
@@ -119,7 +128,7 @@ export const updateVoucherController = async (req, res) => {
             endDate,
             usageLimit,
             isActive,
-            isFreeShipping: discountType === 'free_shipping' ? true : (isFreeShipping || false),
+            isFirstTimeCustomer: isFirstTimeCustomer || false,
             applyForAllProducts,
             products,
             categories
@@ -212,12 +221,13 @@ export const bulkDeleteVouchersController = async (req, res) => {
 
 export const getAvailableVouchersController = async (req, res) => {
     try {
-        const { orderAmount, productIds = [], cartItems = [] } = req.body;
+        const { orderAmount, productIds = [], cartItems = [], userId } = req.body;
 
         console.log('Received request with:', {
             orderAmount,
             productIds: productIds.length,
-            cartItems: cartItems.length
+            cartItems: cartItems.length,
+            userId
         });
 
         if (orderAmount === undefined || orderAmount === null) {
@@ -233,98 +243,75 @@ export const getAvailableVouchersController = async (req, res) => {
         // Calculate the actual total after applying product discounts
         let actualTotal = 0;
         if (Array.isArray(cartItems) && cartItems.length > 0) {
-            // First, use the orderAmount as the base (should be the discounted total from frontend)
             actualTotal = parseFloat(orderAmount);
-
-            // Then verify by calculating from cart items
             const calculatedTotal = cartItems.reduce((total, item) => {
                 const product = item.productId || {};
                 const price = product.discountPrice > 0 && product.discountPrice < product.price
                     ? product.discountPrice
                     : product.price;
                 const itemTotal = price * (item.quantity || 1);
-
-                console.log('Item calculation:', {
-                    productId: product._id,
-                    originalPrice: product.price,
-                    discountPrice: product.discountPrice,
-                    quantity: item.quantity,
-                    itemTotal
-                });
-
                 return total + itemTotal;
             }, 0);
-
-            console.log('Order amount from frontend:', actualTotal);
-            console.log('Calculated total from cart items:', calculatedTotal);
-
-            // Use the smaller of the two values to be safe
             actualTotal = Math.min(actualTotal, calculatedTotal);
         } else {
             actualTotal = parseFloat(orderAmount);
-            console.log('No cart items, using provided order amount:', actualTotal);
         }
 
-        // Find all active vouchers that match the price range, including upcoming ones
+        // Check if user is first time customer
+        const isFirstTimer = await checkFirstTimeCustomer(userId);
+
+        // Find all active vouchers
         const vouchers = await VoucherModel.find({
             isActive: true,
             endDate: { $gte: currentDate },
             $or: [
-                { usageLimit: { $gt: 0 } }, // Has remaining usage
-                { usageLimit: -1 } // Or unlimited usage
+                { usageLimit: { $gt: 0 } },
+                { usageLimit: -1 }
             ]
-        }).sort({ startDate: 1 }); // Sort by start date ascending
+        }).sort({ startDate: 1 });
 
-        // Filter vouchers that are applicable to the products in the cart and meet the minimum order value
+        // Filter vouchers
         const applicableVouchers = vouchers.filter(voucher => {
-            // First check if the actual total meets the minimum order value
+            // Check first time customer requirement
+            if (voucher.isFirstTimeCustomer) {
+                if (!userId || !isFirstTimer) return false;
+            }
+
+            // Check min order value
             const meetsMinOrder = actualTotal >= voucher.minOrderValue;
             if (!meetsMinOrder) return false;
 
-            // If voucher is for all products, it's applicable
+            // Check product applicability
             if (voucher.applyForAllProducts) return true;
-
-            // If no specific products are specified in the voucher, it's applicable
             if (!voucher.products || voucher.products.length === 0) return true;
-
-            // Check if any product in the cart is in the voucher's product list
             return productIds.some(productId =>
                 voucher.products.some(p => p.toString() === productId)
             );
         });
 
-        // Format the response
+        // Format response
         const formattedVouchers = applicableVouchers.map(voucher => {
             const now = new Date();
             const isUpcoming = new Date(voucher.startDate) > now;
             const isActive = !isUpcoming && new Date(voucher.endDate) > now;
             const isFreeShipping = voucher.discountType === 'free_shipping' || voucher.isFreeShipping === true;
 
-            // Format the description to include free shipping info if applicable
-            let description = voucher.description || '';
-            if (isFreeShipping) {
-                description = description ? `${description}. ` : '';
-                description += 'Miễn phí vận chuyển cho đơn hàng từ ' +
-                    new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' })
-                        .format(voucher.minOrderValue || 0);
-            }
-
             return {
                 id: voucher._id,
                 code: voucher.code,
                 name: voucher.name,
-                description,
+                description: voucher.description,
                 minOrder: voucher.minOrderValue,
                 discount: isFreeShipping ? 0 : voucher.discountValue,
                 discountType: voucher.discountType,
                 startDate: voucher.startDate,
                 expiryDate: new Date(voucher.endDate).toLocaleDateString('vi-VN'),
                 isFreeShipping,
+                isFirstTimeCustomer: voucher.isFirstTimeCustomer,
                 maxDiscount: isFreeShipping ? null : (voucher.maxDiscount || null),
                 isActive,
                 isUpcoming,
                 availableFrom: isUpcoming ? new Date(voucher.startDate).toLocaleDateString('vi-VN') : null,
-                // Add human-readable discount text
                 discountText: isFreeShipping
                     ? 'Miễn phí vận chuyển'
                     : voucher.discountType === 'percentage'
@@ -351,7 +338,7 @@ export const getAvailableVouchersController = async (req, res) => {
 
 export const applyVoucherController = async (req, res) => {
     try {
-        const { code, orderAmount, productIds } = req.body;
+        const { code, orderAmount, productIds, userId } = req.body;
 
         if (!code) {
             return res.status(400).json({
@@ -378,6 +365,18 @@ export const applyVoucherController = async (req, res) => {
                 error: true,
                 success: false
             });
+        }
+
+        // Check first time customer requirement
+        if (voucher.isFirstTimeCustomer) {
+            const isFirstTimer = await checkFirstTimeCustomer(userId);
+            if (!isFirstTimer) {
+                return res.status(400).json({
+                    message: "Mã giảm giá này chỉ dành cho khách hàng mới",
+                    error: true,
+                    success: false
+                });
+            }
         }
 
         // Check voucher validity
@@ -549,6 +548,9 @@ export const getBestVoucherController = async (req, res) => {
             actualTotal = Math.min(actualTotal, calculatedTotal);
         }
 
+        // Check if user is first time customer
+        const isFirstTimer = await checkFirstTimeCustomer(userId);
+
         // Find all applicable vouchers
         const vouchers = await VoucherModel.find({
             isActive: true,
@@ -562,6 +564,11 @@ export const getBestVoucherController = async (req, res) => {
 
         // Filter applicable vouchers (only non-free shipping vouchers are considered for "best discount")
         const applicableVouchers = vouchers.filter(voucher => {
+            // Check first time customer requirement
+            if (voucher.isFirstTimeCustomer) {
+                if (!userId || !isFirstTimer) return false;
+            }
+
             // Check minimum order value
             if (actualTotal < voucher.minOrderValue) return false;
 

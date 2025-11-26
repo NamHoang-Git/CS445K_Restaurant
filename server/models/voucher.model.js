@@ -57,6 +57,10 @@ const voucherSchema = new mongoose.Schema({
         type: Boolean,
         default: true
     },
+    isFirstTimeCustomer: {
+        type: Boolean,
+        default: false
+    },
     applyForAllProducts: {
         type: Boolean,
         default: true
