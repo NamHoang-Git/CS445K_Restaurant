@@ -746,9 +746,6 @@ const VoucherPage = () => {
                             <option value="all">Chọn loại giảm giá</option>
                             <option value="percentage">Phần trăm</option>
                             <option value="fixed">Giảm giá cố định</option>
-                            <option value="free_shipping">
-                                Miễn phí vận chuyển
-                            </option>
                         </select>
                     </div>
                     <button

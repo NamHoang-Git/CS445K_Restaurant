@@ -265,8 +265,9 @@ export const getAvailableVouchersController = async (req, res) => {
             isActive: true,
             endDate: { $gte: currentDate },
             $or: [
-                { usageLimit: { $gt: 0 } },
-                { usageLimit: -1 }
+                { usageLimit: null }, // Unlimited (no limit set)
+                { usageLimit: -1 },   // Unlimited (legacy)
+                { usageLimit: { $gt: 0 } } // Has remaining usage
             ]
         }).sort({ startDate: 1 });
 
@@ -557,8 +558,9 @@ export const getBestVoucherController = async (req, res) => {
             startDate: { $lte: currentDate },
             endDate: { $gte: currentDate },
             $or: [
-                { usageLimit: null },
-                { $expr: { $gt: ['$usageLimit', '$usageCount'] } }
+                { usageLimit: null }, // Unlimited (no limit set)
+                { usageLimit: -1 },   // Unlimited (legacy)
+                { $expr: { $gt: ['$usageLimit', '$usageCount'] } } // Has remaining usage
             ]
         });
 
