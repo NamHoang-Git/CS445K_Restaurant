@@ -26,8 +26,12 @@ import { Button } from '@/components/ui/button';
 import { FaFilePdf } from 'react-icons/fa6';
 import { Input } from '@/components/ui/input';
 import { FaSearch } from 'react-icons/fa';
+import VoucherAnalytics from '../components/VoucherAnalytics';
 
 const VoucherPage = () => {
+    // Tab state
+    const [activeTab, setActiveTab] = useState('list'); // 'list' | 'analytics'
+
     // State declarations
     const [openUploadVoucher, setOpenUploadVoucher] = useState(false);
     const [loading, setLoading] = useState(false);
@@ -718,69 +722,102 @@ const VoucherPage = () => {
                 </CardFooter>
             </Card>
 
-            <div className="py-2 space-y-2">
-                {/* Filters */}
-                <div className="w-full sm:w-auto grid sm:grid-cols-2 md:grid-cols-4 gap-4">
-                    <div className="relative w-full font-semibold">
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
-                    px-3 py-1 rounded-md cursor-pointer"
-                        >
-                            <option value="all">Chọn trạng thái</option>
-                            <option value="active">Đang hoạt động</option>
-                            <option value="inactive">Đã tắt</option>
-                            <option value="applying">Đang áp dụng</option>
-                            <option value="expired">Đã hết hạn</option>
-                            <option value="upcoming">Sắp diễn ra</option>
-                        </select>
-                    </div>
-                    <div className="relative w-full font-semibold">
-                        <select
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                            className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
-                    px-3 py-1 rounded-md cursor-pointer"
-                        >
-                            <option value="all">Chọn loại giảm giá</option>
-                            <option value="percentage">Phần trăm</option>
-                            <option value="fixed">Giảm giá cố định</option>
-                        </select>
-                    </div>
-                    <button
-                        onClick={() => {
-                            setStatusFilter('all');
-                            setSearchTerm('');
-                        }}
-                        className="text-center px-4 h-12 font-medium liquid-glass rounded-lg text-sm"
-                    >
-                        Đặt lại bộ lọc
-                    </button>
-                    <button
-                        onClick={handleExportPDF}
-                        className="flex items-center gap-2 justify-center h-12 px-4 py-2 border border-transparent rounded-md shadow-sm sm:text-sm text-xs font-medium
-                    text-white bg-red-600/60 hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-red-500"
-                    >
-                        <FaFilePdf size={15} />
-                        <p>Xuất PDF</p>
-                    </button>
-                </div>
-
-                {/* Search */}
-                <div className="w-full md:w-80 lg:w-96 font-medium">
-                    <div className="relative">
-                        <Input
-                            type="text"
-                            placeholder="Tìm kiếm mã giảm giá..."
-                            value={searchTerm}
-                            onChange={(e) => setSearchTerm(e.target.value)}
-                            className="w-full pl-10 h-12 text-sm"
-                        />
-                        <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
-                    </div>
-                </div>
+            {/* Tab Navigation */}
+            <div className="flex gap-2 border-b border-gray-700">
+                <button
+                    onClick={() => setActiveTab('list')}
+                    className={`px-6 py-3 font-semibold transition-colors ${
+                        activeTab === 'list'
+                            ? 'text-lime-300 border-b-2 border-lime-300'
+                            : 'text-gray-400 hover:text-white'
+                    }`}
+                >
+                    Danh sách
+                </button>
+                <button
+                    onClick={() => setActiveTab('analytics')}
+                    className={`px-6 py-3 font-semibold transition-colors ${
+                        activeTab === 'analytics'
+                            ? 'text-lime-300 border-b-2 border-lime-300'
+                            : 'text-gray-400 hover:text-white'
+                    }`}
+                >
+                    Thống kê
+                </button>
             </div>
+
+            {/* Tab Content */}
+            {activeTab === 'analytics' ? (
+                <VoucherAnalytics />
+            ) : (
+                <div className="py-2 space-y-2">
+                    {/* Filters */}
+                    <div className="w-full sm:w-auto grid sm:grid-cols-2 md:grid-cols-4 gap-4">
+                        <div className="relative w-full font-semibold">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) =>
+                                    setStatusFilter(e.target.value)
+                                }
+                                className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
+                    px-3 py-1 rounded-md cursor-pointer"
+                            >
+                                <option value="all">Chọn trạng thái</option>
+                                <option value="active">Đang hoạt động</option>
+                                <option value="inactive">Đã tắt</option>
+                                <option value="applying">Đang áp dụng</option>
+                                <option value="expired">Đã hết hạn</option>
+                                <option value="upcoming">Sắp diễn ra</option>
+                            </select>
+                        </div>
+                        <div className="relative w-full font-semibold">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) =>
+                                    setStatusFilter(e.target.value)
+                                }
+                                className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
+                    px-3 py-1 rounded-md cursor-pointer"
+                            >
+                                <option value="all">Chọn loại giảm giá</option>
+                                <option value="percentage">Phần trăm</option>
+                                <option value="fixed">Giảm giá cố định</option>
+                            </select>
+                        </div>
+                        <button
+                            onClick={() => {
+                                setStatusFilter('all');
+                                setSearchTerm('');
+                            }}
+                            className="text-center px-4 h-12 font-medium liquid-glass rounded-lg text-sm"
+                        >
+                            Đặt lại bộ lọc
+                        </button>
+                        <button
+                            onClick={handleExportPDF}
+                            className="flex items-center gap-2 justify-center h-12 px-4 py-2 border border-transparent rounded-md shadow-sm sm:text-sm text-xs font-medium
+                    text-white bg-red-600/60 hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-red-500"
+                        >
+                            <FaFilePdf size={15} />
+                            <p>Xuất PDF</p>
+                        </button>
+                    </div>
+
+                    {/* Search */}
+                    <div className="w-full md:w-80 lg:w-96 font-medium">
+                        <div className="relative">
+                            <Input
+                                type="text"
+                                placeholder="Tìm kiếm mã giảm giá..."
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
+                                className="w-full pl-10 h-12 text-sm"
+                            />
+                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Bulk actions */}
             {selectedVouchers.length > 0 && (

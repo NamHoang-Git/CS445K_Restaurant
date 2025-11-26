@@ -6,7 +6,10 @@ import {
     getAllVoucherController, updateVoucherController,
     getAvailableVouchersController,
     applyVoucherController,
-    getBestVoucherController
+    getBestVoucherController,
+    getVoucherOverviewController,
+    getTopVouchersController,
+    getUsageTrendController
 } from '../controllers/voucher.controller.js';
 
 const voucherRouter = Router()
@@ -26,5 +29,10 @@ voucherRouter.post('/apply', applyVoucherController)
 
 // Get best voucher combination
 voucherRouter.post('/best', getBestVoucherController)
+
+// Analytics routes (admin only)
+voucherRouter.get('/analytics/overview', auth, getVoucherOverviewController)
+voucherRouter.get('/analytics/top-vouchers', auth, getTopVouchersController)
+voucherRouter.get('/analytics/usage-trend', auth, getUsageTrendController)
 
 export default voucherRouter

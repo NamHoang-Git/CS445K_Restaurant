@@ -437,6 +437,19 @@ const SummaryApi = {
     get_best_voucher: {
         url: '/api/voucher/best',
         method: 'post'
+    },
+    // Voucher Analytics APIs
+    voucher_analytics_overview: {
+        url: '/api/voucher/analytics/overview',
+        method: 'get'
+    },
+    voucher_analytics_top: {
+        url: '/api/voucher/analytics/top-vouchers',
+        method: 'get'
+    },
+    voucher_analytics_trend: {
+        url: '/api/voucher/analytics/usage-trend',
+        method: 'get'
     }
 }
 

@@ -32,7 +32,7 @@ const AddVoucher = ({ onClose, fetchVoucher }) => {
         endDate: '',
         usageLimit: null,
         isActive: true,
-        isFreeShipping: false,
+        // REMOVED: isFreeShipping: false,
         applyForAllProducts: true,
         products: [],
         categories: [],
@@ -274,70 +274,65 @@ const AddVoucher = ({ onClose, fetchVoucher }) => {
                                     </select>
                                 </div>
 
-                                {formData.discountType !== 'free_shipping' && (
-                                    <div className="space-y-2">
-                                        <Label>
+                                {/* CHANGED: Removed condition check for free_shipping */}
+                                <div className="space-y-2">
+                                    <Label>
+                                        {formData.discountType === 'percentage'
+                                            ? 'Phần trăm giảm giá'
+                                            : 'Số tiền giảm giá'}{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            type="number"
+                                            name="discountValue"
+                                            value={formData.discountValue}
+                                            onChange={handleOnChange}
+                                            min={
+                                                formData.discountType ===
+                                                'percentage'
+                                                    ? '0.01'
+                                                    : '1'
+                                            }
+                                            max={
+                                                formData.discountType ===
+                                                'percentage'
+                                                    ? '100'
+                                                    : ''
+                                            }
+                                            step={
+                                                formData.discountType ===
+                                                'percentage'
+                                                    ? '0.01'
+                                                    : '1'
+                                            }
+                                            className="no-spinner w-full pl-3 pr-8 text-sm h-10"
+                                            required
+                                            placeholder={
+                                                formData.discountType ===
+                                                'percentage'
+                                                    ? '0-100%'
+                                                    : 'Enter amount'
+                                            }
+                                        />
+                                        <span className="absolute right-3 top-2">
                                             {formData.discountType ===
                                             'percentage'
-                                                ? 'Phần trăm giảm giá'
-                                                : 'Số tiền giảm giá'}{' '}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </Label>
-                                        <div className="relative">
-                                            <Input
-                                                type="number"
-                                                name="discountValue"
-                                                value={formData.discountValue}
-                                                onChange={handleOnChange}
-                                                min={
-                                                    formData.discountType ===
-                                                    'percentage'
-                                                        ? '0.01'
-                                                        : '1'
-                                                }
-                                                max={
-                                                    formData.discountType ===
-                                                    'percentage'
-                                                        ? '100'
-                                                        : ''
-                                                }
-                                                step={
-                                                    formData.discountType ===
-                                                    'percentage'
-                                                        ? '0.01'
-                                                        : '1'
-                                                }
-                                                className="no-spinner w-full pl-3 pr-8 text-sm h-10"
-                                                required
-                                                placeholder={
-                                                    formData.discountType ===
-                                                    'percentage'
-                                                        ? '0-100%'
-                                                        : 'Enter amount'
-                                                }
-                                            />
-                                            <span className="absolute right-3 top-2">
-                                                {formData.discountType ===
-                                                'percentage'
-                                                    ? '%'
-                                                    : '₫'}
-                                            </span>
-                                        </div>
-                                        {formData.discountType ===
-                                            'percentage' && (
-                                            <p className="mt-1 text-xs">
-                                                Nhập giá trị từ 0,01% đến 100%
-                                            </p>
-                                        )}
-                                        {formData.discountType === 'fixed' && (
-                                            <p className="mt-1 text-xs">
-                                                Nhập giá trị lớn hơn 0
-                                            </p>
-                                        )}
+                                                ? '%'
+                                                : '₫'}
+                                        </span>
                                     </div>
-                                )}
+                                    {formData.discountType === 'percentage' && (
+                                        <p className="mt-1 text-xs">
+                                            Nhập giá trị từ 0,01% đến 100%
+                                        </p>
+                                    )}
+                                    {formData.discountType === 'fixed' && (
+                                        <p className="mt-1 text-xs">
+                                            Nhập giá trị lớn hơn 0
+                                        </p>
+                                    )}
+                                </div>
 
                                 {formData.discountType === 'percentage' && (
                                     <div className="space-y-2">

@@ -66,7 +66,7 @@ const EditVoucher = ({
         endDate: formatDateForInput(voucherData?.endDate) || '',
         usageLimit: voucherData?.usageLimit || null,
         isActive: voucherData?.isActive ?? true,
-        isFreeShipping: voucherData?.isFreeShipping ?? false,
+        // REMOVED: isFreeShipping: voucherData?.isFreeShipping ?? false,
         applyForAllProducts: voucherData?.applyForAllProducts ?? true,
         products: voucherData?.products ? [...voucherData.products] : [],
         categories: voucherData?.categories ? [...voucherData.categories] : [],
@@ -309,74 +309,67 @@ const EditVoucher = ({
                                     </select>
                                 </div>
 
-                                {editFormData.discountType !==
-                                    'free_shipping' && (
-                                    <div className="space-y-2">
-                                        <Label>
+                                {/* CHANGED: Removed condition check for free_shipping */}
+                                <div className="space-y-2">
+                                    <Label>
+                                        {editFormData.discountType ===
+                                        'percentage'
+                                            ? 'Phần trăm giảm giá'
+                                            : 'Số tiền giảm giá'}{' '}
+                                        <span className="text-red-500">*</span>
+                                    </Label>
+                                    <div className="relative">
+                                        <Input
+                                            type="number"
+                                            name="discountValue"
+                                            value={editFormData.discountValue}
+                                            onChange={handleOnChange}
+                                            min={
+                                                editFormData.discountType ===
+                                                'percentage'
+                                                    ? '0.01'
+                                                    : '1'
+                                            }
+                                            max={
+                                                editFormData.discountType ===
+                                                'percentage'
+                                                    ? '100'
+                                                    : ''
+                                            }
+                                            step={
+                                                editFormData.discountType ===
+                                                'percentage'
+                                                    ? '0.01'
+                                                    : '1'
+                                            }
+                                            className="no-spinner w-full pl-3 pr-8 text-sm h-10"
+                                            required
+                                            placeholder={
+                                                editFormData.discountType ===
+                                                'percentage'
+                                                    ? '0-100%'
+                                                    : 'Enter amount'
+                                            }
+                                        />
+                                        <span className="absolute right-3 top-2">
                                             {editFormData.discountType ===
                                             'percentage'
-                                                ? 'Phần trăm giảm giá'
-                                                : 'Số tiền giảm giá'}{' '}
-                                            <span className="text-red-500">
-                                                *
-                                            </span>
-                                        </Label>
-                                        <div className="relative">
-                                            <Input
-                                                type="number"
-                                                name="discountValue"
-                                                value={
-                                                    editFormData.discountValue
-                                                }
-                                                onChange={handleOnChange}
-                                                min={
-                                                    editFormData.discountType ===
-                                                    'percentage'
-                                                        ? '0.01'
-                                                        : '1'
-                                                }
-                                                max={
-                                                    editFormData.discountType ===
-                                                    'percentage'
-                                                        ? '100'
-                                                        : ''
-                                                }
-                                                step={
-                                                    editFormData.discountType ===
-                                                    'percentage'
-                                                        ? '0.01'
-                                                        : '1'
-                                                }
-                                                className="no-spinner w-full pl-3 pr-8 text-sm h-10"
-                                                required
-                                                placeholder={
-                                                    editFormData.discountType ===
-                                                    'percentage'
-                                                        ? '0-100%'
-                                                        : 'Enter amount'
-                                                }
-                                            />
-                                            <span className="absolute right-3 top-2">
-                                                {editFormData.discountType ===
-                                                'percentage'
-                                                    ? '%'
-                                                    : '₫'}
-                                            </span>
-                                        </div>
-                                        {editFormData.discountType ===
-                                            'percentage' && (
-                                            <p className="mt-1 text-xs">
-                                                Nhập giá trị từ 0,01% đến 100%
-                                            </p>
-                                        )}
-                                        {editFormData.discountType ===
-                                            'fixed' && (
-                                            <p className="mt-1 text-xs">
-                                                Nhập giá trị lớn hơn 0
-                                            </p>
-                                        )}
+                                                ? '%'
+                                                : '₫'}
+                                        </span>
                                     </div>
-                                )}
+                                    {editFormData.discountType ===
+                                        'percentage' && (
+                                        <p className="mt-1 text-xs">
+                                            Nhập giá trị từ 0,01% đến 100%
+                                        </p>
+                                    )}
+                                    {editFormData.discountType === 'fixed' && (
+                                        <p className="mt-1 text-xs">
+                                            Nhập giá trị lớn hơn 0
+                                        </p>
+                                    )}
+                                </div>
 
                                 {editFormData.discountType === 'percentage' && (
                                     <div className="space-y-2">

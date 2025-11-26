@@ -646,3 +646,188 @@ export const getBestVoucherController = async (req, res) => {
     }
 };
 
+// ==================== ANALYTICS CONTROLLERS ====================
+
+// Get voucher overview statistics
+export const getVoucherOverviewController = async (req, res) => {
+    try {
+        // Total vouchers
+        const totalVouchers = await VoucherModel.countDocuments();
+
+        // Active vouchers
+        const currentDate = new Date();
+        const activeVouchers = await VoucherModel.countDocuments({
+            isActive: true,
+            startDate: { $lte: currentDate },
+            endDate: { $gte: currentDate }
+        });
+
+        // Total usage and savings from orders
+        const usageStats = await OrderModel.aggregate([
+            {
+                $match: {
+                    voucherCode: { $ne: null, $exists: true }
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalUsage: { $sum: 1 },
+                    totalSavings: { $sum: '$voucherDiscount' }
+                }
+            }
+        ]);
+
+        const totalUsage = usageStats.length > 0 ? usageStats[0].totalUsage : 0;
+        const totalSavings = usageStats.length > 0 ? usageStats[0].totalSavings : 0;
+        const avgDiscountPerOrder = totalUsage > 0 ? totalSavings / totalUsage : 0;
+
+        return res.json({
+            message: 'Lấy thống kê tổng quan thành công',
+            data: {
+                totalVouchers,
+                activeVouchers,
+                totalUsage,
+                totalSavings: Math.round(totalSavings),
+                avgDiscountPerOrder: Math.round(avgDiscountPerOrder)
+            },
+            error: false,
+            success: true
+        });
+
+    } catch (error) {
+        console.error('Error getting voucher overview:', error);
+        return res.status(500).json({
+            message: error.message || 'Có lỗi xảy ra khi lấy thống kê',
+            error: true,
+            success: false
+        });
+    }
+};
+
+// Get top vouchers by usage
+export const getTopVouchersController = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 5;
+
+        const topVouchers = await OrderModel.aggregate([
+            {
+                $match: {
+                    voucherCode: { $ne: null, $exists: true }
+                }
+            },
+            {
+                $group: {
+                    _id: '$voucherCode',
+                    usageCount: { $sum: 1 },
+                    totalSavings: { $sum: '$voucherDiscount' },
+                    voucherId: { $first: '$voucherId' }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'vouchers',
+                    localField: 'voucherId',
+                    foreignField: '_id',
+                    as: 'voucherDetails'
+                }
+            },
+            {
+                $unwind: {
+                    path: '$voucherDetails',
+                    preserveNullAndEmptyArrays: true
+                }
+            },
+            {
+                $project: {
+                    code: '$_id',
+                    name: { $ifNull: ['$voucherDetails.name', '$_id'] },
+                    usageCount: 1,
+                    totalSavings: { $round: ['$totalSavings', 0] },
+                    discountType: { $ifNull: ['$voucherDetails.discountType', 'unknown'] }
+                }
+            },
+            {
+                $sort: { usageCount: -1 }
+            },
+            {
+                $limit: limit
+            }
+        ]);
+
+        return res.json({
+            message: 'Lấy top vouchers thành công',
+            data: { vouchers: topVouchers },
+            error: false,
+            success: true
+        });
+
+    } catch (error) {
+        console.error('Error getting top vouchers:', error);
+        return res.status(500).json({
+            message: error.message || 'Có lỗi xảy ra khi lấy top vouchers',
+            error: true,
+            success: false
+        });
+    }
+};
+
+// Get usage trend over time
+export const getUsageTrendController = async (req, res) => {
+    try {
+        const period = req.query.period || '7d'; // 7d, 30d, 90d
+
+        let daysAgo = 7;
+        if (period === '30d') daysAgo = 30;
+        else if (period === '90d') daysAgo = 90;
+
+        const startDate = new Date();
+        startDate.setDate(startDate.getDate() - daysAgo);
+        startDate.setHours(0, 0, 0, 0);
+
+        const trend = await OrderModel.aggregate([
+            {
+                $match: {
+                    voucherCode: { $ne: null, $exists: true },
+                    createdAt: { $gte: startDate }
+                }
+            },
+            {
+                $group: {
+                    _id: {
+                        $dateToString: { format: '%Y-%m-%d', date: '$createdAt' }
+                    },
+                    usageCount: { $sum: 1 },
+                    totalSavings: { $sum: '$voucherDiscount' }
+                }
+            },
+            {
+                $project: {
+                    date: '$_id',
+                    usageCount: 1,
+                    totalSavings: { $round: ['$totalSavings', 0] },
+                    _id: 0
+                }
+            },
+            {
+                $sort: { date: 1 }
+            }
+        ]);
+
+        return res.json({
+            message: 'Lấy xu hướng sử dụng thành công',
+            data: { trend, period, daysAgo },
+            error: false,
+            success: true
+        });
+
+    } catch (error) {
+        console.error('Error getting usage trend:', error);
+        return res.status(500).json({
+            message: error.message || 'Có lỗi xảy ra khi lấy xu hướng',
+            error: true,
+            success: false
+        });
+    }
+};
+
