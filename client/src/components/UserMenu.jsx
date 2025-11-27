@@ -9,6 +9,7 @@ import { clearCart } from '../store/cartProduct';
 import { toast } from 'react-hot-toast';
 import AxiosToastError from './../utils/AxiosToastError';
 import { BiLinkExternal, BiRefresh } from 'react-icons/bi';
+import { ChevronDown } from 'lucide-react';
 // import isAdmin from '../utils/isAdmin';
 import GradientText from './GradientText';
 import isAdmin from '@/utils/isAdmin';
@@ -22,6 +23,16 @@ const UserMenu = ({ close }) => {
     const location = useLocation();
     const menuRef = useRef();
     const [isLoadingPoints, setIsLoadingPoints] = useState(false);
+
+    // State for collapsible menu sections
+    const [expandedSections, setExpandedSections] = useState({
+        products: false,
+        restaurant: false,
+        hr: false,
+        reports: false,
+        employee: false,
+        personal: false,
+    });
 
     // Function to fetch user points
     const fetchUserPoints = useCallback(async () => {
@@ -56,6 +67,55 @@ const UserMenu = ({ close }) => {
 
         fetchData();
     }, [user?._id, fetchUserPoints]);
+
+    // Auto-expand section based on current route (accordion behavior)
+    useEffect(() => {
+        const path = location.pathname;
+
+        // Reset all sections first
+        const newSections = {
+            products: false,
+            restaurant: false,
+            hr: false,
+            reports: false,
+            employee: false,
+            personal: false,
+        };
+
+        // Then open only the relevant section
+        if (
+            path.includes('/category') ||
+            path.includes('/sub-category') ||
+            path.includes('/product')
+        ) {
+            newSections.products = true;
+        } else if (
+            path.includes('/table') ||
+            path.includes('/booking') ||
+            path.includes('/bill') ||
+            path.includes('/report')
+        ) {
+            newSections.restaurant = true;
+        } else if (
+            path.includes('/employee-management') ||
+            path.includes('/shift-management') ||
+            path.includes('/attendance-management')
+        ) {
+            newSections.hr = true;
+        } else if (path.includes('/voucher')) {
+            newSections.reports = true;
+        } else if (
+            path.includes('/employee-dashboard') ||
+            path.includes('/my-shifts') ||
+            path.includes('/my-performance')
+        ) {
+            newSections.employee = true;
+        } else if (path.includes('/address') || path.includes('/my-orders')) {
+            newSections.personal = true;
+        }
+
+        setExpandedSections(newSections);
+    }, [location.pathname]);
 
     // Function to check if a path is active
     const isActive = (path) => {
@@ -98,6 +158,51 @@ const UserMenu = ({ close }) => {
         if (close) {
             close();
         }
+    };
+
+    // Toggle section expand/collapse
+    const toggleSection = (section) => {
+        setExpandedSections((prev) => ({
+            ...prev,
+            [section]: !prev[section],
+        }));
+    };
+
+    // MenuSection Component for collapsible groups
+    const MenuSection = ({
+        title,
+        icon,
+        sectionKey,
+        children,
+        show = true,
+    }) => {
+        if (!show) return null;
+
+        const isExpanded = expandedSections[sectionKey];
+
+        return (
+            <div className="mb-1">
+                <button
+                    onClick={() => toggleSection(sectionKey)}
+                    className="w-full flex items-center justify-between px-4 py-2.5 
+                               hover:bg-white/10 transition-colors rounded-lg text-white"
+                >
+                    <div className="flex items-center gap-2.5">
+                        <span className="text-base">{icon}</span>
+                        <span className="font-semibold text-sm">{title}</span>
+                    </div>
+                    <ChevronDown
+                        className={`transition-transform duration-200 ${
+                            isExpanded ? 'rotate-180' : ''
+                        }`}
+                        size={16}
+                    />
+                </button>
+                {isExpanded && (
+                    <div className="ml-6 mt-1 space-y-0.5">{children}</div>
+                )}
+            </div>
+        );
     };
 
     return (
@@ -174,93 +279,143 @@ const UserMenu = ({ close }) => {
                 </div>
             </div>
             <Divider />
-            <div className="lg:text-sm text-xs grid gap-2 font-semibold">
-                {isAdmin(user.role) && (
+            <div className="lg:text-sm text-xs grid gap-1 font-semibold">
+                {/* ADMIN - Products Section */}
+                <MenuSection
+                    title="Quản lý Sản phẩm"
+                    icon="📦"
+                    sectionKey="products"
+                    show={isAdmin(user.role)}
+                >
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/category'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/category')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Quản Lý Danh Mục
+                            Quản lý Danh mục
                         </span>
                     </Link>
-                )}
-
-                {isAdmin(user.role) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/sub-category'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/sub-category')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Quản Lý Danh Mục Phụ
+                            Quản lý Danh mục phụ
                         </span>
                     </Link>
-                )}
-
-                {isAdmin(user.role) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/product'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/product')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Quản Lý Sản Phẩm
+                            Quản lý Sản phẩm
                         </span>
                     </Link>
-                )}
-
-                {['ADMIN', 'MANAGER'].includes(user.role) && (
-                    <Link
-                        onClick={handleClose}
-                        to={'/dashboard/table'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
-                            isActive('/dashboard/table')
-                                ? 'bg-white/20 shadow-md'
-                                : ''
-                        }`}
-                    >
-                        <span className="text-white font-medium text-sm">
-                            Quản lý Bàn Ăn
-                        </span>
-                    </Link>
-                )}
-
-                {['ADMIN', 'MANAGER', 'WAITER'].includes(user.role) && (
-                    <Link
-                        onClick={handleClose}
-                        to={'/dashboard/booking'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
-                            isActive('/dashboard/booking')
-                                ? 'bg-white/20 shadow-md'
-                                : ''
-                        }`}
-                    >
-                        <span className="text-white font-medium text-sm">
-                            Quản lý Danh Sách Đặt Bàn
-                        </span>
-                    </Link>
-                )}
-
-                {/* Employee Management - Admin/Manager */}
-                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
+                </MenuSection>
+                {/* Restaurant Section - ADMIN, MANAGER, WAITER, CASHIER */}
+                <MenuSection
+                    title={
+                        user.role === 'WAITER' || user.role === 'CASHIER'
+                            ? 'Công việc'
+                            : 'Quản lý Nhà hàng'
+                    }
+                    icon="🍽️"
+                    sectionKey="restaurant"
+                    show={['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'].includes(
+                        user.role
+                    )}
+                >
+                    {['ADMIN', 'MANAGER'].includes(user.role) && (
+                        <Link
+                            onClick={handleClose}
+                            to={'/dashboard/table'}
+                            className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
+                                isActive('/dashboard/table')
+                                    ? 'bg-white/20 shadow-md'
+                                    : ''
+                            }`}
+                        >
+                            <span className="text-white font-medium text-sm">
+                                Quản lý Bàn ăn
+                            </span>
+                        </Link>
+                    )}
+                    {['ADMIN', 'MANAGER', 'WAITER'].includes(user.role) && (
+                        <Link
+                            onClick={handleClose}
+                            to={'/dashboard/booking'}
+                            className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
+                                isActive('/dashboard/booking')
+                                    ? 'bg-white/20 shadow-md'
+                                    : ''
+                            }`}
+                        >
+                            <span className="text-white font-medium text-sm">
+                                Danh sách Đặt bàn
+                            </span>
+                        </Link>
+                    )}
+                    {['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'].includes(
+                        user.role
+                    ) && (
+                        <Link
+                            onClick={handleClose}
+                            to={'/dashboard/bill'}
+                            className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
+                                isActive('/dashboard/bill')
+                                    ? 'bg-white/20 shadow-md'
+                                    : ''
+                            }`}
+                        >
+                            <span className="text-white font-medium text-sm">
+                                {user.role === 'CASHIER'
+                                    ? 'Xử lý Thanh toán'
+                                    : 'Danh sách Hóa đơn'}
+                            </span>
+                        </Link>
+                    )}
+                    {['ADMIN', 'MANAGER'].includes(user.role) && (
+                        <Link
+                            onClick={handleClose}
+                            to={'/dashboard/report'}
+                            className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
+                                isActive('/dashboard/report')
+                                    ? 'bg-white/20 shadow-md'
+                                    : ''
+                            }`}
+                        >
+                            <span className="text-white font-medium text-sm">
+                                Báo cáo Thống kê
+                            </span>
+                        </Link>
+                    )}
+                </MenuSection>
+                {/* HR Section - ADMIN, MANAGER */}
+                <MenuSection
+                    title="Quản lý Nhân sự"
+                    icon="👥"
+                    sectionKey="hr"
+                    show={['ADMIN', 'MANAGER'].includes(user.role)}
+                >
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/employee-management'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/employee-management')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -270,13 +425,10 @@ const UserMenu = ({ close }) => {
                             Quản lý Nhân viên
                         </span>
                     </Link>
-                )}
-
-                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/shift-management'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/shift-management')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -286,13 +438,10 @@ const UserMenu = ({ close }) => {
                             Quản lý Ca làm
                         </span>
                     </Link>
-                )}
-
-                {(user.role === 'ADMIN' || user.role === 'MANAGER') && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/attendance-management'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/attendance-management')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -302,16 +451,41 @@ const UserMenu = ({ close }) => {
                             Quản lý Chấm công
                         </span>
                     </Link>
-                )}
-
-                {/* Employee Dashboard - For all employees */}
-                {['WAITER', 'CHEF', 'CASHIER', 'MANAGER'].includes(
-                    user.role
-                ) && (
+                </MenuSection>
+                {/* Reports & Voucher Section - ADMIN only */}
+                <MenuSection
+                    title="Báo cáo & Khuyến mãi"
+                    icon="📈"
+                    sectionKey="reports"
+                    show={isAdmin(user.role)}
+                >
+                    <Link
+                        onClick={handleClose}
+                        to={'/dashboard/voucher'}
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
+                            isActive('/dashboard/voucher')
+                                ? 'bg-white/20 shadow-md'
+                                : ''
+                        }`}
+                    >
+                        <span className="text-white font-medium text-sm">
+                            Quản lý Mã giảm giá
+                        </span>
+                    </Link>
+                </MenuSection>
+                {/* Employee Section - MANAGER, WAITER, CHEF, CASHIER */}
+                <MenuSection
+                    title="Nhân viên"
+                    icon="💼"
+                    sectionKey="employee"
+                    show={['MANAGER', 'WAITER', 'CHEF', 'CASHIER'].includes(
+                        user.role
+                    )}
+                >
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/employee-dashboard'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/employee-dashboard')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -321,16 +495,10 @@ const UserMenu = ({ close }) => {
                             Dashboard Nhân viên
                         </span>
                     </Link>
-                )}
-
-                {/* My Shifts - For all employees */}
-                {['WAITER', 'CHEF', 'CASHIER', 'MANAGER'].includes(
-                    user.role
-                ) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/my-shifts'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/my-shifts')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -340,16 +508,10 @@ const UserMenu = ({ close }) => {
                             Ca làm của tôi
                         </span>
                     </Link>
-                )}
-
-                {/* My Performance - For all employees */}
-                {['WAITER', 'CHEF', 'CASHIER', 'MANAGER'].includes(
-                    user.role
-                ) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/my-performance'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/my-performance')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -359,65 +521,18 @@ const UserMenu = ({ close }) => {
                             Hiệu suất của tôi
                         </span>
                     </Link>
-                )}
-
-                {['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'].includes(
-                    user.role
-                ) && (
-                    <Link
-                        onClick={handleClose}
-                        to={'/dashboard/bill'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
-                            isActive('/dashboard/bill')
-                                ? 'bg-white/20 shadow-md'
-                                : ''
-                        }`}
-                    >
-                        <span className="text-white font-medium text-sm">
-                            {user.role === 'CASHIER'
-                                ? 'Xử lý Thanh toán'
-                                : 'Quản lý Danh Sách Hóa Đơn'}
-                        </span>
-                    </Link>
-                )}
-
-                {['ADMIN', 'MANAGER'].includes(user.role) && (
-                    <Link
-                        onClick={handleClose}
-                        to={'/dashboard/report'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
-                            isActive('/dashboard/report')
-                                ? 'bg-white/20 shadow-md'
-                                : ''
-                        }`}
-                    >
-                        <span className="text-white font-medium text-sm">
-                            Báo Cáo Thống Kê
-                        </span>
-                    </Link>
-                )}
-
-                {isAdmin(user.role) && (
-                    <Link
-                        onClick={handleClose}
-                        to={'/dashboard/voucher'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
-                            isActive('/dashboard/voucher')
-                                ? 'bg-white/20 shadow-md'
-                                : ''
-                        }`}
-                    >
-                        <span className="text-white font-medium text-sm">
-                            Quản Lý Mã Giảm Giá
-                        </span>
-                    </Link>
-                )}
-
-                {user.role !== 'ADMIN' && (
+                </MenuSection>
+                {/* Personal Section - Non-ADMIN users */}
+                <MenuSection
+                    title="Cá nhân"
+                    icon="⚙️"
+                    sectionKey="personal"
+                    show={user.role !== 'ADMIN'}
+                >
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/address'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/address')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -427,13 +542,10 @@ const UserMenu = ({ close }) => {
                             Địa chỉ
                         </span>
                     </Link>
-                )}
-
-                {user.role !== 'ADMIN' && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/my-orders'}
-                        className={`flex items-center text-bl gap-4 px-4 py-3 rounded-xl transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] ${
+                        className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
                             isActive('/dashboard/my-orders')
                                 ? 'bg-white/20 shadow-md'
                                 : ''
@@ -443,7 +555,7 @@ const UserMenu = ({ close }) => {
                             Lịch sử mua hàng
                         </span>
                     </Link>
-                )}
+                </MenuSection>
 
                 <Divider />
                 <div className="pb-2">
