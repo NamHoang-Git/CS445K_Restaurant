@@ -39,6 +39,10 @@ const BillPage = () => {
     );
     const user = useSelector((state) => state.user);
     const isAdmin = user?.role === 'ADMIN';
+    // Allow ADMIN, MANAGER, WAITER, CASHIER to access
+    const canAccessBills = ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'].includes(
+        user?.role
+    );
 
     // State for search and filters
     const [searchTerm, setSearchTerm] = useState('');
@@ -70,8 +74,8 @@ const BillPage = () => {
     useEffect(() => {
         const loadOrders = async () => {
             const accessToken = localStorage.getItem('accesstoken');
-            if (!accessToken || !isAdmin) {
-                navigate('/dashboard/my-orders');
+            if (!accessToken || !canAccessBills) {
+                navigate('/dashboard/profile');
                 return;
             }
 
@@ -85,7 +89,7 @@ const BillPage = () => {
         };
 
         loadOrders();
-    }, [dispatch, isAdmin, navigate, filterParams]);
+    }, [dispatch, canAccessBills, navigate, filterParams]);
 
     const handleFilterChange = (e) => {
         const { name, value } = e.target;
@@ -605,8 +609,7 @@ const BillPage = () => {
     };
 
     const renderSortIcon = (key) => {
-        if (sortConfig.key !== key)
-            return <FaSort className="ml-1" />;
+        if (sortConfig.key !== key) return <FaSort className="ml-1" />;
         return sortConfig.direction === 'asc' ? (
             <FaSortUp className="ml-1" />
         ) : (
@@ -637,12 +640,8 @@ const BillPage = () => {
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-xs font-bold">
-                            Tổng số hóa đơn
-                        </p>
-                        <p className="text-xl font-bold">
-                            {orderCount}
-                        </p>
+                        <p className="text-xs font-bold">Tổng số hóa đơn</p>
+                        <p className="text-xl font-bold">{orderCount}</p>
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
@@ -650,9 +649,7 @@ const BillPage = () => {
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-xs font-bold">
-                            Tổng doanh thu
-                        </p>
+                        <p className="text-xs font-bold">Tổng doanh thu</p>
                         <p className="text-xl font-bold">
                             {DisplayPriceInVND(totalRevenue)}
                         </p>
@@ -663,9 +660,7 @@ const BillPage = () => {
                         <FaFilter className="h-6 w-6" />
                     </div>
                     <div>
-                        <p className="text-xs font-bold">
-                            Đang hiển thị
-                        </p>
+                        <p className="text-xs font-bold">Đang hiển thị</p>
                         <p className="text-xl font-bold">
                             {Math.min(
                                 indexOfFirstOrder + 1,

@@ -522,12 +522,12 @@ const UserMenu = ({ close }) => {
                         </span>
                     </Link>
                 </MenuSection>
-                {/* Personal Section - Non-ADMIN users */}
+                {/* Personal Section - USER only */}
                 <MenuSection
                     title="Cá nhân"
                     icon="⚙️"
                     sectionKey="personal"
-                    show={user.role !== 'ADMIN'}
+                    show={user.role === 'USER'}
                 >
                     <Link
                         onClick={handleClose}

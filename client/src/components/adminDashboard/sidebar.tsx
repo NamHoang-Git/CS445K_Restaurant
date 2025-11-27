@@ -158,7 +158,7 @@ const navigationSections: NavigationSection[] = [
         key: 'personal',
         title: 'Cá nhân',
         icon: '⚙️',
-        roles: ['USER', 'MANAGER', 'WAITER', 'CHEF', 'CASHIER'],
+        roles: ['USER'],
         items: [
             { name: 'Địa chỉ', href: '/dashboard/address', icon: LocateIcon },
             {

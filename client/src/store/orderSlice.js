@@ -44,7 +44,9 @@ export const fetchAllOrders = createAsyncThunk(
             const { user } = getState();
             const accessToken = localStorage.getItem('accesstoken');
 
-            if (!accessToken || !user?._id || user?.role !== 'ADMIN') {
+            // Allow ADMIN, MANAGER, WAITER, CASHIER to access
+            const allowedRoles = ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'];
+            if (!accessToken || !user?._id || !allowedRoles.includes(user?.role)) {
                 throw new Error('Bạn không có quyền truy cập');
             }
 

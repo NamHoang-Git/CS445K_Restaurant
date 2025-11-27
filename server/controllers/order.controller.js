@@ -1251,9 +1251,12 @@ export async function getAllOrdersController(request, response) {
     try {
         const userId = request.userId;
         const user = await UserModel.findById(userId);
-        if (user?.role !== 'ADMIN') {
+
+        // Allow ADMIN, MANAGER, WAITER, CASHIER to access
+        const allowedRoles = ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'];
+        if (!allowedRoles.includes(user?.role)) {
             return response.status(403).json({
-                message: "Truy cập bị từ chối. Chỉ admin mới được phép xem tất cả đơn hàng.",
+                message: "Bạn không có quyền truy cập",
                 error: true,
                 success: false
             });
