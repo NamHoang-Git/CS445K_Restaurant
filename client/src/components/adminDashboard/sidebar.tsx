@@ -1,6 +1,5 @@
 'use client';
-
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
     BarChart2,
     Package,
@@ -13,6 +12,13 @@ import {
     LocateIcon,
     Clock,
     FileText,
+    ChevronDown,
+    Users,
+    Calendar,
+    Utensils,
+    CheckSquare,
+    LayoutDashboard,
+    TrendingUp,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -26,43 +32,222 @@ import { Link, useLocation } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
-
-const navigation = [
-    { name: 'Quản lý danh mục', href: '/dashboard/category', icon: Layers },
+// TypeScript types for navigation
+interface NavigationItem {
+    name: string;
+    href: string;
+    icon: any;
+    roles?: string[];
+}
+interface NavigationSection {
+    key: string;
+    title: string;
+    icon: string;
+    roles: string[];
+    items: NavigationItem[];
+}
+// Grouped navigation sections
+const navigationSections: NavigationSection[] = [
     {
-        name: 'Quản lý danh mục phụ',
-        href: '/dashboard/sub-category',
-        icon: Layers,
+        key: 'products',
+        title: 'Quản lý Sản phẩm',
+        icon: '📦',
+        roles: ['ADMIN'],
+        items: [
+            { name: 'Danh mục', href: '/dashboard/category', icon: Layers },
+            {
+                name: 'Danh mục phụ',
+                href: '/dashboard/sub-category',
+                icon: Layers,
+            },
+            { name: 'Sản phẩm', href: '/dashboard/product', icon: Package },
+        ],
     },
-    { name: 'Quản lý sản phẩm', href: '/dashboard/product', icon: Package },
-    { name: 'Quản lý đơn hàng', href: '/dashboard/bill', icon: FileText },
-    { name: 'Báo cáo thống kê', href: '/dashboard/report', icon: BarChart2 },
-    { name: 'Mã giảm giá', href: '/dashboard/voucher', icon: TicketPercent },
-    { name: 'Địa chỉ', href: '/dashboard/address', icon: LocateIcon },
-    { name: 'Lịch sử mua hàng', href: '/dashboard/my-orders', icon: Clock },
+    {
+        key: 'restaurant',
+        title: 'Quản lý Nhà hàng',
+        icon: '🍽️',
+        roles: ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'],
+        items: [
+            {
+                name: 'Bàn ăn',
+                href: '/dashboard/table',
+                icon: Utensils,
+                roles: ['ADMIN', 'MANAGER'],
+            },
+            {
+                name: 'Đặt bàn',
+                href: '/dashboard/booking',
+                icon: Calendar,
+                roles: ['ADMIN', 'MANAGER', 'WAITER'],
+            },
+            {
+                name: 'Hóa đơn',
+                href: '/dashboard/bill',
+                icon: FileText,
+                roles: ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'],
+            },
+            {
+                name: 'Báo cáo',
+                href: '/dashboard/report',
+                icon: BarChart2,
+                roles: ['ADMIN', 'MANAGER'],
+            },
+        ],
+    },
+    {
+        key: 'hr',
+        title: 'Quản lý Nhân sự',
+        icon: '👥',
+        roles: ['ADMIN', 'MANAGER'],
+        items: [
+            {
+                name: 'Nhân viên',
+                href: '/dashboard/employee-management',
+                icon: Users,
+            },
+            {
+                name: 'Ca làm',
+                href: '/dashboard/shift-management',
+                icon: Clock,
+            },
+            {
+                name: 'Chấm công',
+                href: '/dashboard/attendance-management',
+                icon: CheckSquare,
+            },
+        ],
+    },
+    {
+        key: 'reports',
+        title: 'Báo cáo & Khuyến mãi',
+        icon: '📈',
+        roles: ['ADMIN'],
+        items: [
+            {
+                name: 'Mã giảm giá',
+                href: '/dashboard/voucher',
+                icon: TicketPercent,
+            },
+        ],
+    },
+    {
+        key: 'employee',
+        title: 'Nhân viên',
+        icon: '💼',
+        roles: ['MANAGER', 'WAITER', 'CHEF', 'CASHIER'],
+        items: [
+            {
+                name: 'Dashboard',
+                href: '/dashboard/employee-dashboard',
+                icon: LayoutDashboard,
+            },
+            {
+                name: 'Ca làm của tôi',
+                href: '/dashboard/my-shifts',
+                icon: Clock,
+            },
+            {
+                name: 'Hiệu suất',
+                href: '/dashboard/my-performance',
+                icon: TrendingUp,
+            },
+        ],
+    },
+    {
+        key: 'personal',
+        title: 'Cá nhân',
+        icon: '⚙️',
+        roles: ['USER', 'MANAGER', 'WAITER', 'CHEF', 'CASHIER'],
+        items: [
+            { name: 'Địa chỉ', href: '/dashboard/address', icon: LocateIcon },
+            {
+                name: 'Lịch sử mua hàng',
+                href: '/dashboard/my-orders',
+                icon: Clock,
+            },
+        ],
+    },
 ];
-
 const bottomNavigation = [
     { name: 'Tài khoản', href: '/dashboard/profile', icon: Settings },
     { name: 'Hỗ trợ', href: '/help', icon: HelpCircle },
 ];
-
 export function Sidebar() {
     const { pathname } = useLocation();
     const [isCollapsed, setIsCollapsed] = useState(false);
     const [isMobileOpen, setIsMobileOpen] = useState(false);
-
-    const user = useSelector((state: RootState) => state.user);
-
-    const filteredNavigation = navigation.filter((item) => {
-        if (user.role === 'ADMIN') {
-            return item.name !== 'Địa chỉ' && item.name !== 'Lịch sử mua hàng';
-        } else {
-            return item.name === 'Địa chỉ' || item.name === 'Lịch sử mua hàng';
-        }
+    // State for collapsible menu sections
+    const [expandedSections, setExpandedSections] = useState<
+        Record<string, boolean>
+    >({
+        products: false,
+        restaurant: false,
+        hr: false,
+        reports: false,
+        employee: false,
+        personal: false,
     });
-
-    const NavItem = ({ item, isBottom = false }) => (
+    const user = useSelector((state: RootState) => state.user);
+    // Auto-expand section based on current route (accordion behavior)
+    useEffect(() => {
+        const path = pathname;
+        const newSections: Record<string, boolean> = {
+            products: false,
+            restaurant: false,
+            hr: false,
+            reports: false,
+            employee: false,
+            personal: false,
+        };
+        // Determine which section to expand
+        if (
+            path.includes('/category') ||
+            path.includes('/sub-category') ||
+            path.includes('/product')
+        ) {
+            newSections.products = true;
+        } else if (
+            path.includes('/table') ||
+            path.includes('/booking') ||
+            path.includes('/bill') ||
+            path.includes('/report')
+        ) {
+            newSections.restaurant = true;
+        } else if (
+            path.includes('/employee-management') ||
+            path.includes('/shift-management') ||
+            path.includes('/attendance-management')
+        ) {
+            newSections.hr = true;
+        } else if (path.includes('/voucher')) {
+            newSections.reports = true;
+        } else if (
+            path.includes('/employee-dashboard') ||
+            path.includes('/my-shifts') ||
+            path.includes('/my-performance')
+        ) {
+            newSections.employee = true;
+        } else if (path.includes('/address') || path.includes('/my-orders')) {
+            newSections.personal = true;
+        }
+        setExpandedSections(newSections);
+    }, [pathname]);
+    // Toggle section expand/collapse
+    const toggleSection = (sectionKey: string) => {
+        setExpandedSections((prev) => ({
+            ...prev,
+            [sectionKey]: !prev[sectionKey],
+        }));
+    };
+    // NavItem component for individual links
+    const NavItem = ({
+        item,
+        isBottom = false,
+    }: {
+        item: NavigationItem;
+        isBottom?: boolean;
+    }) => (
         <Tooltip delayDuration={0}>
             <TooltipTrigger asChild>
                 <Link
@@ -91,7 +276,71 @@ export function Sidebar() {
             )}
         </Tooltip>
     );
-
+    // MenuSection component for collapsible groups
+    const MenuSection = ({ section }: { section: NavigationSection }) => {
+        // Filter items by role
+        const visibleItems = section.items.filter(
+            (item) => !item.roles || item.roles.includes(user.role)
+        );
+        if (visibleItems.length === 0) return null;
+        const isExpanded = expandedSections[section.key];
+        return (
+            <div className="mb-1">
+                <Tooltip delayDuration={0}>
+                    <TooltipTrigger asChild>
+                        <button
+                            onClick={() => toggleSection(section.key)}
+                            className={cn(
+                                'w-full flex items-center justify-between px-3 py-2 rounded-md',
+                                'text-sm font-semibold text-muted-foreground',
+                                'hover:bg-muted-foreground/20 hover:text-secondary-foreground',
+                                'transition-colors',
+                                isCollapsed && 'justify-center px-2'
+                            )}
+                        >
+                            {!isCollapsed && (
+                                <>
+                                    <div className="flex items-center gap-2">
+                                        <span className="text-base">
+                                            {section.icon}
+                                        </span>
+                                        <span>{section.title}</span>
+                                    </div>
+                                    <ChevronDown
+                                        className={cn(
+                                            'h-4 w-4 transition-transform duration-200',
+                                            isExpanded && 'rotate-180'
+                                        )}
+                                    />
+                                </>
+                            )}
+                            {isCollapsed && (
+                                <span className="text-base">
+                                    {section.icon}
+                                </span>
+                            )}
+                        </button>
+                    </TooltipTrigger>
+                    {isCollapsed && (
+                        <TooltipContent side="right">
+                            {section.title}
+                        </TooltipContent>
+                    )}
+                </Tooltip>
+                {isExpanded && !isCollapsed && (
+                    <div className="ml-6 mt-1 space-y-1">
+                        {visibleItems.map((item) => (
+                            <NavItem key={item.href} item={item} />
+                        ))}
+                    </div>
+                )}
+            </div>
+        );
+    };
+    // Filter sections by user role
+    const visibleSections = navigationSections.filter((section) =>
+        section.roles.includes(user.role)
+    );
     return (
         <TooltipProvider>
             <>
@@ -176,8 +425,11 @@ export function Sidebar() {
                             </Link>
                         </div>
                         <nav className="flex-1 space-y-1 px-2 py-4">
-                            {filteredNavigation.map((item) => (
-                                <NavItem key={item.name} item={item} />
+                            {visibleSections.map((section) => (
+                                <MenuSection
+                                    key={section.key}
+                                    section={section}
+                                />
                             ))}
                         </nav>
                     </div>
