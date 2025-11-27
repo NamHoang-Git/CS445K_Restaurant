@@ -28,6 +28,7 @@ const EmployeeDashboard = () => {
             }
         } catch (error) {
             // Silently fail if no attendance
+            AxiosToastError(error);
         }
     };
 
@@ -71,6 +72,7 @@ const EmployeeDashboard = () => {
             }
         } catch (error) {
             // Silently fail
+            AxiosToastError(error);
         }
     };
 

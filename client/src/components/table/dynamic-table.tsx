@@ -1065,9 +1065,7 @@ export default function DynamicTable({
             {totalPages > 1 && (
                 <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-2">
-                        <span className="text-sm text-muted-foreground">
-                            Hiển thị
-                        </span>
+                        <span className="text-sm text-highlight">Hiển thị</span>
                         <Select
                             value={currentPageSize.toString()}
                             onValueChange={(value) => {
@@ -1076,7 +1074,7 @@ export default function DynamicTable({
                                 setCurrentPage(1);
                             }}
                         >
-                            <SelectTrigger className="w-[70px]">
+                            <SelectTrigger className="w-[70px] text-red-500 font-bold bg-white/50">
                                 <SelectValue placeholder={currentPageSize} />
                             </SelectTrigger>
                             <SelectContent>
@@ -1090,11 +1088,11 @@ export default function DynamicTable({
                                 ))}
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-highlight">
                             mỗi trang
                         </span>
                     </div>
-                    <div className="text-sm text-muted-foreground">
+                    <div className="text-sm text-highlight">
                         Hiển thị {(currentPage - 1) * currentPageSize + 1} đến{' '}
                         {Math.min(
                             currentPage * currentPageSize,
@@ -1126,7 +1124,7 @@ export default function DynamicTable({
                                 handlePageChange(Number.parseInt(value))
                             }
                         >
-                            <SelectTrigger className="w-16">
+                            <SelectTrigger className="w-16 text-red-500 font-bold bg-white/50">
                                 <SelectValue placeholder={currentPage} />
                             </SelectTrigger>
                             <SelectContent>
@@ -1141,7 +1139,7 @@ export default function DynamicTable({
                             </SelectContent>
                         </Select>
 
-                        <span className="text-sm text-muted-foreground">
+                        <span className="text-sm text-highlight">
                             trong {totalPages}
                         </span>
 

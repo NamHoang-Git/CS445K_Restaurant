@@ -174,7 +174,7 @@ const TableManagementPage = () => {
 
     return (
         <section className="container mx-auto grid gap-2 z-10">
-            <Card className="py-6 flex-row justify-between gap-6 border-gray-600 border-2">
+            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
                     <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Quản lý bàn
