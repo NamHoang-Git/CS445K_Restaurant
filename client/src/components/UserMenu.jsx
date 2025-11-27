@@ -223,7 +223,7 @@ const UserMenu = ({ close }) => {
                     </Link>
                 )}
 
-                {isAdmin(user.role) && (
+                {['ADMIN', 'MANAGER'].includes(user.role) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/table'}
@@ -239,7 +239,7 @@ const UserMenu = ({ close }) => {
                     </Link>
                 )}
 
-                {isAdmin(user.role) && (
+                {['ADMIN', 'MANAGER', 'WAITER'].includes(user.role) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/booking'}
@@ -361,7 +361,9 @@ const UserMenu = ({ close }) => {
                     </Link>
                 )}
 
-                {isAdmin(user.role) && (
+                {['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'].includes(
+                    user.role
+                ) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/bill'}
@@ -372,12 +374,14 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Quản lý Danh Sách Hóa Đơn
+                            {user.role === 'CASHIER'
+                                ? 'Xử lý Thanh toán'
+                                : 'Quản lý Danh Sách Hóa Đơn'}
                         </span>
                     </Link>
                 )}
 
-                {isAdmin(user.role) && (
+                {['ADMIN', 'MANAGER'].includes(user.role) && (
                     <Link
                         onClick={handleClose}
                         to={'/dashboard/report'}
