@@ -30,19 +30,25 @@ import {
     DialogTrigger,
     DialogClose,
 } from '@/components/ui/dialog';
-import { FaEdit, FaTrash } from 'react-icons/fa';
+import { FaEdit, FaTrash, FaTrashRestore } from 'react-icons/fa';
 import Loading from '../components/Loading';
 import GlareHover from '@/components/GlareHover';
 import { IoClose } from 'react-icons/io5';
 import DynamicTable from '@/components/table/dynamic-table';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const EmployeeManagementPage = () => {
     const user = useSelector((state) => state.user);
     const [employees, setEmployees] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState('working'); // 'working' | 'resigned'
+
+    // Filters
     const [filterRole, setFilterRole] = useState('ALL');
-    const [filterStatus, setFilterStatus] = useState('ALL');
+    const [filterStatus, setFilterStatus] = useState('ALL'); // For 'working' tab: ALL, active, on_leave
     const [searchTerm, setSearchTerm] = useState('');
+
+    // Modals
     const [isAddModalOpen, setIsAddModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedEmployee, setSelectedEmployee] = useState(null);
@@ -55,20 +61,20 @@ const EmployeeManagementPage = () => {
         role: 'WAITER',
         position: '',
         hireDate: new Date().toISOString().split('T')[0],
+        employeeStatus: 'active',
     });
 
     const roles = ['ADMIN', 'MANAGER', 'WAITER', 'CHEF', 'CASHIER'];
 
-    // Fetch employees
+    // Fetch all employees
     const fetchEmployees = async () => {
         try {
             setLoading(true);
+            // Fetch all employees without filtering on backend to ensure client-side filtering works smoothly
             const response = await Axios({
                 ...SummaryApi.get_all_employees,
                 params: {
-                    role: filterRole === 'ALL' ? '' : filterRole,
-                    employeeStatus: filterStatus === 'ALL' ? '' : filterStatus,
-                    search: searchTerm,
+                    limit: 1000, // Ensure we get all records
                 },
             });
 
@@ -84,7 +90,7 @@ const EmployeeManagementPage = () => {
 
     useEffect(() => {
         fetchEmployees();
-    }, [filterRole, filterStatus, searchTerm]);
+    }, []);
 
     // Handle form change
     const handleChange = (e) => {
@@ -123,6 +129,7 @@ const EmployeeManagementPage = () => {
                     role: 'WAITER',
                     position: '',
                     hireDate: new Date().toISOString().split('T')[0],
+                    employeeStatus: 'active',
                 });
                 fetchEmployees();
             }
@@ -156,10 +163,38 @@ const EmployeeManagementPage = () => {
         }
     };
 
-    // Delete employee
-    const handleDeleteEmployee = async (id) => {
+    // Soft Delete (Move to Resigned)
+    const handleSoftDelete = async (id) => {
         if (
-            !window.confirm('Bạn có chắc chắn muốn vô hiệu hóa nhân viên này?')
+            !window.confirm(
+                'Bạn có chắc chắn muốn chuyển nhân viên này sang danh sách nghỉ việc?'
+            )
+        ) {
+            return;
+        }
+
+        try {
+            const response = await Axios({
+                ...SummaryApi.update_employee,
+                url: SummaryApi.update_employee.url.replace(':id', id),
+                data: { employeeStatus: 'inactive' },
+            });
+
+            if (response.data.success) {
+                successAlert('Đã chuyển nhân viên sang danh sách nghỉ việc');
+                fetchEmployees();
+            }
+        } catch (error) {
+            AxiosToastError(error);
+        }
+    };
+
+    // Hard Delete (Permanent)
+    const handleHardDelete = async (id) => {
+        if (
+            !window.confirm(
+                'CẢNH BÁO: Hành động này không thể hoàn tác! Bạn có chắc chắn muốn xóa vĩnh viễn nhân viên này?'
+            )
         ) {
             return;
         }
@@ -179,6 +214,24 @@ const EmployeeManagementPage = () => {
         }
     };
 
+    // Restore Employee
+    const handleRestore = async (id) => {
+        try {
+            const response = await Axios({
+                ...SummaryApi.update_employee,
+                url: SummaryApi.update_employee.url.replace(':id', id),
+                data: { employeeStatus: 'active' },
+            });
+
+            if (response.data.success) {
+                successAlert('Đã khôi phục nhân viên');
+                fetchEmployees();
+            }
+        } catch (error) {
+            AxiosToastError(error);
+        }
+    };
+
     // Open edit modal
     const openEditModal = (employee) => {
         setSelectedEmployee(employee);
@@ -191,6 +244,7 @@ const EmployeeManagementPage = () => {
             hireDate: employee.hireDate
                 ? new Date(employee.hireDate).toISOString().split('T')[0]
                 : new Date().toISOString().split('T')[0],
+            employeeStatus: employee.employeeStatus || 'active',
         });
         setIsEditModalOpen(true);
     };
@@ -244,17 +298,33 @@ const EmployeeManagementPage = () => {
                 label: 'Trạng thái',
                 type: 'string',
                 sortable: true,
-                format: (value) => (
-                    <span
-                        className={`px-2 py-1 rounded text-xs ${
-                            value === 'active'
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                        }`}
-                    >
-                        {value === 'active' ? 'Đang làm' : 'Nghỉ việc'}
-                    </span>
-                ),
+                format: (value) => {
+                    let className = 'bg-gray-100 text-gray-800';
+                    let label = 'Không xác định';
+
+                    switch (value) {
+                        case 'active':
+                            className = 'bg-green-100 text-green-800';
+                            label = 'Đang làm';
+                            break;
+                        case 'inactive':
+                            className = 'bg-red-100 text-red-800';
+                            label = 'Nghỉ việc';
+                            break;
+                        case 'on_leave':
+                            className = 'bg-yellow-100 text-yellow-800';
+                            label = 'Nghỉ phép';
+                            break;
+                    }
+
+                    return (
+                        <span
+                            className={`px-2 py-1 rounded text-xs ${className}`}
+                        >
+                            {label}
+                        </span>
+                    );
+                },
             },
             {
                 key: 'action',
@@ -263,34 +333,105 @@ const EmployeeManagementPage = () => {
                 sortable: false,
                 format: (value, row) => (
                     <div className="flex gap-2">
-                        <Button
-                            size="sm"
-                            variant="outline"
-                            onClick={() => openEditModal(row.rawData)}
-                        >
-                            <FaEdit />
-                        </Button>
-                        {user?.role === 'ADMIN' && (
-                            <Button
-                                size="sm"
-                                variant="destructive"
-                                onClick={() =>
-                                    handleDeleteEmployee(row.rawData._id)
-                                }
-                            >
-                                <FaTrash />
-                            </Button>
+                        {activeTab === 'working' ? (
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    onClick={() => openEditModal(row.rawData)}
+                                    title="Chỉnh sửa"
+                                >
+                                    <FaEdit />
+                                </Button>
+                                {user?.role === 'ADMIN' && (
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() =>
+                                            handleSoftDelete(row.rawData._id)
+                                        }
+                                        title="Chuyển sang nghỉ việc"
+                                    >
+                                        <FaTrash />
+                                    </Button>
+                                )}
+                            </>
+                        ) : (
+                            <>
+                                <Button
+                                    size="sm"
+                                    variant="outline"
+                                    className="text-green-600 border-green-200 hover:bg-green-50"
+                                    onClick={() =>
+                                        handleRestore(row.rawData._id)
+                                    }
+                                    title="Khôi phục"
+                                >
+                                    <FaTrashRestore />
+                                </Button>
+                                {user?.role === 'ADMIN' && (
+                                    <Button
+                                        size="sm"
+                                        variant="destructive"
+                                        onClick={() =>
+                                            handleHardDelete(row.rawData._id)
+                                        }
+                                        title="Xóa vĩnh viễn"
+                                    >
+                                        <FaTrash />
+                                    </Button>
+                                )}
+                            </>
                         )}
                     </div>
                 ),
             },
         ],
-        [user?.role]
+        [user?.role, activeTab]
     );
 
-    // Transform data for DynamicTable
+    // Transform and Filter data for DynamicTable
     const tableData = useMemo(() => {
-        return employees.map((employee, index) => ({
+        let filtered = employees;
+
+        // 1. Filter by Tab (Working vs Resigned)
+        if (activeTab === 'working') {
+            filtered = filtered.filter(
+                (emp) => emp.employeeStatus !== 'inactive'
+            );
+        } else {
+            filtered = filtered.filter(
+                (emp) => emp.employeeStatus === 'inactive'
+            );
+        }
+
+        // 2. Filter by Role
+        if (filterRole !== 'ALL') {
+            filtered = filtered.filter((emp) => emp.role === filterRole);
+        }
+
+        // 3. Filter by Status (only for working tab)
+        if (activeTab === 'working' && filterStatus !== 'ALL') {
+            filtered = filtered.filter(
+                (emp) => emp.employeeStatus === filterStatus
+            );
+        }
+
+        // 4. Filter by Search Term
+        if (searchTerm) {
+            const lowerTerm = searchTerm.toLowerCase();
+            filtered = filtered.filter(
+                (emp) =>
+                    (emp.name && emp.name.toLowerCase().includes(lowerTerm)) ||
+                    (emp.email &&
+                        emp.email.toLowerCase().includes(lowerTerm)) ||
+                    (emp.employeeId &&
+                        emp.employeeId.toLowerCase().includes(lowerTerm)) ||
+                    (emp.mobile && emp.mobile.includes(searchTerm))
+            );
+        }
+
+        return filtered.map((employee, index) => ({
             id: index + 1,
             employeeId: employee.employeeId,
             name: employee.name,
@@ -300,7 +441,14 @@ const EmployeeManagementPage = () => {
             employeeStatus: employee.employeeStatus,
             rawData: employee,
         }));
-    }, [employees]);
+    }, [employees, activeTab, filterRole, filterStatus, searchTerm]);
+
+    // Reset filters
+    const resetFilters = () => {
+        setFilterRole('ALL');
+        setFilterStatus('ALL');
+        setSearchTerm('');
+    };
 
     // Check if user has permission
     if (!['ADMIN', 'MANAGER'].includes(user?.role)) {
@@ -497,50 +645,85 @@ const EmployeeManagementPage = () => {
                     </Dialog>
                 </CardFooter>
             </Card>
+
+            {/* Tabs for Working vs Resigned */}
+            <Tabs
+                defaultValue="working"
+                value={activeTab}
+                onValueChange={setActiveTab}
+                className="w-full"
+            >
+                <TabsList className="grid w-full max-w-md grid-cols-2 mb-4">
+                    <TabsTrigger value="working">Đang làm việc</TabsTrigger>
+                    <TabsTrigger value="resigned">Đã nghỉ việc</TabsTrigger>
+                </TabsList>
+            </Tabs>
+
             {/* Filters */}
-            <Card className="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm p-6">
-                <div className="space-y-2">
-                    <Label>Tìm kiếm</Label>
-                    <Input
-                        placeholder="Tên, email, mã nhân viên..."
-                        value={searchTerm}
-                        onChange={(e) => setSearchTerm(e.target.value)}
-                    />
-                </div>
-                <div className="space-y-2">
-                    <Label>Vai trò</Label>
-                    <Select value={filterRole} onValueChange={setFilterRole}>
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Tất cả vai trò" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">Tất cả</SelectItem>
-                            {roles.map((role) => (
-                                <SelectItem key={role} value={role}>
-                                    {role}
-                                </SelectItem>
-                            ))}
-                        </SelectContent>
-                    </Select>
-                </div>
-                <div className="space-y-2">
-                    <Label>Trạng thái</Label>
-                    <Select
-                        value={filterStatus}
-                        onValueChange={setFilterStatus}
+            <Card className="p-6">
+                <div
+                    className={`grid grid-cols-1 gap-6 text-sm items-end ${
+                        activeTab === 'working'
+                            ? 'md:grid-cols-4'
+                            : 'md:grid-cols-3'
+                    }`}
+                >
+                    <div className="space-y-2">
+                        <Label>Tìm kiếm</Label>
+                        <Input
+                            placeholder="Tên, email, mã nhân viên..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                        />
+                    </div>
+                    <div className="space-y-2">
+                        <Label>Vai trò</Label>
+                        <Select
+                            value={filterRole}
+                            onValueChange={setFilterRole}
+                        >
+                            <SelectTrigger className="w-full">
+                                <SelectValue placeholder="Tất cả vai trò" />
+                            </SelectTrigger>
+                            <SelectContent>
+                                <SelectItem value="ALL">Tất cả</SelectItem>
+                                {roles.map((role) => (
+                                    <SelectItem key={role} value={role}>
+                                        {role}
+                                    </SelectItem>
+                                ))}
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    {activeTab === 'working' && (
+                        <div className="space-y-2">
+                            <Label>Trạng thái</Label>
+                            <Select
+                                value={filterStatus}
+                                onValueChange={setFilterStatus}
+                            >
+                                <SelectTrigger className="w-full">
+                                    <SelectValue placeholder="Tất cả trạng thái" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="ALL">Tất cả</SelectItem>
+                                    <SelectItem value="active">
+                                        Đang làm việc
+                                    </SelectItem>
+                                    <SelectItem value="on_leave">
+                                        Nghỉ phép
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
+                        </div>
+                    )}
+                    <Button
+                        variant="outline"
+                        onClick={resetFilters}
+                        className="w-full"
                     >
-                        <SelectTrigger className="w-full">
-                            <SelectValue placeholder="Tất cả trạng thái" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ALL">Tất cả</SelectItem>
-                            <SelectItem value="active">
-                                Đang làm việc
-                            </SelectItem>
-                            <SelectItem value="inactive">Nghỉ việc</SelectItem>
-                            <SelectItem value="on_leave">Nghỉ phép</SelectItem>
-                        </SelectContent>
-                    </Select>
+                        Đặt lại
+                    </Button>
                 </div>
             </Card>
 
@@ -637,6 +820,36 @@ const EmployeeManagementPage = () => {
                                     value={formData.position}
                                     onChange={handleChange}
                                 />
+                            </div>
+                            <div className="space-y-2">
+                                <Label htmlFor="edit-status">
+                                    Trạng thái{' '}
+                                    <span className="text-red-500">*</span>
+                                </Label>
+                                <Select
+                                    value={formData.employeeStatus}
+                                    onValueChange={(value) =>
+                                        handleSelectChange(
+                                            'employeeStatus',
+                                            value
+                                        )
+                                    }
+                                >
+                                    <SelectTrigger>
+                                        <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="active">
+                                            Đang làm việc
+                                        </SelectItem>
+                                        <SelectItem value="on_leave">
+                                            Nghỉ phép
+                                        </SelectItem>
+                                        <SelectItem value="inactive">
+                                            Nghỉ việc
+                                        </SelectItem>
+                                    </SelectContent>
+                                </Select>
                             </div>
                         </CardContent>
                         <div className="flex justify-end gap-2">

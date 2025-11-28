@@ -28,6 +28,15 @@ const ViewBookingDetails = ({ close, data }) => {
         return colorMap[status] || 'text-gray-600';
     };
 
+    const getPaymentStatusText = (status) => {
+        const statusMap = {
+            pending: 'Chưa thanh toán',
+            paid: 'Đã thanh toán',
+            failed: 'Thất bại',
+        };
+        return statusMap[status] || status || 'Chưa thanh toán';
+    };
+
     return (
         <section
             className="bg-neutral-800 z-50 bg-opacity-60 fixed top-0 left-0 right-0 bottom-0 overflow-auto
@@ -204,15 +213,20 @@ const ViewBookingDetails = ({ close, data }) => {
                                         </span>
                                         <span
                                             className={`font-medium ${
-                                                data.preOrderId
-                                                    .payment_status ===
-                                                'Đã thanh toán'
+                                                [
+                                                    'paid',
+                                                    'Đã thanh toán',
+                                                ].includes(
+                                                    data.preOrderId
+                                                        .payment_status
+                                                )
                                                     ? 'text-green-600'
                                                     : 'text-yellow-600'
                                             }`}
                                         >
-                                            {data.preOrderId.payment_status ||
-                                                'Chờ thanh toán'}
+                                            {getPaymentStatusText(
+                                                data.preOrderId.payment_status
+                                            )}
                                         </span>
                                     </div>
                                 </div>

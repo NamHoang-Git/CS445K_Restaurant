@@ -124,10 +124,11 @@ const EditTableModel = ({ close, fetchData, data: propsData }) => {
                                 id="capacity"
                                 name="capacity"
                                 min="1"
+                                max="20"
                                 value={data.capacity}
                                 onChange={handleOnChange}
                                 className="text-sm h-12 no-spinner"
-                                placeholder="Nhập số người"
+                                placeholder="Nhập số người (1-20)"
                                 required
                             />
                         </div>
@@ -135,15 +136,42 @@ const EditTableModel = ({ close, fetchData, data: propsData }) => {
                         {/* Location */}
                         <div className="space-y-2">
                             <Label htmlFor="location">Vị trí</Label>
-                            <Input
-                                type="text"
-                                id="location"
-                                name="location"
+                            <Select
                                 value={data.location}
-                                onChange={handleOnChange}
-                                className="text-sm h-12"
-                                placeholder="Ví dụ: Tầng 1, Tầng 2, Ngoài trời"
-                            />
+                                onValueChange={(value) =>
+                                    setData((prev) => ({
+                                        ...prev,
+                                        location: value,
+                                    }))
+                                }
+                            >
+                                <SelectTrigger className="w-full h-12">
+                                    <SelectValue placeholder="Chọn vị trí" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value="Tầng 1">
+                                        Tầng 1
+                                    </SelectItem>
+                                    <SelectItem value="Tầng 2">
+                                        Tầng 2
+                                    </SelectItem>
+                                    <SelectItem value="Tầng 3">
+                                        Tầng 3
+                                    </SelectItem>
+                                    <SelectItem value="Ngoài trời">
+                                        Ngoài trời
+                                    </SelectItem>
+                                    <SelectItem value="Khu VIP">
+                                        Khu VIP
+                                    </SelectItem>
+                                    <SelectItem value="Khu gia đình">
+                                        Khu gia đình
+                                    </SelectItem>
+                                    <SelectItem value="Gần cửa sổ">
+                                        Gần cửa sổ
+                                    </SelectItem>
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         {/* Status */}

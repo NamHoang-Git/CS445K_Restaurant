@@ -595,10 +595,17 @@ export default function DynamicTable({
                             >
                                 <Search className="h-3 w-3" />
                                 {autoDetectedColumns[0]?.label}: {searchQuery}
-                                <X
-                                    className="h-3 w-3 cursor-pointer"
-                                    onClick={() => setSearchQuery('')}
-                                />
+                                <button
+                                    type="button"
+                                    className="ml-1 hover:opacity-70"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        e.stopPropagation();
+                                        setSearchQuery('');
+                                    }}
+                                >
+                                    <X className="h-3 w-3" />
+                                </button>
                             </Badge>
                         )}
                         <Input
@@ -611,11 +618,11 @@ export default function DynamicTable({
                     </div>
                 </div>
             )}
-            {(appliedTags.length > 0 || groupByField || searchQuery) && (
+            {/* {(appliedTags.length > 0 || groupByField || searchQuery) && (
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="mt-2"
+                    className="mt-2 hover:opacity-70"
                     onClick={() => {
                         setFilterState({ logicOperator: 'AND', rules: [] });
                         setActiveFilters({ logicOperator: 'AND', rules: [] });
@@ -626,7 +633,7 @@ export default function DynamicTable({
                 >
                     Xóa tất cả bộ lọc
                 </Button>
-            )}
+            )} */}
 
             {/* Botones de filtro và nhóm */}
             <div className="flex flex-wrap gap-2">
@@ -785,6 +792,7 @@ export default function DynamicTable({
                                                 <Button
                                                     variant="ghost"
                                                     size="icon"
+                                                    className="hover:opacity-70 cursor-pointer"
                                                     onClick={() => {
                                                         const newRules = [
                                                             ...filterState.rules,
@@ -799,7 +807,7 @@ export default function DynamicTable({
                                                         });
                                                     }}
                                                 >
-                                                    <X className="h-4 w-4" />
+                                                    <X className="h-4 w-4 hover:opacity-70 cursor-pointer" />
                                                 </Button>
                                             </div>
                                         );
