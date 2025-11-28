@@ -204,7 +204,7 @@ const EmployeeManagementPage = () => {
                 type: 'string',
                 sortable: true,
                 format: (value) => (
-                    <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                    <span className="font-mono text-xs bg-background/20 border text-highlight px-2 py-1 rounded">
                         {value || '-'}
                     </span>
                 ),
