@@ -6,22 +6,19 @@ import { vi } from 'date-fns/locale';
 import {
     FaSearch,
     FaFileInvoice,
-    FaPrint,
     FaFilePdf,
     FaFileExcel,
     FaFilter,
-    FaSort,
-    FaSortUp,
-    FaSortDown,
     FaTimesCircle,
 } from 'react-icons/fa';
+import { LuCheck, LuPrinter } from 'react-icons/lu';
 import { DisplayPriceInVND } from '../utils/DisplayPriceInVND';
 import { toast } from 'react-hot-toast';
 import * as XLSX from 'xlsx';
-import StatusBadge from '../components/StatusBadge';
 import { fetchAllOrders, updateOrderStatus } from '../store/orderSlice';
 import ViewImage from '../components/ViewImage';
 import ConfirmBox from '../components/ConfirmBox';
+import Loading from '../components/Loading';
 import { Input } from '@/components/ui/input';
 import {
     Card,
@@ -30,6 +27,7 @@ import {
     CardTitle,
 } from '@/components/ui/card';
 import { Label } from '@radix-ui/react-label';
+import DynamicTable from '@/components/table/dynamic-table';
 
 const BillPage = () => {
     const dispatch = useDispatch();
@@ -38,7 +36,6 @@ const BillPage = () => {
         (state) => state.orders
     );
     const user = useSelector((state) => state.user);
-    const isAdmin = user?.role === 'ADMIN';
     // Allow ADMIN, MANAGER, WAITER, CASHIER to access
     const canAccessBills = ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'].includes(
         user?.role
@@ -59,16 +56,6 @@ const BillPage = () => {
     const [openCancelDialog, setOpenCancelDialog] = useState(false);
     const [selectedOrderId, setSelectedOrderId] = useState(null);
     const [cancelReason, setCancelReason] = useState('');
-
-    const [sortConfig, setSortConfig] = useState({
-        key: 'createdAt',
-        direction: 'desc',
-    });
-
-    const [pagination, setPagination] = useState({
-        currentPage: 1,
-        pageSize: 10,
-    });
 
     // Gọi API chỉ khi filterParams thay đổi
     useEffect(() => {
@@ -116,11 +103,8 @@ const BillPage = () => {
         // Nếu kiểm tra hợp lệ, xóa thông báo lỗi và cập nhật params
         setDateError('');
         setFilterParams(newParams);
-        // Reset về trang đầu tiên khi thay đổi bộ lọc
-        setPagination((prev) => ({ ...prev, currentPage: 1 }));
     };
 
-    // Reset all filters and search
     const resetFilters = () => {
         setFilterParams({
             status: '',
@@ -129,26 +113,7 @@ const BillPage = () => {
         });
         setSearchTerm('');
         setDateError(''); // Xóa thông báo lỗi khi reset
-        setPagination((prev) => ({ ...prev, currentPage: 1 }));
     };
-
-    const handleSort = (key) => {
-        setSortConfig((prev) => ({
-            key,
-            direction:
-                prev.key === key && prev.direction === 'asc' ? 'desc' : 'asc',
-        }));
-    };
-
-    // Reset to first page when search term changes
-    useEffect(() => {
-        if (searchTerm) {
-            setPagination((prev) => ({
-                ...prev,
-                currentPage: 1,
-            }));
-        }
-    }, [searchTerm]);
 
     // Apply filters and search
     useEffect(() => {
@@ -223,194 +188,199 @@ const BillPage = () => {
         }
     }, [orders, searchTerm, filterParams]);
 
-    // Apply sorting
-    const filteredAndSortedOrders = useMemo(() => {
-        const result = [...filteredOrders];
+    const getStatusBadge = (status) => {
+        const statusConfig = {
+            'Đang chờ thanh toán': {
+                text: 'Chờ thanh toán',
+                className: 'bg-yellow-100 text-yellow-800',
+            },
+            'Chờ thanh toán': {
+                text: 'Chờ thanh toán',
+                className: 'bg-yellow-100 text-yellow-800',
+            },
+            'Đã thanh toán': {
+                text: 'Đã thanh toán',
+                className: 'bg-green-100 text-green-800',
+            },
+            'Đã hủy': { text: 'Đã hủy', className: 'bg-red-100 text-red-800' },
+        };
 
-        if (sortConfig.key) {
-            result.sort((a, b) => {
-                let aValue = a[sortConfig.key];
-                let bValue = b[sortConfig.key];
+        const config = statusConfig[status] || {
+            text: status || 'Chưa xác định',
+            className: 'bg-gray-100 text-gray-800',
+        };
 
-                if (sortConfig.key.includes('.')) {
-                    const keys = sortConfig.key.split('.');
-                    aValue = keys.reduce((obj, key) => obj?.[key], a);
-                    bValue = keys.reduce((obj, key) => obj?.[key], b);
-                }
-
-                // Handle date comparisons
-                if (sortConfig.key === 'createdAt') {
-                    const dateA = new Date(aValue);
-                    const dateB = new Date(bValue);
-                    return sortConfig.direction === 'asc'
-                        ? dateA - dateB
-                        : dateB - dateA;
-                }
-
-                // Handle string and number comparisons
-                if (aValue == null) aValue = '';
-                if (bValue == null) bValue = '';
-
-                if (aValue < bValue)
-                    return sortConfig.direction === 'asc' ? -1 : 1;
-                if (aValue > bValue)
-                    return sortConfig.direction === 'asc' ? 1 : -1;
-                return 0;
-            });
-        }
-
-        return result;
-    }, [filteredOrders, sortConfig]);
-
-    // Phân trang
-    const indexOfLastOrder = pagination.currentPage * pagination.pageSize;
-    const indexOfFirstOrder = indexOfLastOrder - pagination.pageSize;
-    const currentOrders = filteredAndSortedOrders.slice(
-        indexOfFirstOrder,
-        indexOfLastOrder
-    );
-    const totalPages = Math.ceil(
-        filteredAndSortedOrders.length / pagination.pageSize
-    );
-
-    const paginate = (pageNumber) =>
-        setPagination((prev) => ({ ...prev, currentPage: pageNumber }));
-
-    const handlePageSizeChange = (e) => {
-        setPagination({
-            currentPage: 1,
-            pageSize: Number(e.target.value),
-        });
+        return (
+            <span
+                className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ${config.className}`}
+            >
+                {config.text}
+            </span>
+        );
     };
 
-    const PaginationControls = () => (
-        <div className="flex items-center sm:flex-row flex-col justify-between mt-4 gap-3 text-foreground">
-            <div className="flex items-center sm:flex-row flex-col space-x-2 gap-2">
-                <span className="text-sm text-center">
-                    Hiển thị{' '}
-                    <span className="font-semibold text-highlight">
-                        {indexOfFirstOrder + 1}
-                    </span>{' '}
-                    đến{' '}
-                    <span className="font-semibold text-highlight">
-                        {Math.min(
-                            indexOfLastOrder,
-                            filteredAndSortedOrders.length
-                        )}
-                    </span>{' '}
-                    trong tổng số{' '}
-                    <span className="font-semibold text-highlight">
-                        {filteredAndSortedOrders.length}
-                    </span>{' '}
-                    đơn hàng
-                </span>
-
-                <select
-                    value={pagination.pageSize}
-                    onChange={handlePageSizeChange}
-                    className="text-sm h-8 border-foreground border bg-transparent
-                px-3 py-1 rounded-md"
-                >
-                    {[5, 10, 25, 50].map((size) => (
-                        <option key={size} value={size}>
-                            {size} dòng/trang
-                        </option>
-                    ))}
-                </select>
-            </div>
-
-            <div className="flex space-x-1">
-                <button
-                    onClick={() => paginate(1)}
-                    disabled={pagination.currentPage === 1}
-                    className="px-3 py-1 rounded-md border border-gray-300 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    «
-                </button>
-                <button
-                    onClick={() => paginate(pagination.currentPage - 1)}
-                    disabled={pagination.currentPage === 1}
-                    className="px-3 py-1 rounded-md border border-gray-300 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    ‹
-                </button>
-
-                {Array.from({ length: totalPages }, (_, i) => i + 1)
-                    .filter((pageNum) => {
-                        return (
-                            pageNum === 1 ||
-                            pageNum === totalPages ||
-                            pageNum === pagination.currentPage ||
-                            (pageNum === 2 && pagination.currentPage > 3) ||
-                            (pageNum === totalPages - 1 &&
-                                pagination.currentPage < totalPages - 2)
-                        );
-                    })
-                    .map((pageNum, idx, arr) => {
-                        if (idx > 0 && pageNum - arr[idx - 1] > 1) {
-                            return (
-                                <React.Fragment key={pageNum}>
-                                    <span className="px-3 py-1 text-gray-500">
-                                        ...
-                                    </span>
-                                    <button
-                                        onClick={() => paginate(pageNum)}
-                                        className={`px-3 py-1 rounded-md border text-sm font-medium ${
-                                            pagination.currentPage === pageNum
-                                                ? 'bg-gray-700 text-white border-lime-300'
-                                                : 'bg-white text-black border-gray-300 hover:bg-gray-50'
-                                        }`}
-                                    >
-                                        {pageNum}
-                                    </button>
-                                </React.Fragment>
-                            );
-                        }
-                        return (
-                            <button
-                                key={pageNum}
-                                onClick={() => paginate(pageNum)}
-                                className={`px-3 py-1 rounded-md border text-sm font-medium ${
-                                    pagination.currentPage === pageNum
-                                        ? 'bg-gray-700 text-white border-lime-300'
-                                        : 'bg-white text-black border-gray-300 hover:bg-gray-50'
-                                }`}
+    // Column configuration for DynamicTable
+    const columns = useMemo(
+        () => [
+            {
+                key: 'orderId',
+                label: 'Mã Đơn',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <div className="font-medium text-center text-rose-500">
+                        {value}
+                    </div>
+                ),
+            },
+            {
+                key: 'customer',
+                label: 'Khách hàng',
+                type: 'string',
+                sortable: false,
+                format: (value, row) => (
+                    <div>
+                        <div className="font-medium text-rose-500">
+                            {row.rawData.userId?.name || 'Khách vãng lai'}
+                        </div>
+                        <p className="text-sm">{row.rawData.userId?.email}</p>
+                        <p className="text-sm">
+                            {row.rawData.delivery_address?.mobile}
+                        </p>
+                        <p className="text-sm">
+                            {row.rawData.delivery_address?.city}
+                        </p>
+                    </div>
+                ),
+            },
+            {
+                key: 'product',
+                label: 'Sản phẩm',
+                type: 'string',
+                sortable: false,
+                format: (value, row) => (
+                    <div className="flex items-center gap-3 max-w-[250px]">
+                        <img
+                            src={
+                                row.rawData.product_details?.image?.[0] ||
+                                '/placeholder.jpg'
+                            }
+                            alt=""
+                            className="w-12 h-12 border border-lime-300 object-cover rounded shadow cursor-pointer"
+                            onClick={() =>
+                                setImageURL(
+                                    row.rawData.product_details?.image?.[0]
+                                )
+                            }
+                            onError={(e) => (e.target.src = '/placeholder.jpg')}
+                        />
+                        <div>
+                            <p
+                                className="line-clamp-2"
+                                title={row.rawData.product_details?.name}
                             >
-                                {pageNum}
+                                {row.rawData.product_details?.name || 'N/A'}
+                            </p>
+                            <p className="text-rose-400 font-bold">
+                                x{row.rawData.quantity}
+                            </p>
+                        </div>
+                    </div>
+                ),
+            },
+            {
+                key: 'totalAmt',
+                label: 'Tổng tiền',
+                type: 'number',
+                sortable: true,
+                format: (value) => (
+                    <div className="text-center font-medium">
+                        {DisplayPriceInVND(value || 0)}
+                    </div>
+                ),
+            },
+            {
+                key: 'payment_status',
+                label: 'Trạng thái',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <div className="text-center">{getStatusBadge(value)}</div>
+                ),
+            },
+            {
+                key: 'createdAt',
+                label: 'Ngày tạo',
+                type: 'date',
+                sortable: true,
+                format: (value) => (
+                    <div className="text-center font-medium">
+                        {format(new Date(value), 'dd/MM/yyyy HH:mm', {
+                            locale: vi,
+                        })}
+                    </div>
+                ),
+            },
+            {
+                key: 'action',
+                label: 'Thao tác',
+                type: 'string',
+                sortable: false,
+                format: (value, row) => (
+                    <div className="flex gap-2 justify-center">
+                        {['Đang chờ thanh toán', 'Chờ thanh toán'].includes(
+                            row.rawData.payment_status
+                        ) && (
+                            <button
+                                className="p-2 bg-green-100 text-green-600 rounded-md hover:bg-green-200"
+                                onClick={() =>
+                                    handleOpenConfirmBox(row.rawData._id)
+                                }
+                                title="Xác nhận thanh toán"
+                            >
+                                <LuCheck size={18} />
                             </button>
-                        );
-                    })}
-
-                <button
-                    onClick={() => paginate(pagination.currentPage + 1)}
-                    disabled={pagination.currentPage === totalPages}
-                    className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    ›
-                </button>
-                <button
-                    onClick={() => paginate(totalPages)}
-                    disabled={pagination.currentPage === totalPages}
-                    className="px-3 py-1 rounded-md border border-gray-300 bg-white text-sm font-medium text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    »
-                </button>
-            </div>
-        </div>
+                        )}
+                        <button
+                            onClick={() => printBill(row.rawData)}
+                            className="p-2 bg-blue-100 text-blue-600 rounded-md hover:bg-blue-200"
+                            title="In hóa đơn"
+                        >
+                            <LuPrinter size={18} />
+                        </button>
+                    </div>
+                ),
+            },
+        ],
+        []
     );
 
+    // Transform data for DynamicTable
+    const tableData = useMemo(() => {
+        return filteredOrders.map((order, index) => ({
+            id: index + 1,
+            orderId: order.orderId,
+            customer: order.userId?.name || 'Khách vãng lai',
+            product: order.product_details?.name || 'N/A',
+            totalAmt: order.totalAmt || 0,
+            payment_status: order.payment_status,
+            createdAt: order.createdAt,
+            rawData: order, // Keep reference to original order data
+        }));
+    }, [filteredOrders]);
+
     const { totalRevenue, orderCount } = useMemo(() => {
-        return filteredAndSortedOrders.reduce(
+        return filteredOrders.reduce(
             (acc, order) => ({
                 totalRevenue: acc.totalRevenue + (order.totalAmt || 0),
                 orderCount: acc.orderCount + 1,
             }),
             { totalRevenue: 0, orderCount: 0 }
         );
-    }, [filteredAndSortedOrders]);
+    }, [filteredOrders]);
 
     const exportToExcel = () => {
-        const data = filteredAndSortedOrders.map((order) => ({
+        const data = filteredOrders.map((order) => ({
             'Mã hóa đơn': order.orderId,
             'Ngày tạo': format(new Date(order.createdAt), 'dd/MM/yyyy HH:mm', {
                 locale: vi,
@@ -465,7 +435,7 @@ const BillPage = () => {
                 'Tổng tiền',
                 'Trạng thái',
             ];
-            const data = filteredAndSortedOrders.map((order) => [
+            const data = filteredOrders.map((order) => [
                 order.orderId,
                 format(new Date(order.createdAt), 'dd/MM/yyyy', { locale: vi }),
                 order.userId?.name || 'Khách vãng lai',
@@ -608,15 +578,6 @@ const BillPage = () => {
         printWindow.document.close();
     };
 
-    const renderSortIcon = (key) => {
-        if (sortConfig.key !== key) return <FaSort className="ml-1" />;
-        return sortConfig.direction === 'asc' ? (
-            <FaSortUp className="ml-1" />
-        ) : (
-            <FaSortDown className="ml-1" />
-        );
-    };
-
     const statusOptions = [
         { value: '', label: 'Tất cả' },
         { value: 'Đang chờ thanh toán', label: 'Đang chờ thanh toán' },
@@ -662,16 +623,7 @@ const BillPage = () => {
                     <div>
                         <p className="text-xs font-bold">Đang hiển thị</p>
                         <p className="text-xl font-bold">
-                            {Math.min(
-                                indexOfFirstOrder + 1,
-                                filteredAndSortedOrders.length
-                            )}{' '}
-                            -{' '}
-                            {Math.min(
-                                indexOfLastOrder,
-                                filteredAndSortedOrders.length
-                            )}{' '}
-                            / {orders.length}
+                            {filteredOrders.length} / {orders.length}
                         </p>
                     </div>
                 </div>
@@ -811,209 +763,20 @@ const BillPage = () => {
                 </div>
             </div>
 
-            {/* Bảng */}
-            <div className="rounded-lg shadow overflow-hidden">
-                <div className="overflow-x-auto scrollbarCustom">
-                    <table className="liquid-glass w-full min-w-[1024px] divide-y-4">
-                        <thead className="text-lime-300">
-                            <tr>
-                                <th className="px-4 py-3 text-center text-xs font-bold uppercase">
-                                    <div className="flex items-center justify-center">
-                                        Mã Đơn
-                                        <button
-                                            onClick={() =>
-                                                handleSort('orderId')
-                                            }
-                                            className="ml-1"
-                                        >
-                                            {renderSortIcon('orderId')}
-                                        </button>
-                                    </div>
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold uppercase">
-                                    Khách hàng
-                                </th>
-                                <th className="px-4 py-3 text-left text-xs font-bold uppercase">
-                                    Sản phẩm
-                                </th>
-                                <th className="px-4 py-3 text-center text-xs font-bold uppercase">
-                                    <div className="flex items-center justify-center">
-                                        Tổng tiền
-                                        <button
-                                            onClick={() =>
-                                                handleSort('totalAmt')
-                                            }
-                                            className="ml-1"
-                                        >
-                                            {renderSortIcon('totalAmt')}
-                                        </button>
-                                    </div>
-                                </th>
-                                <th className="px-4 py-3 text-center text-xs font-bold uppercase">
-                                    Trạng thái
-                                </th>
-                                <th className="px-4 py-3 text-center text-xs font-bold uppercase">
-                                    <div className="flex items-center justify-center">
-                                        Ngày tạo
-                                        <button
-                                            onClick={() =>
-                                                handleSort('createdAt')
-                                            }
-                                            className="ml-1"
-                                        >
-                                            {renderSortIcon('createdAt')}
-                                        </button>
-                                    </div>
-                                </th>
-                                <th className="px-4 py-3 text-center text-xs font-bold uppercase">
-                                    Thao tác
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200 text-white">
-                            {loading ? (
-                                Array.from({ length: 5 }).map((_, i) => (
-                                    <tr key={i}>
-                                        <td colSpan={7} className="px-6 py-4">
-                                            <div className="animate-pulse flex space-x-4">
-                                                <div className="flex-1 space-y-3 py-1">
-                                                    <div className="h-4 bg-gray-200 rounded"></div>
-                                                    <div className="h-4 bg-gray-200 rounded w-5/6"></div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))
-                            ) : currentOrders.length === 0 ? (
-                                <tr>
-                                    <td
-                                        colSpan={7}
-                                        className="px-6 py-4 text-center"
-                                    >
-                                        Không tìm thấy đơn hàng
-                                    </td>
-                                </tr>
-                            ) : (
-                                currentOrders.map((order) => (
-                                    <tr
-                                        key={order._id}
-                                        className="hover:bg-black/60 text-xs sm:text-sm"
-                                    >
-                                        <td className="px-4 py-4 font-medium text-center text-rose-500">
-                                            {order.orderId}
-                                        </td>
-                                        <td className="px-4 py-4">
-                                            <div>
-                                                <div className="font-medium text-rose-500">
-                                                    {order.userId?.name ||
-                                                        'Khách vãng lai'}
-                                                </div>
-                                                <p>{order.userId?.email}</p>
-                                                <p>
-                                                    {
-                                                        order.delivery_address
-                                                            ?.mobile
-                                                    }
-                                                </p>
-                                                <p>
-                                                    {
-                                                        order.delivery_address
-                                                            ?.city
-                                                    }
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 flex items-center gap-3 max-w-[250px]">
-                                            <img
-                                                src={
-                                                    order.product_details
-                                                        ?.image?.[0] ||
-                                                    '/placeholder.jpg'
-                                                }
-                                                alt=""
-                                                className="w-12 h-12 border border-lime-300 object-cover rounded shadow cursor-pointer"
-                                                onClick={() =>
-                                                    setImageURL(
-                                                        order.product_details
-                                                            ?.image?.[0]
-                                                    )
-                                                }
-                                                onError={(e) =>
-                                                    (e.target.src =
-                                                        '/placeholder.jpg')
-                                                }
-                                            />
-                                            <div>
-                                                <p
-                                                    className="line-clamp-2"
-                                                    title={
-                                                        order.product_details
-                                                            ?.name
-                                                    }
-                                                >
-                                                    {order.product_details
-                                                        ?.name || 'N/A'}
-                                                </p>
-                                                <p className="text-rose-400 font-bold">
-                                                    x{order.quantity}
-                                                </p>
-                                            </div>
-                                        </td>
-                                        <td className="px-4 py-4 text-center font-medium">
-                                            {DisplayPriceInVND(
-                                                order.totalAmt || 0
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-4 text-center">
-                                            <StatusBadge
-                                                status={order.payment_status}
-                                            />
-                                        </td>
-                                        <td className="px-4 py-4 text-center font-medium">
-                                            {format(
-                                                new Date(order.createdAt),
-                                                'dd/MM/yyyy HH:mm',
-                                                { locale: vi }
-                                            )}
-                                        </td>
-                                        <td className="px-4 py-4 text-center space-y-2 space-x-2">
-                                            {[
-                                                'Đang chờ thanh toán',
-                                                'Chờ thanh toán',
-                                            ].includes(
-                                                order.payment_status
-                                            ) && (
-                                                <button
-                                                    onClick={() =>
-                                                        handleOpenConfirmBox(
-                                                            order._id
-                                                        )
-                                                    }
-                                                    className="text-white bg-black/50 border-2 border-lime-300 p-2 rounded-md"
-                                                >
-                                                    Cập nhật
-                                                </button>
-                                            )}
-                                            <button
-                                                onClick={() => printBill(order)}
-                                                className="text-rose-600 p-2 liquid-glass rounded-md hover:opacity-80"
-                                            >
-                                                <FaPrint />
-                                            </button>
-                                        </td>
-                                    </tr>
-                                ))
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+            {/* DynamicTable */}
+            <div className="overflow-auto w-full max-w-[95vw]">
+                <DynamicTable
+                    data={tableData}
+                    columns={columns}
+                    pageSize={10}
+                    sortable={true}
+                    searchable={false}
+                    filterable={false}
+                    groupable={false}
+                />
             </div>
 
-            {filteredAndSortedOrders.length > 0 && (
-                <div className="px-6 py-4 border-t-4 border-secondary-200">
-                    <PaginationControls />
-                </div>
-            )}
+            {loading && <Loading />}
 
             {imageURL && (
                 <ViewImage url={imageURL} close={() => setImageURL('')} />

@@ -9,7 +9,8 @@ import {
     getProductController,
     getProductDetails,
     searchProduct,
-    updateProductDetails
+    updateProductDetails,
+    getInitialProducts
 } from "../controllers/product.controller.js";
 
 const productRouter = Router()
@@ -28,5 +29,8 @@ productRouter.delete('/delete-product', auth, admin, deleteProductDetails)
 
 //search product
 productRouter.post('/search-product', searchProduct)
+
+//get initial products
+productRouter.post('/initial-products', getInitialProducts)
 
 export default productRouter

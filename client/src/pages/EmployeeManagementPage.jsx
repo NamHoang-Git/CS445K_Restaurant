@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
@@ -23,14 +23,6 @@ import {
     SelectValue,
 } from '@/components/ui/select';
 import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
-import {
     Dialog,
     DialogContent,
     DialogHeader,
@@ -38,10 +30,11 @@ import {
     DialogTrigger,
     DialogClose,
 } from '@/components/ui/dialog';
-import { FaPlus, FaEdit, FaTrash, FaEye } from 'react-icons/fa';
+import { FaEdit, FaTrash } from 'react-icons/fa';
 import Loading from '../components/Loading';
 import GlareHover from '@/components/GlareHover';
 import { IoClose } from 'react-icons/io5';
+import DynamicTable from '@/components/table/dynamic-table';
 
 const EmployeeManagementPage = () => {
     const user = useSelector((state) => state.user);
@@ -201,6 +194,113 @@ const EmployeeManagementPage = () => {
         });
         setIsEditModalOpen(true);
     };
+
+    // Column configuration for DynamicTable
+    const columns = useMemo(
+        () => [
+            {
+                key: 'employeeId',
+                label: 'Mã NV',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
+                        {value || '-'}
+                    </span>
+                ),
+            },
+            {
+                key: 'name',
+                label: 'Tên',
+                type: 'string',
+                sortable: true,
+            },
+            {
+                key: 'email',
+                label: 'Email',
+                type: 'string',
+                sortable: true,
+            },
+            {
+                key: 'role',
+                label: 'Vai trò',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                        {value}
+                    </span>
+                ),
+            },
+            {
+                key: 'position',
+                label: 'Vị trí',
+                type: 'string',
+                sortable: true,
+                format: (value) => value || '-',
+            },
+            {
+                key: 'employeeStatus',
+                label: 'Trạng thái',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <span
+                        className={`px-2 py-1 rounded text-xs ${
+                            value === 'active'
+                                ? 'bg-green-100 text-green-800'
+                                : 'bg-red-100 text-red-800'
+                        }`}
+                    >
+                        {value === 'active' ? 'Đang làm' : 'Nghỉ việc'}
+                    </span>
+                ),
+            },
+            {
+                key: 'action',
+                label: 'Thao tác',
+                type: 'string',
+                sortable: false,
+                format: (value, row) => (
+                    <div className="flex gap-2">
+                        <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => openEditModal(row.rawData)}
+                        >
+                            <FaEdit />
+                        </Button>
+                        {user?.role === 'ADMIN' && (
+                            <Button
+                                size="sm"
+                                variant="destructive"
+                                onClick={() =>
+                                    handleDeleteEmployee(row.rawData._id)
+                                }
+                            >
+                                <FaTrash />
+                            </Button>
+                        )}
+                    </div>
+                ),
+            },
+        ],
+        [user?.role]
+    );
+
+    // Transform data for DynamicTable
+    const tableData = useMemo(() => {
+        return employees.map((employee, index) => ({
+            id: index + 1,
+            employeeId: employee.employeeId,
+            name: employee.name,
+            email: employee.email,
+            role: employee.role,
+            position: employee.position,
+            employeeStatus: employee.employeeStatus,
+            rawData: employee,
+        }));
+    }, [employees]);
 
     // Check if user has permission
     if (!['ADMIN', 'MANAGER'].includes(user?.role)) {
@@ -450,89 +550,15 @@ const EmployeeManagementPage = () => {
                     <Loading />
                 </div>
             ) : (
-                <Table>
-                    <TableHeader>
-                        <TableRow>
-                            <TableHead>Mã NV</TableHead>
-                            <TableHead>Tên</TableHead>
-                            <TableHead>Email</TableHead>
-                            <TableHead>Vai trò</TableHead>
-                            <TableHead>Vị trí</TableHead>
-                            <TableHead>Trạng thái</TableHead>
-                            <TableHead>Thao tác</TableHead>
-                        </TableRow>
-                    </TableHeader>
-                    <TableBody>
-                        {employees.length === 0 ? (
-                            <TableRow>
-                                <TableCell colSpan={7} className="text-center">
-                                    Không có nhân viên nào
-                                </TableCell>
-                            </TableRow>
-                        ) : (
-                            employees.map((employee) => (
-                                <TableRow key={employee._id}>
-                                    <TableCell>
-                                        <span className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
-                                            {employee.employeeId || '-'}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>{employee.name}</TableCell>
-                                    <TableCell>{employee.email}</TableCell>
-                                    <TableCell>
-                                        <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                                            {employee.role}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        {employee.position || '-'}
-                                    </TableCell>
-                                    <TableCell>
-                                        <span
-                                            className={`px-2 py-1 rounded text-xs ${
-                                                employee.employeeStatus ===
-                                                'active'
-                                                    ? 'bg-green-100 text-green-800'
-                                                    : 'bg-red-100 text-red-800'
-                                            }`}
-                                        >
-                                            {employee.employeeStatus ===
-                                            'active'
-                                                ? 'Đang làm'
-                                                : 'Nghỉ việc'}
-                                        </span>
-                                    </TableCell>
-                                    <TableCell>
-                                        <div className="flex gap-2">
-                                            <Button
-                                                size="sm"
-                                                variant="outline"
-                                                onClick={() =>
-                                                    openEditModal(employee)
-                                                }
-                                            >
-                                                <FaEdit />
-                                            </Button>
-                                            {user?.role === 'ADMIN' && (
-                                                <Button
-                                                    size="sm"
-                                                    variant="destructive"
-                                                    onClick={() =>
-                                                        handleDeleteEmployee(
-                                                            employee._id
-                                                        )
-                                                    }
-                                                >
-                                                    <FaTrash />
-                                                </Button>
-                                            )}
-                                        </div>
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        )}
-                    </TableBody>
-                </Table>
+                <DynamicTable
+                    data={tableData}
+                    columns={columns}
+                    pageSize={10}
+                    sortable={true}
+                    searchable={false}
+                    filterable={false}
+                    groupable={false}
+                />
             )}
 
             {/* Edit Modal */}
