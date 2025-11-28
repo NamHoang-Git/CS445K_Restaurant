@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useSelector } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
@@ -13,15 +13,8 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-    Table,
-    TableBody,
-    TableCell,
-    TableHead,
-    TableHeader,
-    TableRow,
-} from '@/components/ui/table';
 import Loading from '../components/Loading';
+import DynamicTable from '@/components/table/dynamic-table';
 
 const AttendanceManagementPage = () => {
     const user = useSelector((state) => state.user);
@@ -67,29 +60,112 @@ const AttendanceManagementPage = () => {
         });
     };
 
-    const getStatusBadge = (status) => {
-        const statusMap = {
-            on_time: {
-                label: 'Đúng giờ',
-                class: 'bg-green-100 text-green-800',
+    // Column configuration for DynamicTable
+    const columns = useMemo(
+        () => [
+            {
+                key: 'employeeName',
+                label: 'Nhân viên',
+                type: 'string',
+                sortable: true,
+                format: (value) => value || '-',
             },
-            late: { label: 'Muộn', class: 'bg-yellow-100 text-yellow-800' },
-            early_leave: {
-                label: 'Về sớm',
-                class: 'bg-orange-100 text-orange-800',
+            {
+                key: 'role',
+                label: 'Vai trò',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                        {value || '-'}
+                    </span>
+                ),
             },
-            absent: { label: 'Vắng', class: 'bg-red-100 text-red-800' },
-        };
-        const s = statusMap[status] || {
-            label: status,
-            class: 'bg-gray-100 text-gray-800',
-        };
-        return (
-            <span className={`px-2 py-1 rounded text-xs ${s.class}`}>
-                {s.label}
-            </span>
-        );
-    };
+            {
+                key: 'shiftType',
+                label: 'Ca làm',
+                type: 'string',
+                sortable: true,
+                format: (value) => (
+                    <span className="capitalize">{value || '-'}</span>
+                ),
+            },
+            {
+                key: 'checkInTime',
+                label: 'Giờ vào',
+                type: 'string',
+                sortable: true,
+                format: (value) => formatTime(value),
+            },
+            {
+                key: 'checkOutTime',
+                label: 'Giờ ra',
+                type: 'string',
+                sortable: true,
+                format: (value) => formatTime(value),
+            },
+            {
+                key: 'workingHours',
+                label: 'Số giờ',
+                type: 'number',
+                sortable: true,
+                format: (value) => (value ? `${value.toFixed(2)}h` : '-'),
+            },
+            {
+                key: 'status',
+                label: 'Trạng thái',
+                type: 'string',
+                sortable: true,
+                format: (value) => {
+                    const statusMap = {
+                        on_time: {
+                            label: 'Đúng giờ',
+                            class: 'bg-green-100 text-green-800',
+                        },
+                        late: {
+                            label: 'Muộn',
+                            class: 'bg-yellow-100 text-yellow-800',
+                        },
+                        early_leave: {
+                            label: 'Về sớm',
+                            class: 'bg-orange-100 text-orange-800',
+                        },
+                        absent: {
+                            label: 'Vắng',
+                            class: 'bg-red-100 text-red-800',
+                        },
+                    };
+                    const s = statusMap[value] || {
+                        label: value,
+                        class: 'bg-gray-100 text-gray-800',
+                    };
+                    return (
+                        <span
+                            className={`px-2 py-1 rounded text-xs ${s.class}`}
+                        >
+                            {s.label}
+                        </span>
+                    );
+                },
+            },
+        ],
+        []
+    );
+
+    // Transform data for DynamicTable
+    const tableData = useMemo(() => {
+        return attendances.map((att, index) => ({
+            id: index + 1,
+            employeeName: att.userId?.name,
+            role: att.userId?.role,
+            shiftType: att.shiftId?.shiftType,
+            checkInTime: att.checkInTime,
+            checkOutTime: att.checkOutTime,
+            workingHours: att.workingHours,
+            status: att.status,
+            rawData: att,
+        }));
+    }, [attendances]);
 
     // Check permission
     if (!['ADMIN', 'MANAGER'].includes(user?.role)) {
@@ -143,63 +219,15 @@ const AttendanceManagementPage = () => {
                             Tổng số: {attendances.length} bản ghi
                         </p>
                     </Card>
-                    <Table>
-                        <TableHeader>
-                            <TableRow>
-                                <TableHead>Nhân viên</TableHead>
-                                <TableHead>Vai trò</TableHead>
-                                <TableHead>Ca làm</TableHead>
-                                <TableHead>Giờ vào</TableHead>
-                                <TableHead>Giờ ra</TableHead>
-                                <TableHead>Số giờ</TableHead>
-                                <TableHead>Trạng thái</TableHead>
-                            </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                            {attendances.length === 0 ? (
-                                <TableRow>
-                                    <TableCell
-                                        colSpan={7}
-                                        className="text-center"
-                                    >
-                                        Không có dữ liệu chấm công
-                                    </TableCell>
-                                </TableRow>
-                            ) : (
-                                attendances.map((att) => (
-                                    <TableRow key={att._id}>
-                                        <TableCell>
-                                            {att.userId?.name || '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                                                {att.userId?.role || '-'}
-                                            </span>
-                                        </TableCell>
-                                        <TableCell className="capitalize">
-                                            {att.shiftId?.shiftType || '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatTime(att.checkInTime)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {formatTime(att.checkOutTime)}
-                                        </TableCell>
-                                        <TableCell>
-                                            {att.workingHours
-                                                ? `${att.workingHours.toFixed(
-                                                      2
-                                                  )}h`
-                                                : '-'}
-                                        </TableCell>
-                                        <TableCell>
-                                            {getStatusBadge(att.status)}
-                                        </TableCell>
-                                    </TableRow>
-                                ))
-                            )}
-                        </TableBody>
-                    </Table>
+                    <DynamicTable
+                        data={tableData}
+                        columns={columns}
+                        pageSize={10}
+                        sortable={true}
+                        searchable={false}
+                        filterable={false}
+                        groupable={false}
+                    />
                 </>
             )}
         </section>
