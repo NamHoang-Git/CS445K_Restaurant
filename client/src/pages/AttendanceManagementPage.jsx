@@ -13,6 +13,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Button } from '@/components/ui/button';
 import Loading from '../components/Loading';
 import DynamicTable from '@/components/table/dynamic-table';
 
@@ -23,6 +24,8 @@ const AttendanceManagementPage = () => {
     const [selectedDate, setSelectedDate] = useState(
         new Date().toISOString().split('T')[0]
     );
+
+    const [showMyShifts, setShowMyShifts] = useState(false);
 
     // Fetch attendance by date
     const fetchAttendance = async () => {
@@ -154,7 +157,13 @@ const AttendanceManagementPage = () => {
 
     // Transform data for DynamicTable
     const tableData = useMemo(() => {
-        return attendances.map((att, index) => ({
+        let filtered = attendances;
+
+        if (showMyShifts) {
+            filtered = filtered.filter((att) => att.userId?._id === user?._id);
+        }
+
+        return filtered.map((att, index) => ({
             id: index + 1,
             employeeName: att.userId?.name,
             role: att.userId?.role,
@@ -165,7 +174,7 @@ const AttendanceManagementPage = () => {
             status: att.status,
             rawData: att,
         }));
-    }, [attendances]);
+    }, [attendances, showMyShifts, user?._id]);
 
     // Check permission
     if (!['ADMIN', 'MANAGER'].includes(user?.role)) {
@@ -194,7 +203,7 @@ const AttendanceManagementPage = () => {
                     </CardDescription>
                 </CardHeader>
 
-                <CardFooter>
+                <CardFooter className="flex gap-4 items-end">
                     {/* Date Filter */}
                     <div className="space-y-2">
                         <Label>Chọn ngày</Label>
@@ -204,6 +213,15 @@ const AttendanceManagementPage = () => {
                             onChange={(e) => setSelectedDate(e.target.value)}
                         />
                     </div>
+
+                    {/* My Shifts Toggle */}
+                    <Button
+                        variant={showMyShifts ? 'default' : 'outline'}
+                        onClick={() => setShowMyShifts(!showMyShifts)}
+                        className="mb-0.5"
+                    >
+                        Ca làm của tôi
+                    </Button>
                 </CardFooter>
             </Card>
 

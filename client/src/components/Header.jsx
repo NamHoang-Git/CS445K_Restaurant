@@ -12,6 +12,7 @@ import {
     FaHome,
     FaSearch,
     FaCalendarAlt,
+    FaUtensils,
 } from 'react-icons/fa';
 // eslint-disable-next-line no-unused-vars
 import { AnimatePresence, motion } from 'framer-motion';
@@ -49,6 +50,11 @@ export default function Header() {
             href: '/booking',
             icon: <FaCalendarAlt size={14} className="" />,
             label: 'Đặt bàn',
+        },
+        {
+            href: '/booking-with-preorder',
+            icon: <FaUtensils size={14} className="" />,
+            label: 'Đặt bàn & Món',
         },
     ];
 

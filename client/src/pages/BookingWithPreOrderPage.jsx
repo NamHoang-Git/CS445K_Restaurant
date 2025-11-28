@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
 import SummaryApi from '../common/SummaryApi';
 import Axios from '../utils/Axios';
 import toast from 'react-hot-toast';
@@ -39,7 +38,6 @@ const BookingWithPreOrderPage = () => {
     const [cart, setCart] = useState([]);
 
     const user = useSelector((state) => state.user);
-    const navigate = useNavigate();
 
     // Step 1: Booking Info
     const [bookingData, setBookingData] = useState({
@@ -165,10 +163,19 @@ const BookingWithPreOrderPage = () => {
 
     // Cart functions
     const addToCart = (product) => {
+        if (product.stock <= 0) {
+            toast.error('Sản phẩm đã hết hàng');
+            return;
+        }
+
         const existingItem = cart.find(
             (item) => item.productId === product._id
         );
         if (existingItem) {
+            if (existingItem.quantity + 1 > product.stock) {
+                toast.error(`Chỉ còn ${product.stock} sản phẩm trong kho`);
+                return;
+            }
             setCart(
                 cart.map((item) =>
                     item.productId === product._id
@@ -188,6 +195,7 @@ const BookingWithPreOrderPage = () => {
                         ? product.image[0]
                         : product.image,
                     quantity: 1,
+                    stock: product.stock, // Add stock to cart item for later checks
                 },
             ]);
         }
@@ -195,10 +203,20 @@ const BookingWithPreOrderPage = () => {
     };
 
     const updateQuantity = (productId, change) => {
+        const item = cart.find((i) => i.productId === productId);
+        if (!item) return;
+
+        const newQuantity = item.quantity + change;
+
+        if (change > 0 && newQuantity > item.stock) {
+            toast.error(`Chỉ còn ${item.stock} sản phẩm trong kho`);
+            return;
+        }
+
         setCart(
             cart.map((item) =>
                 item.productId === productId
-                    ? { ...item, quantity: Math.max(1, item.quantity + change) }
+                    ? { ...item, quantity: Math.max(1, newQuantity) }
                     : item
             )
         );
@@ -686,18 +704,27 @@ const BookingWithPreOrderPage = () => {
                                                 className="hover:shadow-lg transition-shadow"
                                             >
                                                 <CardContent className="p-4">
-                                                    <img
-                                                        src={
-                                                            Array.isArray(
-                                                                product.image
-                                                            )
-                                                                ? product
-                                                                      .image[0]
-                                                                : product.image
-                                                        }
-                                                        alt={product.name}
-                                                        className="w-full h-32 object-cover rounded mb-2"
-                                                    />
+                                                    <div className="relative">
+                                                        <img
+                                                            src={
+                                                                Array.isArray(
+                                                                    product.image
+                                                                )
+                                                                    ? product
+                                                                          .image[0]
+                                                                    : product.image
+                                                            }
+                                                            alt={product.name}
+                                                            className="w-full h-32 object-cover rounded mb-2"
+                                                        />
+                                                        {product.stock <= 0 && (
+                                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded">
+                                                                <span className="text-white font-bold bg-red-500 px-2 py-1 rounded text-sm">
+                                                                    Hết hàng
+                                                                </span>
+                                                            </div>
+                                                        )}
+                                                    </div>
                                                     <h4 className="font-semibold text-sm mb-1">
                                                         {product.name}
                                                     </h4>
@@ -727,6 +754,10 @@ const BookingWithPreOrderPage = () => {
                                                                     )}
                                                                 </p>
                                                             )}
+                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                                Kho:{' '}
+                                                                {product.stock}
+                                                            </p>
                                                         </div>
                                                         <Button
                                                             size="sm"
@@ -735,7 +766,11 @@ const BookingWithPreOrderPage = () => {
                                                                     product
                                                                 )
                                                             }
-                                                            className="bg-lime-500 hover:bg-lime-600"
+                                                            disabled={
+                                                                product.stock <=
+                                                                0
+                                                            }
+                                                            className="bg-lime-500 hover:bg-lime-600 disabled:bg-gray-300"
                                                         >
                                                             <FaPlus />
                                                         </Button>

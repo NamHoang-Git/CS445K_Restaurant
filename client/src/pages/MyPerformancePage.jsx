@@ -91,16 +91,19 @@ const MyPerformancePage = () => {
 
         // Filter and sort attendance data
         const filteredData = attendanceData
-            .filter((item) => new Date(item.date) >= startDate)
-            .sort((a, b) => new Date(a.date) - new Date(b.date));
+            .filter((item) => new Date(item.checkInTime) >= startDate)
+            .sort((a, b) => new Date(a.checkInTime) - new Date(b.checkInTime));
 
         // Group by date
         const groupedData = {};
         filteredData.forEach((item) => {
-            const dateStr = new Date(item.date).toLocaleDateString('vi-VN', {
-                day: '2-digit',
-                month: '2-digit',
-            });
+            const dateStr = new Date(item.checkInTime).toLocaleDateString(
+                'vi-VN',
+                {
+                    day: '2-digit',
+                    month: '2-digit',
+                }
+            );
             if (!groupedData[dateStr]) {
                 groupedData[dateStr] = {
                     date: dateStr,

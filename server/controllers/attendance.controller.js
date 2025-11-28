@@ -54,12 +54,28 @@ export const checkIn = async (req, res) => {
             });
         }
 
+        // Calculate status
+        let status = 'on_time';
+        const [startHour, startMinute] = shift.startTime.split(':').map(Number);
+
+        // Create shift start time object based on shift date
+        const shiftStart = new Date(shift.date);
+        shiftStart.setHours(startHour, startMinute, 0, 0);
+
+        // Add 15 minutes grace period
+        const gracePeriod = 15 * 60 * 1000;
+        const lateThreshold = new Date(shiftStart.getTime() + gracePeriod);
+
+        if (new Date() > lateThreshold) {
+            status = 'late';
+        }
+
         // Create attendance record
         const attendance = new AttendanceModel({
             userId,
             shiftId,
             checkInTime: new Date(),
-            status: 'on_time' // Can add logic to check if late
+            status: status
         });
 
         await attendance.save();

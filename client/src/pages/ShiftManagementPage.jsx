@@ -12,7 +12,6 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -34,6 +33,7 @@ import { FaPlus, FaEdit, FaTrash, FaUserPlus } from 'react-icons/fa';
 import Loading from '../components/Loading';
 import GlareHover from '@/components/GlareHover';
 import { IoClose } from 'react-icons/io5';
+import { Button } from '@/components/ui/button';
 
 const ShiftManagementPage = () => {
     const user = useSelector((state) => state.user);
@@ -98,7 +98,11 @@ const ShiftManagementPage = () => {
             });
 
             if (response.data.success) {
-                setEmployees(response.data.data);
+                // Filter only active employees
+                const activeEmployees = response.data.data.filter(
+                    (emp) => emp.employeeStatus === 'active'
+                );
+                setEmployees(activeEmployees);
             }
         } catch (error) {
             AxiosToastError(error);
