@@ -74,7 +74,8 @@ const OrdersTab = () => {
         (state) => state.orders
     );
     const user = useSelector((state) => state.user);
-    const isAdmin = user?.role === 'ADMIN';
+    // Allow ADMIN and MANAGER to access reports
+    const canAccessReports = ['ADMIN', 'MANAGER'].includes(user?.role);
     const [imageURL, setImageURL] = useState('');
     const [dateRange, setDateRange] = useState('7days');
     const [chartType, setChartType] = useState('bar');
@@ -100,8 +101,8 @@ const OrdersTab = () => {
     useEffect(() => {
         const loadOrders = async () => {
             const accessToken = localStorage.getItem('accesstoken');
-            if (!accessToken || !isAdmin) {
-                navigate('/dashboard/my-orders');
+            if (!accessToken || !canAccessReports) {
+                navigate('/dashboard/profile');
                 return;
             }
 
@@ -117,7 +118,7 @@ const OrdersTab = () => {
         };
 
         loadOrders();
-    }, [dispatch, isAdmin, navigate, filters]);
+    }, [dispatch, canAccessReports, navigate, filters]);
 
     useEffect(() => {
         let startDate, endDate;
@@ -341,7 +342,7 @@ const OrdersTab = () => {
                 <select
                     value={pagination.pageSize}
                     onChange={handlePageSizeChange}
-                    className="text-sm h-8 border-gray-700 border bg-neutral-950
+                    className="text-sm h-8 border-gray-700 border
                 px-3 py-1 rounded-md"
                 >
                     {[5, 10, 25, 50].map((size) => (
@@ -594,7 +595,7 @@ const OrdersTab = () => {
             legend: {
                 position: 'top',
                 labels: {
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                     font: {
                         size: 12,
                     },
@@ -615,7 +616,7 @@ const OrdersTab = () => {
                         }
                         return label;
                     },
-                    titleColor: '#FFFFFF',
+                    titleColor: '#0EA5E9',
                     bodyColor: '#E5E7EB',
                     backgroundColor: 'rgba(0, 0, 0, 0.8)',
                     borderColor: '#4B5563',
@@ -626,7 +627,7 @@ const OrdersTab = () => {
         scales: {
             x: {
                 ticks: {
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                 },
                 grid: {
                     color: 'rgba(75, 85, 99, 0.5)',
@@ -639,10 +640,10 @@ const OrdersTab = () => {
                 title: {
                     display: true,
                     text: 'Doanh thu (VND)',
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                 },
                 ticks: {
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                 },
                 grid: {
                     color: 'rgba(75, 85, 99, 0.5)',
@@ -659,10 +660,10 @@ const OrdersTab = () => {
                 title: {
                     display: true,
                     text: 'Số đơn hàng',
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                 },
                 ticks: {
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                 },
             },
         },
@@ -697,7 +698,7 @@ const OrdersTab = () => {
                                     legend: {
                                         position: 'bottom',
                                         labels: {
-                                            color: '#FFFFFF', // Màu trắng cho chú thích
+                                            color: '#0EA5E9',
                                             font: {
                                                 size: 12,
                                             },
@@ -720,7 +721,7 @@ const OrdersTab = () => {
                                                 return `${label}: ${value} đơn (${percentage}%)`;
                                             },
                                         },
-                                        titleColor: '#FFFFFF',
+                                        titleColor: '#000',
                                         bodyColor: '#E5E7EB',
                                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                                         borderColor: '#4B5563',
@@ -738,19 +739,10 @@ const OrdersTab = () => {
 
     return (
         <div className="container mx-auto grid gap-2 z-10">
-            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
-                <CardHeader>
-                    <CardTitle className="text-lg text-lime-300 font-bold uppercase">
-                        Báo cáo thống kê
-                    </CardTitle>
-                    <CardDescription>Báo cáo thống kê hệ thống</CardDescription>
-                </CardHeader>
-            </Card>
-
             {/* Summary Cards */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 py-2">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 pb-2">
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <BsCoin className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -761,7 +753,7 @@ const OrdersTab = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <FaCoins className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -776,7 +768,7 @@ const OrdersTab = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -785,7 +777,7 @@ const OrdersTab = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <FaFilter className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -809,7 +801,7 @@ const OrdersTab = () => {
             {/* Chart Type Selector */}
             <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow mb-3">
                 <div className="flex justify-between items-center mb-4">
-                    <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase">
+                    <h2 className="text-base sm:text-lg font-bold text-highlight uppercase">
                         Biểu đồ thống kê
                     </h2>
                     <div className="flex space-x-2">
@@ -817,8 +809,8 @@ const OrdersTab = () => {
                             onClick={() => setChartType('line')}
                             className={`p-2 rounded-md ${
                                 chartType === 'line'
-                                    ? 'bg-black/50 border border-lime-300'
-                                    : 'bg-gray-100 text-black'
+                                    ? 'bg-background/50 text-foreground border border-highlight'
+                                    : 'bg-foreground text-background'
                             }`}
                             title="Biểu đồ đường"
                         >
@@ -828,8 +820,8 @@ const OrdersTab = () => {
                             onClick={() => setChartType('bar')}
                             className={`p-2 rounded-md ${
                                 chartType === 'bar'
-                                    ? 'bg-black/50 border border-lime-300'
-                                    : 'bg-gray-100 text-black'
+                                    ? 'bg-background/50 text-foreground border border-highlight'
+                                    : 'bg-foreground text-background'
                             }`}
                             title="Biểu đồ cột"
                         >
@@ -839,8 +831,8 @@ const OrdersTab = () => {
                             onClick={() => setChartType('pie')}
                             className={`p-2 rounded-md ${
                                 chartType === 'pie'
-                                    ? 'bg-black/50 border border-lime-300'
-                                    : 'bg-gray-100 text-black'
+                                    ? 'bg-background/50 text-foreground border border-highlight'
+                                    : 'bg-foreground text-background'
                             }`}
                             title="Biểu đồ trạng thái đơn hàng"
                         >
@@ -852,7 +844,7 @@ const OrdersTab = () => {
                     {filteredAndSortedOrders.length > 0 ? (
                         renderChart()
                     ) : (
-                        <div className="flex items-center justify-center h-full text-lime-300">
+                        <div className="flex items-center justify-center h-full text-highlight">
                             Không có dữ liệu để hiển thị biểu đồ
                         </div>
                     )}
@@ -862,10 +854,10 @@ const OrdersTab = () => {
             {/* Top Products Chart */}
             {filteredAndSortedOrders.length > 0 && (
                 <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow mb-3">
-                    <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase">
+                    <h2 className="text-base sm:text-lg font-bold text-highlight uppercase">
                         Top sản phẩm bán chạy
                     </h2>
-                    <div className="text-white">
+                    <div>
                         <Bar
                             data={chartData.productsData}
                             options={{
@@ -883,7 +875,7 @@ const OrdersTab = () => {
                                                 )}`;
                                             },
                                         },
-                                        titleColor: '#FFFFFF',
+                                        titleColor: '#0EA5E9',
                                         bodyColor: '#E5E7EB',
                                         backgroundColor: 'rgba(0, 0, 0, 0.8)',
                                         borderColor: '#4B5563',
@@ -893,7 +885,7 @@ const OrdersTab = () => {
                                 scales: {
                                     x: {
                                         ticks: {
-                                            color: '#FFFFFF',
+                                            color: '#0EA5E9',
                                         },
                                         grid: {
                                             color: 'rgba(75, 85, 99, 0.5)',
@@ -902,7 +894,7 @@ const OrdersTab = () => {
                                     y: {
                                         beginAtZero: true,
                                         ticks: {
-                                            color: '#FFFFFF',
+                                            color: '#0EA5E9',
                                             callback: function (value) {
                                                 return DisplayPriceInVND(value);
                                             },
@@ -933,21 +925,25 @@ const OrdersTab = () => {
                             type="text"
                             name="search"
                             placeholder="Tìm kiếm..."
-                            className="w-full pl-10 h-12 text-sm"
+                            className="w-full pl-10 h-12 text-sm placeholder:text-foreground border-foreground"
                             value={filters.search}
                             onChange={handleFilterChange}
                         />
-                        <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                        <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                     </div>
                     <select
                         name="status"
-                        className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
+                        className="text-sm h-12 w-full border-foreground border bg-transparent
                     px-3 py-1 rounded-md cursor-pointer"
                         value={filters.status}
                         onChange={handleFilterChange}
                     >
                         {statusOptions.map((option) => (
-                            <option key={option.value} value={option.value}>
+                            <option
+                                key={option.value}
+                                value={option.value}
+                                className="text-foreground bg-background"
+                            >
                                 {option.label}
                             </option>
                         ))}
@@ -955,23 +951,53 @@ const OrdersTab = () => {
 
                     <select
                         name="dateRange"
-                        className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
+                        className="text-sm h-12 w-full border-foreground border bg-transparent
                     px-3 py-1 rounded-md cursor-pointer"
                         value={dateRange}
                         onChange={handleFilterChange}
                     >
-                        <option value="today">Hôm nay</option>
-                        <option value="yesterday">Hôm qua</option>
-                        <option value="7days">7 ngày qua</option>
-                        <option value="30days">30 ngày qua</option>
-                        <option value="thismonth">Tháng này</option>
-                        <option value="custom">Tùy chỉnh</option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="today"
+                        >
+                            Hôm nay
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="yesterday"
+                        >
+                            Hôm qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="7days"
+                        >
+                            7 ngày qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="30days"
+                        >
+                            30 ngày qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="thismonth"
+                        >
+                            Tháng này
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="custom"
+                        >
+                            Tùy chỉnh
+                        </option>
                     </select>
 
                     <button
                         onClick={exportToExcel}
                         className="flex items-center gap-2 justify-center h-12 px-4 py-2 border border-transparent rounded-md shadow-sm sm:text-sm text-xs font-medium
-                    text-white bg-green-600/60 hover:bg-green-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-green-500"
+                    text-white bg-green-600/80 hover:bg-green-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-green-500"
                     >
                         <FaFileExcel size={15} />
                         <p>Xuất Excel</p>
@@ -992,7 +1018,7 @@ const OrdersTab = () => {
                                         dateError
                                             ? 'border-red-500'
                                             : 'border-gray-700'
-                                    } bg-neutral-950 px-3 py-1 rounded-md pr-8 appearance-none text-sm`}
+                                    } px-3 py-1 rounded-md pr-8 appearance-none text-sm`}
                                     value={
                                         filters.startDate?.split('T')[0] || ''
                                     }
@@ -1029,7 +1055,7 @@ const OrdersTab = () => {
                                         dateError
                                             ? 'border-red-500'
                                             : 'border-gray-700'
-                                    } bg-neutral-950 px-3 py-1 rounded-md pr-8 appearance-none text-sm`}
+                                    } px-3 py-1 rounded-md pr-8 appearance-none text-sm`}
                                     value={filters.endDate?.split('T')[0] || ''}
                                     onChange={handleFilterChange}
                                     min={filters.startDate?.split('T')[0] || ''}

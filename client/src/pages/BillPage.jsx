@@ -284,22 +284,22 @@ const BillPage = () => {
     };
 
     const PaginationControls = () => (
-        <div className="flex items-center sm:flex-row flex-col justify-between mt-4 gap-3 text-white">
+        <div className="flex items-center sm:flex-row flex-col justify-between mt-4 gap-3 text-foreground">
             <div className="flex items-center sm:flex-row flex-col space-x-2 gap-2">
                 <span className="text-sm text-center">
                     Hiển thị{' '}
-                    <span className="font-semibold text-lime-300">
+                    <span className="font-semibold text-highlight">
                         {indexOfFirstOrder + 1}
                     </span>{' '}
                     đến{' '}
-                    <span className="font-semibold text-lime-300">
+                    <span className="font-semibold text-highlight">
                         {Math.min(
                             indexOfLastOrder,
                             filteredAndSortedOrders.length
                         )}
                     </span>{' '}
                     trong tổng số{' '}
-                    <span className="font-semibold text-lime-300">
+                    <span className="font-semibold text-highlight">
                         {filteredAndSortedOrders.length}
                     </span>{' '}
                     đơn hàng
@@ -308,7 +308,7 @@ const BillPage = () => {
                 <select
                     value={pagination.pageSize}
                     onChange={handlePageSizeChange}
-                    className="text-sm h-8 border-gray-700 border bg-neutral-950
+                    className="text-sm h-8 border-foreground border bg-transparent
                 px-3 py-1 rounded-md"
                 >
                     {[5, 10, 25, 50].map((size) => (
@@ -627,7 +627,7 @@ const BillPage = () => {
         <section className="container mx-auto grid gap-2 z-10">
             <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
-                    <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Quản lý đơn hàng
                     </CardTitle>
                     <CardDescription>Quản lý đơn hàng hệ thống</CardDescription>
@@ -636,7 +636,7 @@ const BillPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div>
@@ -645,7 +645,7 @@ const BillPage = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div>
@@ -656,7 +656,7 @@ const BillPage = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                         <FaFilter className="h-6 w-6" />
                     </div>
                     <div>
@@ -686,11 +686,11 @@ const BillPage = () => {
                             <Input
                                 type="text"
                                 placeholder="Tìm kiếm..."
-                                className="w-full pl-10 h-12 text-sm"
+                                className="w-full pl-10 h-12 text-sm placeholder:text-foreground border-foreground"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                             />
-                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                         </div>
                     </div>
 
@@ -698,13 +698,17 @@ const BillPage = () => {
                         <Label className="block font-medium">Trạng thái</Label>
                         <select
                             name="status"
-                            className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
+                            className="text-sm h-12 w-full border-foreground border bg-transparent
                     px-3 py-1 rounded-md cursor-pointer"
                             value={filterParams.status}
                             onChange={handleFilterChange}
                         >
                             {statusOptions.map((opt) => (
-                                <option key={opt.value} value={opt.value}>
+                                <option
+                                    key={opt.value}
+                                    value={opt.value}
+                                    className="text-foreground bg-background"
+                                >
                                     {opt.label}
                                 </option>
                             ))}
@@ -719,14 +723,14 @@ const BillPage = () => {
                             <input
                                 type="date"
                                 name="startDate"
-                                className="text-sm h-12 w-full border-gray-700 border bg-neutral-950
+                                className="text-sm h-12 w-full border-foreground border bg-transparent
                             px-3 py-1 rounded-md pr-8 appearance-none" // Thêm appearance-none
                                 value={filterParams.startDate}
                                 onChange={handleFilterChange}
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                                 <svg
-                                    className="w-5 h-5 text-gray-400"
+                                    className="w-5 h-5 text-foreground"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"
@@ -754,15 +758,15 @@ const BillPage = () => {
                                 className={`w-full h-12 border ${
                                     dateError
                                         ? 'border-red-500'
-                                        : 'border-gray-700'
-                                } bg-neutral-950 px-3 py-1 rounded-md pr-8 appearance-none text-sm`}
+                                        : 'border-foreground'
+                                } bg-transparent px-3 py-1 rounded-md pr-8 appearance-none text-sm`}
                                 value={filterParams.endDate}
                                 onChange={handleFilterChange}
                                 min={filterParams.startDate}
                             />
                             <div className="absolute right-3 top-1/2 -translate-y-1/2 pointer-events-none">
                                 <svg
-                                    className="w-5 h-5 text-gray-400"
+                                    className="w-5 h-5 text-foreground"
                                     fill="none"
                                     stroke="currentColor"
                                     viewBox="0 0 24 24"

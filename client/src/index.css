@@ -209,6 +209,25 @@ body {
     margin: 0;
 }
 
+/* Input */
+/* input[type='date']::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+}
+
+input[type='datetime-local']::-webkit-calendar-picker-indicator {
+    position: absolute;
+    right: 0;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+} */
+
 /* Styles */
 .liquid-glass-header {
     backdrop-filter: blur(20px) saturate(200%);

@@ -228,6 +228,7 @@ const EmployeeManagementPage = () => {
                         Quản lý thông tin nhân viên
                     </CardDescription>
                 </CardHeader>
+
                 <CardFooter>
                     <Dialog
                         open={isAddModalOpen}
@@ -242,7 +243,7 @@ const EmployeeManagementPage = () => {
                             playOnce={false}
                         >
                             <DialogTrigger asChild>
-                                <Button className="bg-foreground">
+                                <Button className="bg-foreground capitalize">
                                     Thêm Nhân viên
                                 </Button>
                             </DialogTrigger>

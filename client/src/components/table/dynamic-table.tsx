@@ -555,10 +555,10 @@ export default function DynamicTable({
     }, [sortedAndGroupedData, currentPageSize, currentPage]);
 
     return (
-        <div className="w-full space-y-4">
+        <div className="w-full space-y-2">
             {/* Barra de búsqueda */}
             {searchable && (
-                <div className="relative">
+                <div className="relative mt-2">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
                     <div className="flex items-center flex-wrap gap-2 pl-8 pr-3 py-2 bg-background border rounded-md">
                         {appliedTags.map((tag, index) => (
@@ -889,7 +889,7 @@ export default function DynamicTable({
                 )}
             </div>
 
-            {/* Tabla */}
+            {/* Table */}
             <div className="rounded-md border">
                 <Table className="bg-background/50 rounded-md">
                     <TableHeader>
@@ -1063,9 +1063,11 @@ export default function DynamicTable({
 
             {/* Paginación */}
             {totalPages > 1 && (
-                <div className="flex items-center justify-between">
+                <div className="flex items-center justify-between liquid-glass p-2 rounded-md">
                     <div className="flex items-center space-x-2">
-                        <span className="text-sm text-highlight">Hiển thị</span>
+                        <span className="text-sm text-foreground">
+                            Hiển thị
+                        </span>
                         <Select
                             value={currentPageSize.toString()}
                             onValueChange={(value) => {
@@ -1088,11 +1090,11 @@ export default function DynamicTable({
                                 ))}
                             </SelectContent>
                         </Select>
-                        <span className="text-sm text-highlight">
+                        <span className="text-sm text-foreground">
                             mỗi trang
                         </span>
                     </div>
-                    <div className="text-sm text-highlight">
+                    <div className="text-sm text-foreground">
                         Hiển thị {(currentPage - 1) * currentPageSize + 1} đến{' '}
                         {Math.min(
                             currentPage * currentPageSize,
@@ -1139,7 +1141,7 @@ export default function DynamicTable({
                             </SelectContent>
                         </Select>
 
-                        <span className="text-sm text-highlight">
+                        <span className="text-sm text-foreground">
                             trong {totalPages}
                         </span>
 

@@ -33,7 +33,10 @@ const ViewBookingDetails = ({ close, data }) => {
             className="bg-neutral-800 z-50 bg-opacity-60 fixed top-0 left-0 right-0 bottom-0 overflow-auto
         flex items-center justify-center px-2"
         >
-            <Card className="w-full max-w-2xl overflow-hidden border-foreground">
+            <Card
+                className="w-full max-w-2xl border-foreground overflow-hidden overflow-y-auto
+            max-h-[calc(100vh-150px)] scrollbarCustom scrollbar-hide"
+            >
                 {/* Header */}
                 <CardHeader className="pt-4">
                     <div className="flex items-center justify-between">

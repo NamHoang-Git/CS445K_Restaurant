@@ -15,7 +15,7 @@ const ReportPage = () => {
         <div className="container mx-auto grid gap-2 z-10">
             <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
-                    <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Báo cáo & Thống kê
                     </CardTitle>
                     <CardDescription>Báo cáo thống kê hệ thống</CardDescription>

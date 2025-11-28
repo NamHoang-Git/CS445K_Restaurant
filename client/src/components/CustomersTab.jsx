@@ -161,12 +161,12 @@ const CustomersTab = () => {
         plugins: {
             legend: {
                 labels: {
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                     font: { size: 12 },
                 },
             },
             tooltip: {
-                titleColor: '#FFFFFF',
+                titleColor: '#0EA5E9',
                 bodyColor: '#E5E7EB',
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 borderColor: '#4B5563',
@@ -175,11 +175,11 @@ const CustomersTab = () => {
         },
         scales: {
             x: {
-                ticks: { color: '#FFFFFF' },
+                ticks: { color: '#0EA5E9' },
                 grid: { color: 'rgba(75, 85, 99, 0.5)' },
             },
             y: {
-                ticks: { color: '#FFFFFF' },
+                ticks: { color: '#0EA5E9' },
                 grid: { color: 'rgba(75, 85, 99, 0.5)' },
             },
         },
@@ -191,7 +191,7 @@ const CustomersTab = () => {
             {customerData && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaUsers className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -203,7 +203,7 @@ const CustomersTab = () => {
                     </div>
 
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-green-400">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaUserPlus className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -217,7 +217,7 @@ const CustomersTab = () => {
                     </div>
 
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-blue-400">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaChartLine className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -229,7 +229,7 @@ const CustomersTab = () => {
                     </div>
 
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-purple-400">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaUsers className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -255,14 +255,34 @@ const CustomersTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 w-full">
                     <select
                         name="dateRange"
-                        className="text-sm h-12 w-full border-gray-700 border bg-neutral-950 px-3 py-1 rounded-md cursor-pointer"
+                        className="text-sm h-12 w-full border-foreground border bg-transparent px-3 py-1 rounded-md cursor-pointer"
                         value={dateRange}
                         onChange={handleFilterChange}
                     >
-                        <option value="7days">7 ngày qua</option>
-                        <option value="30days">30 ngày qua</option>
-                        <option value="thismonth">Tháng này</option>
-                        <option value="custom">Tùy chỉnh</option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="7days"
+                        >
+                            7 ngày qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="30days"
+                        >
+                            30 ngày qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="thismonth"
+                        >
+                            Tháng này
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="custom"
+                        >
+                            Tùy chỉnh
+                        </option>
                     </select>
                 </div>
 
@@ -312,11 +332,11 @@ const CustomersTab = () => {
             </div>
 
             {loading ? (
-                <div className="text-center py-8 text-lime-300">
+                <div className="text-center py-8 text-highlight">
                     Đang tải dữ liệu...
                 </div>
             ) : !customerData ? (
-                <div className="text-center py-8 text-lime-300">
+                <div className="text-center py-8 text-highlight">
                     Không có dữ liệu
                 </div>
             ) : (
@@ -324,13 +344,13 @@ const CustomersTab = () => {
                     {/* Top Customers Tables */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Top by Orders */}
-                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow">
-                            <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase mb-4">
+                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-foreground shadow">
+                            <h2 className="text-base sm:text-lg font-bold text-highlight uppercase mb-4">
                                 Top khách hàng (Số đơn)
                             </h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead className="text-lime-300 border-b border-gray-600">
+                                    <thead className="text-highlight border-b border-gray-600">
                                         <tr>
                                             <th className="text-left py-2">
                                                 #
@@ -358,7 +378,7 @@ const CustomersTab = () => {
                                                             <p className="font-medium">
                                                                 {customer.name}
                                                             </p>
-                                                            <p className="text-xs text-gray-400">
+                                                            <p className="text-xs text-foreground/80">
                                                                 {customer.email}
                                                             </p>
                                                         </div>
@@ -375,13 +395,13 @@ const CustomersTab = () => {
                         </Card>
 
                         {/* Top by Revenue */}
-                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow">
-                            <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase mb-4">
+                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-foreground shadow">
+                            <h2 className="text-base sm:text-lg font-bold text-highlight uppercase mb-4">
                                 Top khách hàng (Doanh thu)
                             </h2>
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
-                                    <thead className="text-lime-300 border-b border-gray-600">
+                                    <thead className="text-highlight border-b border-gray-600">
                                         <tr>
                                             <th className="text-left py-2">
                                                 #
@@ -409,7 +429,7 @@ const CustomersTab = () => {
                                                             <p className="font-medium">
                                                                 {customer.name}
                                                             </p>
-                                                            <p className="text-xs text-gray-400">
+                                                            <p className="text-xs text-foreground/80">
                                                                 {customer.email}
                                                             </p>
                                                         </div>
@@ -430,8 +450,8 @@ const CustomersTab = () => {
 
                     {/* Customer Growth Chart */}
                     {customerGrowthChartData && (
-                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow">
-                            <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase mb-4">
+                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-foreground shadow">
+                            <h2 className="text-base sm:text-lg font-bold text-highlight uppercase mb-4">
                                 Tăng trưởng khách hàng theo tháng
                             </h2>
                             <div className="h-64">

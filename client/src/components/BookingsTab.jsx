@@ -220,12 +220,12 @@ const BookingsTab = () => {
         plugins: {
             legend: {
                 labels: {
-                    color: '#FFFFFF',
+                    color: '#0EA5E9',
                     font: { size: 12 },
                 },
             },
             tooltip: {
-                titleColor: '#FFFFFF',
+                titleColor: '#0EA5E9',
                 bodyColor: '#E5E7EB',
                 backgroundColor: 'rgba(0, 0, 0, 0.8)',
                 borderColor: '#4B5563',
@@ -234,11 +234,11 @@ const BookingsTab = () => {
         },
         scales: {
             x: {
-                ticks: { color: '#FFFFFF' },
+                ticks: { color: '#0EA5E9' },
                 grid: { color: 'rgba(75, 85, 99, 0.5)' },
             },
             y: {
-                ticks: { color: '#FFFFFF' },
+                ticks: { color: '#0EA5E9' },
                 grid: { color: 'rgba(75, 85, 99, 0.5)' },
             },
         },
@@ -250,7 +250,7 @@ const BookingsTab = () => {
             {bookingData && (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaCalendarAlt className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -262,7 +262,7 @@ const BookingsTab = () => {
                     </div>
 
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaBan className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -274,7 +274,7 @@ const BookingsTab = () => {
                     </div>
 
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-lime-200">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaUsers className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -286,7 +286,7 @@ const BookingsTab = () => {
                     </div>
 
                     <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                        <div className="p-3 rounded-full border-[3px] liquid-glass text-green-400">
+                        <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
                             <FaChartBar className="h-6 w-6" />
                         </div>
                         <div className="mt-1 space-y-1">
@@ -312,16 +312,46 @@ const BookingsTab = () => {
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-2.5 w-full">
                     <select
                         name="dateRange"
-                        className="text-sm h-12 w-full border-gray-700 border bg-neutral-950 px-3 py-1 rounded-md cursor-pointer"
+                        className="text-sm h-12 w-full border-foreground border bg-transparent px-3 py-1 rounded-md cursor-pointer"
                         value={dateRange}
                         onChange={handleFilterChange}
                     >
-                        <option value="today">Hôm nay</option>
-                        <option value="yesterday">Hôm qua</option>
-                        <option value="7days">7 ngày qua</option>
-                        <option value="30days">30 ngày qua</option>
-                        <option value="thismonth">Tháng này</option>
-                        <option value="custom">Tùy chỉnh</option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="today"
+                        >
+                            Hôm nay
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="yesterday"
+                        >
+                            Hôm qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="7days"
+                        >
+                            7 ngày qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="30days"
+                        >
+                            30 ngày qua
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="thismonth"
+                        >
+                            Tháng này
+                        </option>
+                        <option
+                            className="text-foreground bg-background"
+                            value="custom"
+                        >
+                            Tùy chỉnh
+                        </option>
                     </select>
                 </div>
 
@@ -371,11 +401,11 @@ const BookingsTab = () => {
             </div>
 
             {loading ? (
-                <div className="text-center py-8 text-lime-300">
+                <div className="text-center py-8 text-highlight">
                     Đang tải dữ liệu...
                 </div>
             ) : !bookingData ? (
-                <div className="text-center py-8 text-lime-300">
+                <div className="text-center py-8 text-highlight">
                     Không có dữ liệu
                 </div>
             ) : (
@@ -384,8 +414,8 @@ const BookingsTab = () => {
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
                         {/* Peak Hours Chart */}
                         {peakHoursChartData && (
-                            <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow">
-                                <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase mb-4">
+                            <Card className="p-4 rounded-lg border-2 border-gray-700 shadow">
+                                <h2 className="text-base sm:text-lg font-bold text-highlight uppercase mb-4">
                                     Giờ cao điểm
                                 </h2>
                                 <div className="h-64">
@@ -399,8 +429,8 @@ const BookingsTab = () => {
 
                         {/* Status Distribution */}
                         {statusChartData && (
-                            <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow">
-                                <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase mb-4">
+                            <Card className="p-4 rounded-lg border-2 border-gray-700 shadow">
+                                <h2 className="text-base sm:text-lg font-bold text-highlight uppercase mb-4">
                                     Phân bố trạng thái
                                 </h2>
                                 <div className="h-64 flex items-center justify-center">
@@ -414,7 +444,7 @@ const BookingsTab = () => {
                                                     legend: {
                                                         position: 'bottom',
                                                         labels: {
-                                                            color: '#FFFFFF',
+                                                            color: '#0EA5E9',
                                                             font: { size: 12 },
                                                         },
                                                     },
@@ -429,8 +459,8 @@ const BookingsTab = () => {
 
                     {/* Bookings by Date */}
                     {bookingsByDateChartData && (
-                        <Card className="p-4 rounded-lg border-2 border-gray-700 text-white shadow">
-                            <h2 className="text-base sm:text-lg font-bold text-lime-300 uppercase mb-4">
+                        <Card className="p-4 rounded-lg border-2 border-gray-700 shadow">
+                            <h2 className="text-base sm:text-lg font-bold text-highlight uppercase mb-4">
                                 Đặt bàn theo ngày
                             </h2>
                             <div className="h-64">

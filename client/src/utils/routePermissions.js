@@ -39,26 +39,18 @@ export const routePermissions = {
 
 // Helper function to check if user has permission for a route
 export const hasRoutePermission = (userRole, pathname) => {
-    console.log('[RoutePermissions] Checking:', { userRole, pathname });
-
     // Check exact match first
     if (routePermissions[pathname]) {
-        const result = routePermissions[pathname].includes(userRole);
-        console.log('[RoutePermissions] Exact match:', { pathname, allowed: routePermissions[pathname], result });
-        return result;
+        return routePermissions[pathname].includes(userRole);
     }
 
     // Check if pathname starts with any configured route (for nested routes)
     for (const [route, roles] of Object.entries(routePermissions)) {
         if (pathname.startsWith(route) && route !== '/dashboard') {
-            const result = roles.includes(userRole);
-            console.log('[RoutePermissions] Prefix match:', { pathname, route, allowed: roles, result });
-            return result;
+            return roles.includes(userRole);
         }
     }
 
     // Default: allow if ADMIN, otherwise deny
-    const result = userRole === 'ADMIN';
-    console.log('[RoutePermissions] Default fallback:', { userRole, result });
-    return result;
+    return userRole === 'ADMIN';
 };

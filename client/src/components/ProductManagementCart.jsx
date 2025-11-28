@@ -85,21 +85,21 @@ const ProductManagementCart = ({ data, fetchProduct }) => {
                                 {data.category.map((cate) => (
                                     <Badge
                                         variant="outline"
-                                        className="bg-background/50 border-highlight p-0.5 px-2 text-highlight"
+                                        className="bg-background/50 border-foreground p-0.5 px-2 text-foreground"
                                     >
                                         {cate.name}
                                     </Badge>
                                 ))}
                             </div>
                         </div>
-                        <div className="flex py-1 gap-3 md:text-base text-sm justify-between">
+                        <div className="flex py-1 gap-3 md:text-base text-sm justify-between items-baseline">
                             <p
                                 title={data?.unit}
                                 className="font-semibold line-clamp-1 text-highlight_2"
                             >
                                 {data?.unit}
                             </p>
-                            <p className="text-highlight font-medium">
+                            <p className="text-foreground font-medium text-base">
                                 {DisplayPriceInVND(data?.price)}
                             </p>
                         </div>

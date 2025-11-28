@@ -3,7 +3,14 @@ import { useSelector } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -100,16 +107,20 @@ const AttendanceManagementPage = () => {
     }
 
     return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
+        <section className="container mx-auto grid gap-2 z-10">
+            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
-                    <CardTitle className="text-2xl font-bold">
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Quản lý Chấm công
                     </CardTitle>
+                    <CardDescription>
+                        Quản lý thông tin chấm công
+                    </CardDescription>
                 </CardHeader>
-                <CardContent>
+
+                <CardFooter>
                     {/* Date Filter */}
-                    <div className="mb-6 max-w-xs">
+                    <div className="space-y-2">
                         <Label>Chọn ngày</Label>
                         <Input
                             type="date"
@@ -117,87 +128,81 @@ const AttendanceManagementPage = () => {
                             onChange={(e) => setSelectedDate(e.target.value)}
                         />
                     </div>
-
-                    {/* Attendance Table */}
-                    {loading ? (
-                        <div className="flex justify-center py-8">
-                            <Loading />
-                        </div>
-                    ) : (
-                        <>
-                            <div className="mb-4">
-                                <p className="text-sm text-muted-foreground">
-                                    Tổng số: {attendances.length} bản ghi
-                                </p>
-                            </div>
-                            <Table>
-                                <TableHeader>
-                                    <TableRow>
-                                        <TableHead>Nhân viên</TableHead>
-                                        <TableHead>Vai trò</TableHead>
-                                        <TableHead>Ca làm</TableHead>
-                                        <TableHead>Giờ vào</TableHead>
-                                        <TableHead>Giờ ra</TableHead>
-                                        <TableHead>Số giờ</TableHead>
-                                        <TableHead>Trạng thái</TableHead>
-                                    </TableRow>
-                                </TableHeader>
-                                <TableBody>
-                                    {attendances.length === 0 ? (
-                                        <TableRow>
-                                            <TableCell
-                                                colSpan={7}
-                                                className="text-center"
-                                            >
-                                                Không có dữ liệu chấm công
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : (
-                                        attendances.map((att) => (
-                                            <TableRow key={att._id}>
-                                                <TableCell>
-                                                    {att.userId?.name || '-'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
-                                                        {att.userId?.role ||
-                                                            '-'}
-                                                    </span>
-                                                </TableCell>
-                                                <TableCell className="capitalize">
-                                                    {att.shiftId?.shiftType ||
-                                                        '-'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatTime(
-                                                        att.checkInTime
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {formatTime(
-                                                        att.checkOutTime
-                                                    )}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {att.workingHours
-                                                        ? `${att.workingHours.toFixed(
-                                                              2
-                                                          )}h`
-                                                        : '-'}
-                                                </TableCell>
-                                                <TableCell>
-                                                    {getStatusBadge(att.status)}
-                                                </TableCell>
-                                            </TableRow>
-                                        ))
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </>
-                    )}
-                </CardContent>
+                </CardFooter>
             </Card>
-        </div>
+
+            {/* Attendance Table */}
+            {loading ? (
+                <div className="flex justify-center py-8">
+                    <Loading />
+                </div>
+            ) : (
+                <>
+                    <Card className="mb-4 p-4">
+                        <p className="text-sm text-foreground">
+                            Tổng số: {attendances.length} bản ghi
+                        </p>
+                    </Card>
+                    <Table>
+                        <TableHeader>
+                            <TableRow>
+                                <TableHead>Nhân viên</TableHead>
+                                <TableHead>Vai trò</TableHead>
+                                <TableHead>Ca làm</TableHead>
+                                <TableHead>Giờ vào</TableHead>
+                                <TableHead>Giờ ra</TableHead>
+                                <TableHead>Số giờ</TableHead>
+                                <TableHead>Trạng thái</TableHead>
+                            </TableRow>
+                        </TableHeader>
+                        <TableBody>
+                            {attendances.length === 0 ? (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={7}
+                                        className="text-center"
+                                    >
+                                        Không có dữ liệu chấm công
+                                    </TableCell>
+                                </TableRow>
+                            ) : (
+                                attendances.map((att) => (
+                                    <TableRow key={att._id}>
+                                        <TableCell>
+                                            {att.userId?.name || '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            <span className="px-2 py-1 bg-blue-100 text-blue-800 rounded text-xs">
+                                                {att.userId?.role || '-'}
+                                            </span>
+                                        </TableCell>
+                                        <TableCell className="capitalize">
+                                            {att.shiftId?.shiftType || '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatTime(att.checkInTime)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {formatTime(att.checkOutTime)}
+                                        </TableCell>
+                                        <TableCell>
+                                            {att.workingHours
+                                                ? `${att.workingHours.toFixed(
+                                                      2
+                                                  )}h`
+                                                : '-'}
+                                        </TableCell>
+                                        <TableCell>
+                                            {getStatusBadge(att.status)}
+                                        </TableCell>
+                                    </TableRow>
+                                ))
+                            )}
+                        </TableBody>
+                    </Table>
+                </>
+            )}
+        </section>
     );
 };
 

@@ -333,7 +333,6 @@ const ProductManagementPage = () => {
             <div className="flex items-center gap-3 text-sm mt-1.5">
                 {/* Filter Button */}
                 <GlareHover
-                    background="#000"
                     glareColor="#ffffff"
                     glareOpacity={0.8}
                     glareAngle={-30}
@@ -343,7 +342,7 @@ const ProductManagementPage = () => {
                 >
                     <Button
                         onClick={() => setShowFilters(!showFilters)}
-                        className="flex items-center gap-2 px-4 text-highlight_2 h-11 w-full hover:bg-transparent"
+                        className="flex items-center gap-2 px-4 text-foreground h-11 w-full bg-background hover:bg-transparent"
                     >
                         <FaFilter className="mb-[3px]" />
                         <span className="font-bold uppercase">Lọc</span>
@@ -352,7 +351,7 @@ const ProductManagementPage = () => {
 
                 {/* Search */}
                 <div
-                    className="text-highlight h-11 max-w-72 w-full min-w-16 lg:min-w-24 bg-background/80 border border-muted-foreground px-4
+                    className="text-foreground h-11 max-w-72 w-full min-w-16 lg:min-w-24 bg-background/80 border border-muted-foreground px-4
                 flex items-center gap-3 rounded-xl shadow-md shadow-secondary-100 focus-within:border-lime-200"
                 >
                     <IoSearch size={22} className="mb-[3px] sm:block hidden" />
@@ -363,7 +362,7 @@ const ProductManagementPage = () => {
                     <input
                         type="text"
                         placeholder="Tìm kiếm sản phẩm..."
-                        className="h-full w-full outline-none bg-transparent placeholder:text-highlight"
+                        className="h-full w-full outline-none bg-transparent placeholder:text-foreground"
                         value={search}
                         onChange={handleOnChange}
                         spellCheck={false}

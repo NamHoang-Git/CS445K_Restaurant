@@ -693,12 +693,12 @@ const VoucherPage = () => {
     return (
         <section className="container mx-auto grid gap-2 z-10">
             {/* Header */}
-            <Card className="text-white py-6 flex-row justify-between gap-6 border-gray-600 border-2">
+            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
-                    <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Quản lý mã giảm giá
                     </CardTitle>
-                    <CardDescription className="text-white">
+                    <CardDescription>
                         Quản lý danh sách mã giảm giá
                     </CardDescription>
                 </CardHeader>
@@ -714,7 +714,7 @@ const VoucherPage = () => {
                     >
                         <Button
                             onClick={() => setOpenUploadVoucher(true)}
-                            className="bg-transparent text-white hover:bg-transparent"
+                            className="bg-foreground"
                         >
                             Thêm Mới
                         </Button>
