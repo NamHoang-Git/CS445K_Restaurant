@@ -24,6 +24,7 @@ import DisplayCartItem from './DisplayCartItem';
 import defaultAvatar from '../assets/defaultAvatar.png';
 import Search from './Search';
 import { valideURLConvert } from '@/utils/valideURLConvert';
+import { ThemeToggle } from './theme-toggle';
 
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
@@ -33,18 +34,13 @@ export default function Header() {
 
     const links = [
         {
-            href: '/',
-            icon: <FaHome size={14} className="" />,
-            label: 'Trang chủ',
-        },
-        {
             href: firstCategory
                 ? `/${valideURLConvert(firstCategory.name)}-${
                       firstCategory._id
                   }`
                 : '/products',
             icon: <FaBoxOpen size={14} className="" />,
-            label: 'Sản phẩm',
+            label: 'Thực đơn',
         },
         {
             href: '/booking',
@@ -118,7 +114,7 @@ export default function Header() {
 
     return (
         <>
-            <header className="sticky top-0 z-50 p-4 text-amber-50 font-semibold">
+            <header className="sticky top-0 z-50 p-4 text-red-500 dark:text-red-50 font-semibold">
                 <div className="container mx-auto">
                     <div className="flex h-16 items-center justify-between px-6 liquid-glass-header rounded-full">
                         {/* Brand Logo */}
@@ -153,120 +149,135 @@ export default function Header() {
                                     </Link>
                                 ))}
                             </nav>
-                            <Link to="/search">
-                                <FaSearch size={14} className=" mb-[3px]" />
-                            </Link>
+                            {/* <div className="flex items-center gap-3">
+                                <Link to="/search">
+                                    <FaSearch size={14} className=" mb-[3px]" />
+                                </Link>
+                            </div> */}
                         </div>
                         {/* User */}
-                        <div className="hidden md:flex items-center justify-end gap-5">
-                            {user?._id ? (
-                                <div className="relative" ref={menuRef}>
-                                    <div className="relative">
-                                        <button
-                                            onClick={toggleUserMenu}
-                                            className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-background/15 transition-colors"
-                                            aria-expanded={openUserMenu}
-                                            aria-haspopup="true"
-                                            aria-label="User menu"
-                                            type="button"
-                                        >
-                                            <div className="relative p-0.5 overflow-hidden rounded-full liquid-glass-2">
-                                                <img
-                                                    src={
-                                                        user.avatar ||
-                                                        defaultAvatar
-                                                    }
-                                                    alt={user.name}
-                                                    className="w-8 h-8 rounded-full object-cover"
-                                                    width={32}
-                                                    height={32}
-                                                />
-                                            </div>
-                                            <div className="flex flex-col items-start flex-1 min-w-0">
-                                                <span
-                                                    title={user.name}
-                                                    className="text-sm font-medium  truncate max-w-16 lg:max-w-20 xl:max-w-max"
-                                                >
-                                                    {user.name}
-                                                </span>
-                                                {user.role === 'ADMIN' && (
-                                                    <span className="text-xs text-highlight py-0.5 px-1 bg-background rounded-md">
-                                                        Quản trị
-                                                    </span>
-                                                )}
-                                            </div>
-                                            {openUserMenu ? (
-                                                <FaCaretUp
-                                                    className="flex-shrink-0 ml-2"
-                                                    size={15}
-                                                />
-                                            ) : (
-                                                <FaCaretDown
-                                                    className="flex-shrink-0 ml-2"
-                                                    size={15}
-                                                />
-                                            )}
-                                        </button>
-                                    </div>
-                                    <AnimatePresence>
-                                        {openUserMenu && (
-                                            <motion.div
-                                                className="absolute right-0 top-full mt-2 z-50 w-64"
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -10 }}
-                                                transition={{
-                                                    duration: 0.15,
-                                                    ease: 'easeOut',
-                                                }}
+                        <div className="hidden md:flex items-center gap-1.5">
+                            <ThemeToggle />
+
+                            <div className="flex items-center justify-end gap-5">
+                                {user?._id ? (
+                                    <div className="relative" ref={menuRef}>
+                                        <div className="relative">
+                                            <button
+                                                onClick={toggleUserMenu}
+                                                className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-background/15 transition-colors"
+                                                aria-expanded={openUserMenu}
+                                                aria-haspopup="true"
+                                                aria-label="User menu"
+                                                type="button"
                                             >
-                                                <UserMenu
-                                                    close={closeMenu}
-                                                    menuTriggerRef={menuRef}
-                                                />
-                                            </motion.div>
-                                        )}
-                                    </AnimatePresence>
-                                </div>
-                            ) : (
-                                <button
-                                    onClick={redirectToLoginPage}
-                                    className="underline text-sm hover:text-purple-300 transition-colors"
-                                >
-                                    Đăng nhập
-                                </button>
-                            )}
-                            {user.role !== 'ADMIN' && (
-                                <button
-                                    onClick={
-                                        user?._id
-                                            ? () => setOpenCartSection(true)
-                                            : redirectToLoginPage
-                                    }
-                                    className={`${
-                                        cartItem[0] ? ' py-1.5' : ' py-3'
-                                    } flex items-center gap-2 bg-background text-highlight font-medium rounded-lg px-3.5
-                                hover:bg-lime-300 hover:shadow-md hover:scale-[1.02] transition-all`}
-                                >
-                                    <div className="animate-bounce">
-                                        <FaCartPlus size={20} />
-                                    </div>
-                                    <div className="font-bold text-sm">
-                                        {cartItem[0] ? (
-                                            <div className="ml-1 flex flex-col items-center justify-center">
-                                                <p>{totalQty} sản phẩm</p>
-                                                <p>
-                                                    {DisplayPriceInVND(
-                                                        totalPrice
+                                                <div className="relative p-0.5 overflow-hidden rounded-full liquid-glass-2">
+                                                    <img
+                                                        src={
+                                                            user.avatar ||
+                                                            defaultAvatar
+                                                        }
+                                                        alt={user.name}
+                                                        className="w-8 h-8 rounded-full object-cover"
+                                                        width={32}
+                                                        height={32}
+                                                    />
+                                                </div>
+                                                <div className="flex flex-col items-start flex-1 min-w-0">
+                                                    <span
+                                                        title={user.name}
+                                                        className="text-sm font-medium  truncate max-w-16 lg:max-w-20 xl:max-w-max"
+                                                    >
+                                                        {user.name}
+                                                    </span>
+                                                    {user.role === 'ADMIN' && (
+                                                        <span className="text-xs text-highlight py-0.5 px-1 bg-background rounded-md">
+                                                            Quản trị
+                                                        </span>
                                                     )}
-                                                </p>
-                                            </div>
-                                        ) : (
-                                            <p>Giỏ hàng</p>
-                                        )}
+                                                </div>
+                                                {openUserMenu ? (
+                                                    <FaCaretUp
+                                                        className="flex-shrink-0 ml-2"
+                                                        size={15}
+                                                    />
+                                                ) : (
+                                                    <FaCaretDown
+                                                        className="flex-shrink-0 ml-2"
+                                                        size={15}
+                                                    />
+                                                )}
+                                            </button>
+                                        </div>
+                                        <AnimatePresence>
+                                            {openUserMenu && (
+                                                <motion.div
+                                                    className="absolute right-0 top-full mt-2 z-50 w-64"
+                                                    initial={{
+                                                        opacity: 0,
+                                                        y: -10,
+                                                    }}
+                                                    animate={{
+                                                        opacity: 1,
+                                                        y: 0,
+                                                    }}
+                                                    exit={{
+                                                        opacity: 0,
+                                                        y: -10,
+                                                    }}
+                                                    transition={{
+                                                        duration: 0.15,
+                                                        ease: 'easeOut',
+                                                    }}
+                                                >
+                                                    <UserMenu
+                                                        close={closeMenu}
+                                                        menuTriggerRef={menuRef}
+                                                    />
+                                                </motion.div>
+                                            )}
+                                        </AnimatePresence>
                                     </div>
-                                </button>
-                            )}
+                                ) : (
+                                    <button
+                                        onClick={redirectToLoginPage}
+                                        className="underline text-sm hover:text-purple-300 transition-colors"
+                                    >
+                                        Đăng nhập
+                                    </button>
+                                )}
+                                {user.role !== 'ADMIN' && (
+                                    <button
+                                        onClick={
+                                            user?._id
+                                                ? () => setOpenCartSection(true)
+                                                : redirectToLoginPage
+                                        }
+                                        className={`${
+                                            cartItem[0] ? ' py-1.5' : ' py-3'
+                                        } flex items-center gap-2 bg-background text-highlight font-medium rounded-lg px-3.5
+                                hover:bg-lime-300 hover:shadow-md hover:scale-[1.02] transition-all`}
+                                    >
+                                        <div className="animate-bounce">
+                                            <FaCartPlus size={20} />
+                                        </div>
+                                        <div className="font-bold text-sm">
+                                            {cartItem[0] ? (
+                                                <div className="ml-1 flex flex-col items-center justify-center">
+                                                    <p>{totalQty} sản phẩm</p>
+                                                    <p>
+                                                        {DisplayPriceInVND(
+                                                            totalPrice
+                                                        )}
+                                                    </p>
+                                                </div>
+                                            ) : (
+                                                <p>Giỏ hàng</p>
+                                            )}
+                                        </div>
+                                    </button>
+                                )}
+                            </div>
                         </div>
                         {/* Mobile Nav */}
                         <div className="md:hidden">

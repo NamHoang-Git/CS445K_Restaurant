@@ -11,6 +11,7 @@ import sendEmail from "../config/sendEmail.js";
 import bookingEmailTemplate from "../utils/bookingEmailTemplate.js";
 import bookingWithPreOrderEmailTemplate from "../utils/bookingWithPreOrderEmailTemplate.js";
 import orderEmailTemplate from "../utils/orderEmailTemplate.js";
+import PerformanceModel from "../models/performance.model.js";
 
 export async function CashOnDeliveryOrderController(request, response) {
     const maxRetries = 3;
@@ -1225,6 +1226,48 @@ export async function updateOrderStatusController(request, response) {
                 },
                 { session }
             );
+        }
+
+        // Update performance metrics for WAITER when order is completed
+        if (status === 'Đã thanh toán' && userId) {
+            const user = await UserModel.findById(userId).session(session);
+
+            if (user && user.role === 'WAITER') {
+                // Get today's date at midnight
+                const performanceDate = new Date();
+                performanceDate.setHours(0, 0, 0, 0);
+
+                // Find or create performance record for today
+                let performance = await PerformanceModel.findOne({
+                    userId,
+                    date: performanceDate
+                }).session(session);
+
+                if (!performance) {
+                    performance = new PerformanceModel({
+                        userId,
+                        date: performanceDate,
+                        role: user.role,
+                        metrics: {
+                            ordersHandled: 0,
+                            dishesCooked: 0,
+                            workingHours: 0,
+                            customerRating: 0
+                        }
+                    });
+                }
+
+                // Increment orders handled
+                performance.metrics.ordersHandled += 1;
+                await performance.save({ session });
+
+                // Also update user's overall stats
+                await UserModel.findByIdAndUpdate(
+                    userId,
+                    { $inc: { 'performanceStats.ordersHandled': 1 } },
+                    { session }
+                );
+            }
         }
 
         await session.commitTransaction();

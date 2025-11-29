@@ -38,7 +38,7 @@ const Search = () => {
         <search className="relative z-10 cursor-pointer liquid-glass max-w-2xl container mx-auto rounded-3xl">
             <div
                 className="md:px-8 px-2 sm:my-0 h-8 sm:h-12 rounded-3xl border-[3px] border-inset overflow-hidden
-                flex items-center text-sm text-gray-300 liquid-glass group focus-within:border-purple-400"
+                flex items-center text-sm text-red-600 dark:text-red-50 liquid-glass group focus-within:border-purple-400"
             >
                 <div>
                     {isMobile && isSearchPage ? (

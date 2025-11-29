@@ -96,6 +96,7 @@ function App() {
                     <main className="min-h-[80vh]">
                         <div className="fixed inset-0 z-0 pointer-events-none">
                             <LiquidEther
+                                colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
                                 isViscous={false}
                                 iterationsViscous={8}
                                 iterationsPoisson={8}
@@ -121,6 +122,7 @@ function App() {
                 <main className="min-h-screen">
                     <div className="fixed inset-0 z-0 pointer-events-none">
                         <LiquidEther
+                            colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
                             isViscous={false}
                             iterationsViscous={8}
                             iterationsPoisson={8}
@@ -141,6 +143,7 @@ function App() {
                 <main className="min-h-screen">
                     <div className="fixed inset-0 z-0 pointer-events-none">
                         <LiquidEther
+                            colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
                             isViscous={false}
                             iterationsViscous={8}
                             iterationsPoisson={8}

@@ -3,7 +3,7 @@ import { TooltipProvider } from '@/components/ui/tooltip';
 import { SettingsProvider } from '@/contexts/settings-context';
 import { Outlet } from 'react-router-dom';
 import { useEffect, useState } from 'react';
-import { ThemeProvider } from '@/components/adminDashboard/theme-provider';
+
 import { Sidebar } from '@/components/adminDashboard/sidebar';
 import { TopNav } from '@/components/adminDashboard/top-nav';
 
@@ -31,22 +31,20 @@ export default function AdminDashboard() {
     }, []);
 
     return (
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <SettingsProvider>
-                <TooltipProvider delayDuration={0}>
-                    <div className="min-h-screen flex">
-                        <Sidebar />
-                        <div className="flex-1 overflow-auto w-full">
-                            <TopNav />
-                            <div className="container mx-auto p-6">
-                                <main className="w-full relative">
-                                    <Outlet />
-                                </main>
-                            </div>
+        <SettingsProvider>
+            <TooltipProvider delayDuration={0}>
+                <div className="min-h-screen flex">
+                    <Sidebar />
+                    <div className="flex-1 overflow-auto w-full">
+                        <TopNav />
+                        <div className="container mx-auto p-6">
+                            <main className="w-full relative">
+                                <Outlet />
+                            </main>
                         </div>
                     </div>
-                </TooltipProvider>
-            </SettingsProvider>
-        </ThemeProvider>
+                </div>
+            </TooltipProvider>
+        </SettingsProvider>
     );
 }

@@ -210,7 +210,7 @@ function PhoneCard({
                 <div
                     className={`absolute rounded-2xl inset-0 bg-gradient-to-b from-white/10 to-white/5 transition-all duration-500 ${
                         isHovered
-                            ? 'border-4 border-highlight/70 bg-gradient-to-b from-black/50 to-cyan-500/30 transition-opacity duration-500 shadow-[0_0_25px_rgba(132,204,22,0.45)]'
+                            ? 'border-4 border-highlight/70 dark:border-amber-400 bg-gradient-to-b from-black/50 to-cyan-500/30 transition-opacity duration-500 shadow-[0_0_25px_rgba(132,204,22,0.45)]'
                             : 'border border-transparent'
                     }`}
                 />

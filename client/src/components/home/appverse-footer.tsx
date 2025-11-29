@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Card } from '../../components/ui/card';
 import GradientText from '../GradientText';
+
 interface FooterContent {
     tagline: string;
     copyright: string;
@@ -10,15 +11,15 @@ interface FooterContent {
 
 const defaultContent: FooterContent = {
     tagline:
-        'Experience 3D animation like never before. We craft cinematic visuals for brands and products.',
-    copyright: '© 2025 — Skitbit International Uk',
+        'Trải nghiệm ẩm thực đẳng cấp với những món ăn được chế biến từ nguyên liệu tươi ngon nhất.',
+    copyright: '© 2025 — EatEase Restaurant',
 };
 
 export function AppverseFooter() {
     const [content, setContent] = useState<FooterContent>(defaultContent);
 
     useEffect(() => {
-        const savedContent = localStorage.getItem('skitbit-content');
+        const savedContent = localStorage.getItem('restaurant-content');
         if (savedContent) {
             try {
                 const parsed = JSON.parse(savedContent);
@@ -37,28 +38,26 @@ export function AppverseFooter() {
                 <Card className="relative overflow-hidden rounded-3xl liquid-glass p-6 sm:p-10">
                     <div className="relative grid items-center gap-8 md:grid-cols-2">
                         <div>
-                            <p className="mb-2 text-xs tracking-widest text-lime-300 uppercase">
-                                Khám phá kỷ nguyên mới của hiệu năng và thiết kế
+                            <p className="mb-2 text-xs tracking-widest text-orange-600 font-extrabold uppercase">
+                                Món Đặc Biệt Trong Tuần
                             </p>
-                            <h3 className="text-2xl font-bold leading-tight text-white sm:text-3xl uppercase">
-                                Siêu phẩm mới nhất từ Apple – Bứt phá mọi giới
-                                hạn
+                            <h3 className="text-2xl font-bold leading-tight text-foreground/80 sm:text-3xl uppercase">
+                                Combo Gia Đình Cao Cấp – Trọn Vẹn Hương Vị
                             </h3>
-                            <p className="mt-2 max-w-prose text-sm text-neutral-100">
-                                Tốc độ, sắc nét và thông minh hơn bao giờ hết –
-                                iPhone 17 Pro Max định nghĩa lại trải nghiệm di
-                                động.
+                            <p className="mt-2 max-w-prose text-sm text-foreground font-semibold">
+                                Thưởng thức bữa ăn trọn vẹn với combo 4-6 người,
+                                bao gồm các món chính, khai vị và tráng miệng
+                                hấp dẫn. Giảm giá đặc biệt 20% khi đặt trước!
                             </p>
                         </div>
 
                         <div className="mx-auto w-full max-w-[320px]">
                             <div className="relative rounded-[28px] liquid-glass p-2 shadow-2xl">
-                                <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
+                                <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-gradient-to-br from-orange-900 via-amber-800 to-orange-900">
                                     <img
-                                        src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Timeline%202-YFaCK7cEiHWSMRv8XEHaLCoYj2SUAi.mp4"
-                                        // src={logo}
-                                        className="absolute inset-0 h-full w-full object-cover opacity-40"
-                                        aria-label="Skitbit app preview - approvals made easy"
+                                        src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=400&h=800&fit=crop"
+                                        className="absolute inset-0 h-full w-full object-cover opacity-60"
+                                        alt="Featured combo dish"
                                     />
                                     <div className="relative p-3">
                                         <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-white/20" />
@@ -78,17 +77,22 @@ export function AppverseFooter() {
                                                 ]}
                                                 animationSpeed={5.5}
                                                 showBorder={false}
-                                                className="custom-class text-5xl font-extrabold"
+                                                className="custom-class text-4xl font-extrabold"
                                             >
-                                                iPhone 17 Pro Max
+                                                Combo Gia Đình
                                             </GradientText>
                                             <p className="text-xs text-white text-justify">
-                                                iPhone 17 Pro Max – màn hình
-                                                120Hz, chip A17 Bionic, camera
-                                                48MP, pin bền bỉ.
+                                                Phở Bò Đặc Biệt, Bún Chả Hà Nội,
+                                                Nem Rán, Salad Tươi & Chè Thập
+                                                Cẩm. Phục vụ 4-6 người.
                                             </p>
-                                            <div className="inline-flex items-center rounded-full bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-lime-300">
-                                                New
+                                            <div className="flex items-center gap-2">
+                                                <div className="inline-flex items-center rounded-full bg-red-600 px-2 py-0.5 text-[10px] uppercase tracking-wider text-white font-bold">
+                                                    -20%
+                                                </div>
+                                                <div className="inline-flex items-center rounded-full bg-lime-500 px-2 py-0.5 text-[10px] uppercase tracking-wider text-black font-bold">
+                                                    Hot Deal
+                                                </div>
                                             </div>
                                         </div>
                                     </div>

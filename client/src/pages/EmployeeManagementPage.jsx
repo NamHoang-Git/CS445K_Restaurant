@@ -343,7 +343,7 @@ const EmployeeManagementPage = () => {
                                 >
                                     <FaEdit />
                                 </Button>
-                                {user?.role === 'ADMIN' && (
+                                {['ADMIN', 'MANAGER'].includes(user?.role) && (
                                     <Button
                                         size="sm"
                                         variant="destructive"
@@ -369,7 +369,7 @@ const EmployeeManagementPage = () => {
                                 >
                                     <FaTrashRestore />
                                 </Button>
-                                {user?.role === 'ADMIN' && (
+                                {['ADMIN', 'MANAGER'].includes(user?.role) && (
                                     <Button
                                         size="sm"
                                         variant="destructive"

@@ -1,10 +1,16 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-// import Link from "next/link"
-import { Instagram, Twitter, Youtube, MessageCircle } from 'lucide-react';
+import {
+    Instagram,
+    Twitter,
+    Youtube,
+    MessageCircle,
+    Phone,
+    Mail,
+    MapPin,
+} from 'lucide-react';
 import { Link } from 'react-router-dom';
-// import Image from "next/image"
 
 interface FooterContent {
     tagline: string;
@@ -13,16 +19,15 @@ interface FooterContent {
 
 const defaultContent: FooterContent = {
     tagline:
-        'Experience 3D animation like never before. We craft cinematic visuals for brands and products.',
-    copyright: '© 2025 — TechSpace International Uk',
+        'Trải nghiệm ẩm thực đẳng cấp với những món ăn được chế biến từ nguyên liệu tươi ngon nhất. Phục vụ tận tâm, chất lượng đảm bảo.',
+    copyright: '© 2025 — EatEase Restaurant',
 };
 
 export function Footer() {
     const [content, setContent] = useState<FooterContent>(defaultContent);
 
     useEffect(() => {
-        // Load content from localStorage
-        const savedContent = localStorage.getItem('skitbit-content');
+        const savedContent = localStorage.getItem('restaurant-content');
         if (savedContent) {
             try {
                 const parsed = JSON.parse(savedContent);
@@ -36,7 +41,7 @@ export function Footer() {
     }, []);
 
     return (
-        <section className="text-white liquid-glass-menu">
+        <section className="liquid-glass-menu">
             {/* Footer */}
             <footer className="border-t border-white/10 pb-20 md:pb-10">
                 <div className="container mx-auto px-4 py-10">
@@ -44,31 +49,100 @@ export function Footer() {
                         {/* Brand */}
                         <div className="space-y-3">
                             <div className="flex items-center gap-1.5">
-                                {/* <Image src="/icons/skitbit-white.svg" alt="Skitbit logo" width={24} height={24} className="h-6 w-6" /> */}
-                                <span className="text-xl font-semibold text-lime-300">
-                                    TechSpace
+                                <span className="text-xl font-semibold text-orange-400">
+                                    🍽️ EatEase Restaurant
                                 </span>
                             </div>
                             <p className="max-w-sm text-sm">
                                 {content.tagline}
                             </p>
+
+                            {/* Contact Info */}
+                            <div className="space-y-2 text-sm pt-2">
+                                <div className="flex items-center gap-2">
+                                    <Phone className="h-4 w-4 text-orange-400" />
+                                    <span>+84 123 456 789</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <Mail className="h-4 w-4 text-orange-400" />
+                                    <span>contact@eatease.vn</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                    <MapPin className="h-4 w-4 text-orange-400" />
+                                    <span>123 Nguyễn Huệ, Q1, TP.HCM</span>
+                                </div>
+                            </div>
                         </div>
 
                         {/* Navigation */}
                         <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 md:grid-cols-2">
+                            {/* Quick Links */}
                             <div>
-                                <h5 className="mb-2 text-xs font-semibold uppercase tracking-widest">
-                                    Social media
+                                <h5 className="mb-2 text-xs font-semibold uppercase tracking-widest text-orange-400">
+                                    Liên Kết
                                 </h5>
-                                <ul className="space-y-2 text-sm text-neutral-300">
+                                <ul className="space-y-2 text-sm">
+                                    <li>
+                                        <Link
+                                            to="/products"
+                                            className="hover:text-orange-400 transition-colors"
+                                        >
+                                            Thực Đơn
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/booking"
+                                            className="hover:text-orange-400 transition-colors"
+                                        >
+                                            Đặt Bàn
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/booking-with-preorder"
+                                            className="hover:text-orange-400 transition-colors"
+                                        >
+                                            Đặt Bàn & Món
+                                        </Link>
+                                    </li>
+                                    <li>
+                                        <Link
+                                            to="/about"
+                                            className="hover:text-orange-400 transition-colors"
+                                        >
+                                            Về Chúng Tôi
+                                        </Link>
+                                    </li>
+                                </ul>
+                            </div>
+
+                            {/* Social Media */}
+                            <div>
+                                <h5 className="mb-2 text-xs font-semibold uppercase tracking-widest text-orange-400">
+                                    Mạng Xã Hội
+                                </h5>
+                                <ul className="space-y-2 text-sm">
+                                    <li className="flex items-center gap-2">
+                                        <Instagram className="h-4 w-4" />
+                                        <a
+                                            href="https://instagram.com/eatease"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="hover:text-orange-400 transition-colors"
+                                            aria-label="Follow EatEase on Instagram"
+                                        >
+                                            Instagram
+                                        </a>
+                                    </li>
                                     <li className="flex items-center gap-2">
                                         <Twitter className="h-4 w-4" />
                                         <a
-                                            href="https://twitter.com/theskitbit"
+                                            href="https://twitter.com/eatease"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hover:text-lime-300"
-                                            aria-label="Follow skitbit on Twitter"
+                                            className="hover:text-orange-400 transition-colors"
+                                            aria-label="Follow EatEase on Twitter"
                                         >
                                             X/Twitter
                                         </a>
@@ -76,37 +150,13 @@ export function Footer() {
                                     <li className="flex items-center gap-2">
                                         <Youtube className="h-4 w-4" />
                                         <a
-                                            href="https://www.youtube.com/@skitbitinternational"
+                                            href="https://youtube.com/@eatease"
                                             target="_blank"
                                             rel="noopener noreferrer"
-                                            className="hover:text-lime-300"
-                                            aria-label="Subscribe to skitbit on YouTube"
+                                            className="hover:text-orange-400 transition-colors"
+                                            aria-label="Subscribe to EatEase on YouTube"
                                         >
                                             YouTube
-                                        </a>
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <Instagram className="h-4 w-4" />
-                                        <a
-                                            href="https://instagram.com/theskitbit"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="hover:text-lime-300"
-                                            aria-label="Follow skitbit on Instagram"
-                                        >
-                                            Instagram
-                                        </a>
-                                    </li>
-                                    <li className="flex items-center gap-2">
-                                        <MessageCircle className="h-4 w-4" />
-                                        <a
-                                            href="https://threads.com/theskitbit"
-                                            target="_blank"
-                                            rel="noopener noreferrer"
-                                            className="hover:text-lime-300"
-                                            aria-label="Follow skitbit on Threads"
-                                        >
-                                            Threads
                                         </a>
                                     </li>
                                 </ul>
@@ -117,25 +167,22 @@ export function Footer() {
                     {/* Bottom bar */}
                     <div
                         className="mt-8 flex flex-col items-center justify-between gap-4 border-t
-                    border-white/10 pt-6 text-xs sm:flex-row"
+                    border-orange-400 dark:border-white/50 pt-6 text-xs sm:flex-row"
                     >
                         <p>{content.copyright}</p>
                         <div className="flex items-center gap-6">
-                            <a
-                                href="/revisions"
-                                className="hover:text-lime-300"
+                            <Link
+                                to="/privacy"
+                                className="hover:text-orange-400 transition-colors"
                             >
-                                Revision Policy
-                            </a>
-                            <a href="/t&c" className="hover:text-lime-300">
-                                Terms & Conditions
-                            </a>
-                            {/* <Link href="/revisions" className="hover:text-lime-300">
-                Revision Policy
-              </Link>
-              <Link href="/t&c" className="hover:text-lime-300">
-                Terms & Conditions
-              </Link> */}
+                                Chính Sách Bảo Mật
+                            </Link>
+                            <Link
+                                to="/terms"
+                                className="hover:text-orange-400 transition-colors"
+                            >
+                                Điều Khoản Sử Dụng
+                            </Link>
                         </div>
                     </div>
                 </div>

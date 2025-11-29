@@ -1,6 +1,7 @@
 import AttendanceModel from "../models/attendance.model.js";
 import ShiftModel from "../models/shift.model.js";
 import UserModel from "../models/user.model.js";
+import PerformanceModel from "../models/performance.model.js";
 
 /**
  * Check-in for shift
@@ -173,12 +174,41 @@ export const checkOut = async (req, res) => {
 
         // Update check-out time
         attendance.checkOutTime = new Date();
-        await attendance.save(); // Pre-save hook will calculate working hours
+        const savedAttendance = await attendance.save(); // Pre-save hook will calculate working hours
+
+        // Update PerformanceModel
+        const performanceDate = new Date(savedAttendance.checkInTime);
+        performanceDate.setHours(0, 0, 0, 0);
+
+        // Find user to get role
+        const user = await UserModel.findById(userId);
+
+        let performance = await PerformanceModel.findOne({
+            userId,
+            date: performanceDate
+        });
+
+        if (!performance) {
+            performance = new PerformanceModel({
+                userId,
+                date: performanceDate,
+                role: user.role,
+                metrics: {
+                    ordersHandled: 0,
+                    dishesCooked: 0,
+                    workingHours: 0,
+                    customerRating: 0
+                }
+            });
+        }
+
+        performance.metrics.workingHours += savedAttendance.workingHours || 0;
+        await performance.save();
 
         // Update user's total working hours
         await UserModel.findByIdAndUpdate(
             userId,
-            { $inc: { 'performanceStats.totalWorkingHours': attendance.workingHours } }
+            { $inc: { 'performanceStats.totalWorkingHours': savedAttendance.workingHours || 0 } }
         );
 
         const populatedAttendance = await AttendanceModel.findById(attendanceId)

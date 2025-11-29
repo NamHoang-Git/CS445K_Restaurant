@@ -25,7 +25,7 @@ employeeRouter.post('/create', auth, requireRole('ADMIN', 'MANAGER'), createEmpl
 employeeRouter.put('/update/:id', auth, requireRole('ADMIN', 'MANAGER'), updateEmployee);
 
 // Delete employee (Admin only)
-employeeRouter.delete('/delete/:id', auth, requireRole('ADMIN'), deleteEmployee);
+employeeRouter.delete('/delete/:id', auth, requireRole('ADMIN', 'MANAGER'), deleteEmployee);
 
 // Get employees by role (Admin/Manager only)
 employeeRouter.get('/role/:role', auth, requireRole('ADMIN', 'MANAGER'), getEmployeesByRole);

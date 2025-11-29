@@ -185,10 +185,10 @@ const MyPerformancePage = () => {
                             <CardContent>
                                 <div className="text-2xl font-bold">
                                     {user.role === 'CHEF'
-                                        ? performanceData?.metrics
-                                              ?.dishesCooked || 0
-                                        : performanceData?.metrics
-                                              ?.ordersHandled || 0}
+                                        ? performanceData?.summary
+                                              ?.totalDishesCooked || 0
+                                        : performanceData?.summary
+                                              ?.totalOrdersHandled || 0}
                                 </div>
                                 <p className="text-xs text-muted-foreground">
                                     Tổng số tích lũy
@@ -205,8 +205,8 @@ const MyPerformancePage = () => {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-2xl font-bold">
-                                    {performanceData?.metrics?.customerRating ||
-                                        4.5}
+                                    {performanceData?.summary?.averageRating ||
+                                        0}
                                     /5.0
                                 </div>
                                 <p className="text-xs text-muted-foreground">
