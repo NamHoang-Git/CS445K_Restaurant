@@ -36,7 +36,7 @@ export default function AdminDashboard() {
                 <TooltipProvider delayDuration={0}>
                     <div className="min-h-screen flex">
                         <Sidebar />
-                        <div className="flex-1 overflow-auto">
+                        <div className="flex-1 overflow-auto w-full">
                             <TopNav />
                             <div className="container mx-auto p-6">
                                 <main className="w-full relative">

@@ -704,8 +704,8 @@ const VoucherPage = () => {
                     onClick={() => setActiveTab('list')}
                     className={`px-6 py-3 font-semibold transition-colors ${
                         activeTab === 'list'
-                            ? 'text-lime-300 border-b-2 border-lime-300'
-                            : 'text-gray-400 hover:text-white'
+                            ? 'text-highlight border-b-4 border-highlight'
+                            : 'text-foreground hover:opacity-80'
                     }`}
                 >
                     Danh sách
@@ -714,8 +714,8 @@ const VoucherPage = () => {
                     onClick={() => setActiveTab('analytics')}
                     className={`px-6 py-3 font-semibold transition-colors ${
                         activeTab === 'analytics'
-                            ? 'text-lime-300 border-b-2 border-lime-300'
-                            : 'text-gray-400 hover:text-white'
+                            ? 'text-highlight border-b-4 border-highlight'
+                            : 'text-foreground hover:opacity-80'
                     }`}
                 >
                     Thống kê
@@ -735,14 +735,44 @@ const VoucherPage = () => {
                                 onChange={(e) =>
                                     setStatusFilter(e.target.value)
                                 }
-                                className="text-sm h-12 w-full border-gray-700 border bg-neutral-950 px-3 py-1 rounded-md cursor-pointer"
+                                className="text-sm h-12 w-full border-foreground border bg-transparent px-3 rounded-md cursor-pointer"
                             >
-                                <option value="all">Chọn trạng thái</option>
-                                <option value="active">Đang hoạt động</option>
-                                <option value="inactive">Đã tắt</option>
-                                <option value="applying">Đang áp dụng</option>
-                                <option value="expired">Đã hết hạn</option>
-                                <option value="upcoming">Sắp diễn ra</option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="all"
+                                >
+                                    Chọn trạng thái
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="active"
+                                >
+                                    Đang hoạt động
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="inactive"
+                                >
+                                    Đã tắt
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="applying"
+                                >
+                                    Đang áp dụng
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="expired"
+                                >
+                                    Đã hết hạn
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="upcoming"
+                                >
+                                    Sắp diễn ra
+                                </option>
                             </select>
                         </div>
                         <div className="relative w-full font-semibold">
@@ -751,22 +781,49 @@ const VoucherPage = () => {
                                 onChange={(e) =>
                                     setStatusFilter(e.target.value)
                                 }
-                                className="text-sm h-12 w-full border-gray-700 border bg-neutral-950 px-3 py-1 rounded-md cursor-pointer"
+                                className="text-sm h-12 w-full border-foreground border bg-transparent px-3 rounded-md cursor-pointer"
                             >
-                                <option value="all">Chọn loại giảm giá</option>
-                                <option value="percentage">Phần trăm</option>
-                                <option value="fixed">Giảm giá cố định</option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="all"
+                                >
+                                    Chọn loại giảm giá
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="percentage"
+                                >
+                                    Phần trăm
+                                </option>
+                                <option
+                                    className="text-foreground bg-background"
+                                    value="fixed"
+                                >
+                                    Giảm giá cố định
+                                </option>
                             </select>
                         </div>
-                        <button
-                            onClick={() => {
-                                setStatusFilter('all');
-                                setSearchTerm('');
-                            }}
-                            className="text-center px-4 h-12 font-medium liquid-glass rounded-lg text-sm"
+
+                        <GlareHover
+                            background="transparent"
+                            glareOpacity={0.3}
+                            glareAngle={-30}
+                            glareSize={300}
+                            transitionDuration={800}
+                            playOnce={false}
+                            className="h-12"
                         >
-                            Đặt lại bộ lọc
-                        </button>
+                            <Button
+                                onClick={() => {
+                                    setStatusFilter('all');
+                                    setSearchTerm('');
+                                }}
+                                className="text-sm w-full h-full bg-background/80 hover:bg-transparent text-highlight"
+                            >
+                                Đặt lại bộ lọc
+                            </Button>
+                        </GlareHover>
+
                         <button
                             onClick={handleExportPDF}
                             className="flex items-center gap-2 justify-center h-12 px-4 py-2 border border-transparent rounded-md shadow-sm sm:text-sm text-xs font-medium text-white bg-red-600/60 hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-red-500"
@@ -784,9 +841,9 @@ const VoucherPage = () => {
                                 placeholder="Tìm kiếm mã giảm giá..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 h-12 text-sm"
+                                className="w-full pl-10 h-12 text-sm placeholder:text-foreground border-foreground bg-foreground/30"
                             />
-                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400" />
+                            <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                         </div>
                     </div>
 
@@ -798,7 +855,7 @@ const VoucherPage = () => {
                                     setOpenConfirmBulkStatusUpdateBox(true);
                                     setPendingStatus(true);
                                 }}
-                                className="flex items-center gap-1 px-3 py-1 bg-green-100 text-green-800 rounded hover:bg-green-200"
+                                className="flex items-center gap-1 px-3 bg-green-100 text-green-800 rounded hover:bg-green-200"
                             >
                                 Kích hoạt ({selectedVouchers.length})
                             </button>
@@ -807,7 +864,7 @@ const VoucherPage = () => {
                                     setOpenConfirmBulkStatusUpdateBox(true);
                                     setPendingStatus(false);
                                 }}
-                                className="flex items-center gap-1 px-3 py-1 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200"
+                                className="flex items-center gap-1 px-3 bg-yellow-100 text-yellow-800 rounded hover:bg-yellow-200"
                             >
                                 Vô hiệu hóa ({selectedVouchers.length})
                             </button>
@@ -815,7 +872,7 @@ const VoucherPage = () => {
                                 onClick={() =>
                                     setOpenConfirmBulkDeleteBox(true)
                                 }
-                                className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-800 rounded hover:bg-red-200"
+                                className="flex items-center gap-1 px-3 bg-red-100 text-red-800 rounded hover:bg-red-200"
                             >
                                 Xóa ({selectedVouchers.length})
                             </button>
@@ -828,15 +885,17 @@ const VoucherPage = () => {
                             <Loading />
                         </div>
                     ) : (
-                        <DynamicTable
-                            data={tableData}
-                            columns={columns}
-                            pageSize={10}
-                            sortable={true}
-                            searchable={false}
-                            filterable={false}
-                            groupable={false}
-                        />
+                        <div className="overflow-auto w-full max-w-[96vw]">
+                            <DynamicTable
+                                data={tableData}
+                                columns={columns}
+                                pageSize={10}
+                                sortable={true}
+                                searchable={false}
+                                filterable={false}
+                                groupable={false}
+                            />
+                        </div>
                     )}
                 </div>
             )}

@@ -1,4 +1,4 @@
-'use client'
+'use client';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -53,7 +53,7 @@ export function TopNav() {
                                 </Avatar>
                             </Button>
                         </DropdownMenuTrigger>
-                        <DropdownMenuContent className='mr-4'>
+                        <DropdownMenuContent className="mr-4">
                             <UserMenu close={close} />
                         </DropdownMenuContent>
                     </DropdownMenu>

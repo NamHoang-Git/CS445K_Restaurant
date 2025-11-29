@@ -195,11 +195,7 @@ export const deleteEmployee = async (req, res) => {
     try {
         const { id } = req.params;
 
-        const employee = await UserModel.findByIdAndUpdate(
-            id,
-            { employeeStatus: 'inactive', status: 'Inactive' },
-            { new: true }
-        ).select('-password -refresh_token');
+        const employee = await UserModel.findByIdAndDelete(id);
 
         if (!employee) {
             return res.status(404).json({

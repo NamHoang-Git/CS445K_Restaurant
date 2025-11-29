@@ -62,6 +62,18 @@ export const checkIn = async (req, res) => {
         const shiftStart = new Date(shift.date);
         shiftStart.setHours(startHour, startMinute, 0, 0);
 
+        // Check if check-in is too early (more than 30 minutes before shift start)
+        const allowedCheckInTime = new Date(shiftStart.getTime() - 30 * 60 * 1000);
+        const now = new Date();
+
+        if (now < allowedCheckInTime) {
+            return res.status(400).json({
+                message: "Chưa đến giờ check-in (chỉ được check-in trước 30 phút)",
+                error: true,
+                success: false
+            });
+        }
+
         // Add 15 minutes grace period
         const gracePeriod = 15 * 60 * 1000;
         const lateThreshold = new Date(shiftStart.getTime() + gracePeriod);
@@ -141,6 +153,22 @@ export const checkOut = async (req, res) => {
                 error: true,
                 success: false
             });
+        }
+
+        // Check if shift has ended
+        const shift = await ShiftModel.findById(attendance.shiftId);
+        if (shift) {
+            const [endHour, endMinute] = shift.endTime.split(':').map(Number);
+            const shiftEnd = new Date(shift.date);
+            shiftEnd.setHours(endHour, endMinute, 0, 0);
+
+            if (new Date() < shiftEnd) {
+                return res.status(400).json({
+                    message: "Chưa đến giờ kết thúc ca làm việc",
+                    error: true,
+                    success: false
+                });
+            }
         }
 
         // Update check-out time
