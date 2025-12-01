@@ -1,4 +1,7 @@
 import TableModel from "../models/table.model.js";
+import UserModel from "../models/user.model.js";
+import bcryptjs from "bcryptjs";
+import { generateTableQRCode } from "../utils/qrCodeGenerator.js";
 
 // Create new table
 export async function createTableController(request, response) {
@@ -42,6 +45,42 @@ export async function createTableController(request, response) {
         });
 
         const savedTable = await newTable.save();
+
+        // Auto-create table account
+        try {
+            const tableEmail = `table_${tableNumber.toLowerCase()}@internal.restaurant.com`;
+            const randomPassword = Math.random().toString(36).slice(-12);
+            const salt = await bcryptjs.genSalt(10);
+            const hashPassword = await bcryptjs.hash(randomPassword, salt);
+
+            const tableUser = new UserModel({
+                name: `Bàn ${tableNumber.toUpperCase()}`,
+                email: tableEmail,
+                password: hashPassword,
+                role: "TABLE",
+                linkedTableId: savedTable._id,
+                verify_email: true,
+                status: "Active"
+            });
+
+            const savedUser = await tableUser.save();
+
+            // Generate QR code
+            const { token, qrCodeImage } = await generateTableQRCode(
+                savedTable._id,
+                savedTable.tableNumber
+            );
+
+            // Update table with account and QR code
+            savedTable.tableAccountId = savedUser._id;
+            savedTable.qrCodeToken = token;
+            savedTable.qrCode = qrCodeImage;
+            await savedTable.save();
+
+        } catch (qrError) {
+            console.error('Error creating table account/QR:', qrError);
+            // Continue even if QR generation fails
+        }
 
         return response.status(201).json({
             message: "Tạo bàn thành công",
@@ -200,6 +239,17 @@ export async function deleteTableController(request, response) {
                 error: true,
                 success: false
             });
+        }
+
+        // Delete table account if exists
+        if (table.tableAccountId) {
+            try {
+                await UserModel.findByIdAndDelete(table.tableAccountId);
+                console.log(`Deleted table account: ${table.tableAccountId}`);
+            } catch (error) {
+                console.error('Error deleting table account:', error);
+                // Continue even if account deletion fails
+            }
         }
 
         // Hard delete - xóa hẳn khỏi database

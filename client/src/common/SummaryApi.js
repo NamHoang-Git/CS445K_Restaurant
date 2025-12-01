@@ -269,6 +269,28 @@ const SummaryApi = {
         url: '/api/table/available',
         method: 'get'
     },
+    generate_table_qr: {
+        url: '/api/table/generate-qr',
+        method: 'post'
+    },
+    get_table_qr: {
+        url: '/api/table/qr/:id',
+        method: 'get'
+    },
+
+    // Table Authentication
+    tableLogin: {
+        url: '/api/table-auth/login-qr',
+        method: 'post'
+    },
+    getTableSession: {
+        url: '/api/table-auth/session',
+        method: 'get'
+    },
+    logoutTable: {
+        url: '/api/table-auth/logout',
+        method: 'post'
+    },
 
     // Booking
     create_booking: {
@@ -426,14 +448,6 @@ const SummaryApi = {
     },
 
     // Voucher APIs
-    get_available_vouchers: {
-        url: '/api/voucher/available',
-        method: 'post'
-    },
-    apply_voucher: {
-        url: '/api/voucher/apply',
-        method: 'post'
-    },
     get_best_voucher: {
         url: '/api/voucher/best',
         method: 'post'

@@ -93,7 +93,7 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ["ADMIN", "MANAGER", "WAITER", "CHEF", "CASHIER", "USER"],
+        enum: ["ADMIN", "MANAGER", "WAITER", "CHEF", "CASHIER", "USER", "TABLE"],
         default: "USER",
     },
     // Employee-specific fields
@@ -112,6 +112,12 @@ const userSchema = new mongoose.Schema({
         type: String,
         enum: ["active", "inactive", "on_leave"],
         default: "active",
+    },
+    // Table-specific field
+    linkedTableId: {
+        type: mongoose.Schema.ObjectId,
+        ref: 'table',
+        default: null
     },
     performanceStats: {
         totalWorkingHours: { type: Number, default: 0 },

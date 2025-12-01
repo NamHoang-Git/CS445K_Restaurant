@@ -41,6 +41,8 @@ import ShiftManagementPage from '../pages/ShiftManagementPage';
 import AttendanceManagementPage from '../pages/AttendanceManagementPage';
 import MyShiftsPage from '../pages/MyShiftsPage';
 import MyPerformancePage from '../pages/MyPerformancePage';
+import TableLoginPage from '../pages/TableLoginPage';
+import TableMenuPage from '../pages/TableMenuPage';
 
 const router = createBrowserRouter([
     {
@@ -66,6 +68,18 @@ const router = createBrowserRouter([
             {
                 path: 'booking/success',
                 element: <BookingSuccessPage />,
+            },
+            {
+                path: 'table-login',
+                element: <TableLoginPage />,
+            },
+            {
+                path: 'table-menu',
+                element: (
+                    <ProtectedRoute>
+                        <TableMenuPage />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: 'login',

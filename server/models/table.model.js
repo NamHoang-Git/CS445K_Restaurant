@@ -27,6 +27,17 @@ const tableSchema = new mongoose.Schema({
         type: String,
         default: ""
     },
+    qrCodeToken: {
+        type: String,
+        default: "",
+        unique: true,
+        sparse: true
+    },
+    tableAccountId: {
+        type: mongoose.Schema.ObjectId,
+        ref: "user",
+        default: null
+    },
     description: {
         type: String,
         default: "",

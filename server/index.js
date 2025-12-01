@@ -21,6 +21,7 @@ import employeeRouter from './route/employee.route.js';
 import shiftRouter from './route/shift.route.js';
 import attendanceRouter from './route/attendance.route.js';
 import performanceRouter from './route/performance.route.js';
+import tableAuthRouter from './route/tableAuth.route.js';
 
 const app = express();
 
@@ -86,6 +87,7 @@ app.use('/api/employee', employeeRouter);
 app.use('/api/shift', shiftRouter);
 app.use('/api/attendance', attendanceRouter);
 app.use('/api/performance', performanceRouter);
+app.use('/api/table-auth', tableAuthRouter);
 
 connectDB().then(() => {
     app.listen(PORT, () => {

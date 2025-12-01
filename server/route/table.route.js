@@ -9,6 +9,10 @@ import {
     updateTableStatusController,
     getAvailableTablesController
 } from "../controllers/table.controller.js";
+import {
+    generateQRCodeController,
+    getQRCodeController
+} from "../controllers/tableQR.controller.js";
 
 const tableRouter = Router();
 
@@ -19,5 +23,9 @@ tableRouter.put('/update', auth, updateTableController);
 tableRouter.delete('/delete', auth, deleteTableController);
 tableRouter.patch('/update-status', auth, updateTableStatusController);
 tableRouter.get('/available', getAvailableTablesController);
+
+// QR Code routes
+tableRouter.post('/generate-qr', auth, generateQRCodeController);
+tableRouter.get('/qr/:id', getQRCodeController);
 
 export default tableRouter;
