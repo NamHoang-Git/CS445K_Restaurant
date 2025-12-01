@@ -14,10 +14,10 @@ const auth = async (req, res, next) => {
 
         const decoded = jwt.verify(token, process.env.SECRET_KEY_ACCESS_TOKEN);
 
-        req.userId = decoded.id;
+        req.userId = decoded.id || decoded._id;
 
         // Fetch user data for role checking
-        const user = await UserModel.findById(decoded.id).select('role name email employeeStatus');
+        const user = await UserModel.findById(req.userId).select('role name email employeeStatus');
         if (user) {
             req.user = user;
         }

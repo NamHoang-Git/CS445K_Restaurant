@@ -43,6 +43,7 @@ import MyShiftsPage from '../pages/MyShiftsPage';
 import MyPerformancePage from '../pages/MyPerformancePage';
 import TableLoginPage from '../pages/TableLoginPage';
 import TableMenuPage from '../pages/TableMenuPage';
+import TableOrderManagementPage from '../pages/TableOrderManagementPage';
 
 const router = createBrowserRouter([
     {
@@ -78,6 +79,14 @@ const router = createBrowserRouter([
                 element: (
                     <ProtectedRoute>
                         <TableMenuPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: 'table-order-management',
+                element: (
+                    <ProtectedRoute>
+                        <TableOrderManagementPage />
                     </ProtectedRoute>
                 ),
             },

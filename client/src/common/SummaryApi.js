@@ -292,6 +292,28 @@ const SummaryApi = {
         method: 'post'
     },
 
+    // Table Order Management
+    add_items_to_table_order: {
+        url: '/api/table-order/add-items',
+        method: 'post'
+    },
+    get_current_table_order: {
+        url: '/api/table-order/current',
+        method: 'get'
+    },
+    checkout_table_order: {
+        url: '/api/table-order/checkout',
+        method: 'post'
+    },
+    cancel_table_order: {
+        url: '/api/table-order/cancel',
+        method: 'post'
+    },
+    get_all_active_table_orders: {
+        url: '/api/table-order/all-active',
+        method: 'get'
+    },
+
     // Booking
     create_booking: {
         url: '/api/booking/create',

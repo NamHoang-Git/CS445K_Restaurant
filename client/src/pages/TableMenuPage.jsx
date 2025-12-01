@@ -5,7 +5,12 @@ import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import toast from 'react-hot-toast';
 import { FiShoppingCart, FiLogOut, FiMinus, FiPlus } from 'react-icons/fi';
-import { handleAddItemCart } from '../store/cartProduct';
+import {
+    handleAddItemCart,
+    updateCartItemQuantity,
+    removeFromCart,
+    clearCart,
+} from '../store/cartProduct';
 
 const TableMenuPage = () => {
     const navigate = useNavigate();
@@ -177,32 +182,30 @@ const TableMenuPage = () => {
         }
 
         try {
-            // Calculate totals
-            const subTotalAmt = cartItems.reduce(
-                (sum, item) =>
-                    sum + (item.productId?.price || 0) * item.quantity,
-                0
-            );
-            const totalAmt = subTotalAmt; // For dine-in, no shipping cost
+            // Prepare items for table order
+            const items = cartItems.map((item) => ({
+                productId: item.productId._id,
+                quantity: item.quantity,
+            }));
 
             const response = await Axios({
-                ...SummaryApi.cash_on_delivery_order,
+                ...SummaryApi.add_items_to_table_order,
                 data: {
-                    list_items: cartItems,
-                    subTotalAmt: subTotalAmt,
-                    totalAmt: totalAmt,
-                    orderType: 'dine_in',
+                    items: items,
                     tableNumber: tableInfo?.tableNumber,
                 },
             });
+
             if (response.data.success) {
-                toast.success('Đã gọi món thành công!');
+                toast.success('Đã thêm món vào đơn!');
+                dispatch(clearCart()); // Clear cart in Redux
                 setShowCart(false);
-                fetchCart();
+                // Navigate to order management page
+                navigate('/table-order-management');
             }
         } catch (error) {
-            console.error('Error placing order:', error);
-            toast.error('Không thể gọi món');
+            console.error('Error adding items to order:', error);
+            toast.error(error.response?.data?.message || 'Không thể thêm món');
         }
     };
 

@@ -20,7 +20,10 @@ import { Button } from '@/components/ui/button';
 import UploadTableModel from '@/components/UploadTableModel';
 import EditTableModel from '@/components/EditTableModel';
 
+import ActiveTableOrders from '@/components/ActiveTableOrders';
+
 const TableManagementPage = () => {
+    const [activeTab, setActiveTab] = useState('tables'); // 'tables' or 'orders'
     const [openAddTable, setOpenAddTable] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -68,8 +71,10 @@ const TableManagementPage = () => {
     };
 
     useEffect(() => {
-        fetchTables();
-    }, []);
+        if (activeTab === 'tables') {
+            fetchTables();
+        }
+    }, [activeTab]);
 
     const handleDeleteTable = async () => {
         try {
@@ -180,42 +185,72 @@ const TableManagementPage = () => {
                         Quản lý bàn
                     </CardTitle>
                     <CardDescription>
-                        Quản lý thông tin bàn ăn trong nhà hàng
+                        Quản lý thông tin bàn ăn và đơn hàng tại bàn
                     </CardDescription>
                 </CardHeader>
 
-                <CardFooter>
-                    <GlareHover
-                        background="transparent"
-                        glareOpacity={0.3}
-                        glareAngle={-30}
-                        glareSize={300}
-                        transitionDuration={800}
-                        playOnce={false}
-                    >
-                        <Button
-                            onClick={() => setOpenAddTable(true)}
-                            className="bg-foreground"
+                <CardFooter className="flex gap-2">
+                    <div className="flex bg-gray-100 p-1 rounded-lg">
+                        <button
+                            onClick={() => setActiveTab('tables')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                activeTab === 'tables'
+                                    ? 'bg-white text-orange-600 shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
                         >
-                            Thêm Bàn Mới
-                        </Button>
-                    </GlareHover>
+                            Danh sách bàn
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('orders')}
+                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
+                                activeTab === 'orders'
+                                    ? 'bg-white text-orange-600 shadow-sm'
+                                    : 'text-gray-600 hover:text-gray-900'
+                            }`}
+                        >
+                            Đơn gọi món
+                        </button>
+                    </div>
+
+                    {activeTab === 'tables' && (
+                        <GlareHover
+                            background="transparent"
+                            glareOpacity={0.3}
+                            glareAngle={-30}
+                            glareSize={300}
+                            transitionDuration={800}
+                            playOnce={false}
+                        >
+                            <Button
+                                onClick={() => setOpenAddTable(true)}
+                                className="bg-foreground ml-4"
+                            >
+                                Thêm Bàn Mới
+                            </Button>
+                        </GlareHover>
+                    )}
                 </CardFooter>
             </Card>
 
-            <div className="overflow-auto w-full max-w-[95vw]">
-                <DynamicTable
-                    data={data}
-                    columns={columns}
-                    pageSize={10}
-                    sortable={true}
-                    searchable={true}
-                    filterable={false}
-                    groupable={false}
-                />
-            </div>
-
-            {loading && <Loading />}
+            {activeTab === 'tables' ? (
+                <>
+                    <div className="overflow-auto w-full max-w-[95vw]">
+                        <DynamicTable
+                            data={data}
+                            columns={columns}
+                            pageSize={10}
+                            sortable={true}
+                            searchable={true}
+                            filterable={false}
+                            groupable={false}
+                        />
+                    </div>
+                    {loading && <Loading />}
+                </>
+            ) : (
+                <ActiveTableOrders />
+            )}
 
             {openAddTable && (
                 <UploadTableModel
