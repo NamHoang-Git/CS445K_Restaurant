@@ -166,32 +166,6 @@ const SummaryApi = {
         method: 'delete'
     },
 
-    // Address
-    add_address: {
-        url: '/api/address/add-address',
-        method: 'post'
-    },
-    get_address: {
-        url: '/api/address/get-address',
-        method: 'get'
-    },
-    update_address: {
-        url: '/api/address/update-address',
-        method: 'put'
-    },
-    delete_address: {
-        url: '/api/address/delete-address',
-        method: 'delete'
-    },
-    restore_address: {
-        url: '/api/address/restore-address',
-        method: 'post'
-    },
-    permanent_delete_address: {
-        url: '/api/address/permanent-delete',
-        method: 'post'
-    },
-
     // Order
     cash_on_delivery_order: {
         url: '/api/order/cash-on-delivery',

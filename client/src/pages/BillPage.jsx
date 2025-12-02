@@ -151,17 +151,11 @@ const BillPage = () => {
                         order.orderId,
                         order.userId?.name,
                         order.userId?.email,
-                        // Check both user mobile and delivery address mobile
+                        // Check user mobile
                         order.userId?.mobile,
-                        order.delivery_address?.mobile,
                         // Check phone number in different formats
                         order.userId?.mobile?.replace(/\s+/g, ''), // Remove spaces
-                        order.delivery_address?.mobile?.replace(/\s+/g, ''), // Remove spaces
                         order.payment_status,
-                        order.delivery_address?.city,
-                        order.delivery_address?.district,
-                        order.delivery_address?.ward,
-                        order.delivery_address?.address,
                         // Search in product details if available
                         ...(order.products?.flatMap((product) => [
                             product.name,
@@ -244,12 +238,6 @@ const BillPage = () => {
                             {row.rawData.userId?.name || 'Khách vãng lai'}
                         </div>
                         <p className="text-sm">{row.rawData.userId?.email}</p>
-                        <p className="text-sm">
-                            {row.rawData.delivery_address?.mobile}
-                        </p>
-                        <p className="text-sm">
-                            {row.rawData.delivery_address?.city}
-                        </p>
                     </div>
                 ),
             },
@@ -390,7 +378,6 @@ const BillPage = () => {
             'Số lượng': order.quantity,
             'Tổng tiền': order.totalAmt,
             'Trạng thái thanh toán': order.payment_status || 'Chưa xác định',
-            'Địa chỉ giao hàng': order.delivery_address?.address || '',
         }));
 
         const ws = XLSX.utils.json_to_sheet(data);
@@ -548,9 +535,6 @@ const BillPage = () => {
                     <div class="info-row"><div class="info-label">Khách:</div><div>${
                         order.userId?.name || 'Khách vãng lai'
                     }<br>${order.userId?.mobile || ''}</div></div>
-                    <div class="info-row"><div class="info-label">Địa chỉ:</div><div>${
-                        order.delivery_address?.city || ''
-                    }</div></div>
                 </div>
                 <table>
                     <tr><th>STT</th><th>Sản phẩm</th><th>Đơn giá</th><th>SL</th><th>Thành tiền</th></tr>

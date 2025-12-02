@@ -251,20 +251,6 @@ const MyOrders = () => {
                                             </div>
                                         )}
                                     </div>
-                                    <div className="flex sm:flex-row flex-col items-baseline gap-1">
-                                        <p className="font-semibold text-rose-400">
-                                            Địa chỉ giao hàng:
-                                        </p>
-                                        <p className="text-white text-sm font-medium">
-                                            {order?.delivery_address?.city +
-                                                ', ' +
-                                                order?.delivery_address
-                                                    ?.district +
-                                                ', ' +
-                                                order?.delivery_address?.ward ||
-                                                'Chưa xác định'}
-                                        </p>
-                                    </div>
                                     <GlareHover
                                         background="#000"
                                         glareOpacity={0.3}

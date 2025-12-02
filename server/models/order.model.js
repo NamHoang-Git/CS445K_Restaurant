@@ -32,12 +32,7 @@ const orderSchema = new mongoose.Schema({
         type: String,
         default: "",
     },
-    delivery_address: {
-        type: mongoose.Schema.ObjectId,
-        ref: "address",
-        default: null
-    },
-    // Customer contact information for pre-orders (instead of delivery_address)
+    // Customer contact information for pre-orders
     customerContact: {
         name: {
             type: String,

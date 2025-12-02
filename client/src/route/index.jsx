@@ -12,7 +12,6 @@ import ResetPassword from '../pages/ResetPassword';
 import UserMenuMobile from '../pages/UserMenuMobile';
 import Profile from '../pages/Profile';
 import MyOrders from '../pages/MyOrders';
-import Address from '../pages/Address';
 import CategoryPage from './../pages/CategoryPage';
 import AdminPermission from '../layouts/AdminPermission';
 import ManagerPermission from '../layouts/ManagerPermission';
@@ -221,10 +220,6 @@ const router = createBrowserRouter([
                                 <VoucherPage />
                             </AdminPermission>
                         ),
-                    },
-                    {
-                        path: 'address',
-                        element: <Address />,
                     },
                     {
                         path: 'my-orders',

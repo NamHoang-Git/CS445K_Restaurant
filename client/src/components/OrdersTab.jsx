@@ -238,12 +238,6 @@ const OrdersTab = () => {
                             {row.rawData.userId?.name || 'Khách vãng lai'}
                         </div>
                         <p className="text-sm">{row.rawData.userId?.email}</p>
-                        <p className="text-sm">
-                            {row.rawData.delivery_address?.mobile}
-                        </p>
-                        <p className="text-sm">
-                            {row.rawData.delivery_address?.city}
-                        </p>
                     </div>
                 ),
             },
@@ -363,14 +357,8 @@ const OrdersTab = () => {
                     order.userId?.name,
                     order.userId?.email,
                     order.userId?.mobile,
-                    order.delivery_address?.mobile,
                     order.userId?.mobile?.replace(/\s+/g, ''),
-                    order.delivery_address?.mobile?.replace(/\s+/g, ''),
                     order.payment_status,
-                    order.delivery_address?.city,
-                    order.delivery_address?.district,
-                    order.delivery_address?.ward,
-                    order.delivery_address?.address,
                     ...(order.products?.flatMap((product) => [
                         product.name,
                         product.sku,

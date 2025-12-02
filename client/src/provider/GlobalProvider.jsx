@@ -6,7 +6,6 @@ import AxiosToastError from '../utils/AxiosToastError';
 import toast from 'react-hot-toast';
 import { pricewithDiscount } from '../utils/PriceWithDiscount';
 import { handleAddItemCart } from '../store/cartProduct';
-import { handleAddAddress } from '../store/addressSlice';
 import { setOrder } from '../store/orderSlice';
 
 export const GlobalContext = createContext(null);
@@ -110,29 +109,6 @@ const GlobalProvider = ({ children }) => {
         setNotDiscountTotalPrice(notDiscountPrice);
     }, [cartItem]);
 
-    const fetchAddress = async () => {
-        // Kiểm tra token và user._id
-        const accessToken = localStorage.getItem('accesstoken');
-        if (!accessToken || !user?._id) {
-            return;
-        }
-
-        try {
-            const response = await Axios({
-                ...SummaryApi.get_address,
-            });
-            const { data: responseData } = response;
-
-            if (responseData.success) {
-                dispatch(handleAddAddress(responseData.data));
-            }
-        } catch (error) {
-            if (error?.response?.status !== 401) {
-                AxiosToastError(error);
-            }
-        }
-    };
-
     const fetchOrder = () => async (dispatch, getState) => {
         // Chuyển thành thunk action
         const { user } = getState();
@@ -168,7 +144,6 @@ const GlobalProvider = ({ children }) => {
         // Fetch khi có user._id và accessToken
         if (user?._id && accessToken) {
             fetchCartItem();
-            fetchAddress();
             dispatch(fetchOrder());
         } else if (user === null || !accessToken) {
             dispatch(handleAddItemCart([])); // Clear cart items
@@ -230,7 +205,6 @@ const GlobalProvider = ({ children }) => {
                 fetchCartItem,
                 updateCartItem,
                 deleteCartItem,
-                fetchAddress,
                 totalPrice,
                 totalQty,
                 notDiscountTotalPrice,

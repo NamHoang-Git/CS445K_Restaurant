@@ -279,7 +279,7 @@ export async function CashOnDeliveryOrderController(request, response) {
             if (result?.data?.orders?.length > 0 && result?.data?.userEmail) {
                 try {
                     // Populate delivery address for email template
-                    const populatedOrders = await OrderModel.find({ _id: { $in: result.data.orders.map(o => o._id) } }).populate('delivery_address');
+                    const populatedOrders = await OrderModel.find({ _id: { $in: result.data.orders.map(o => o._id) } });
 
                     await sendEmail({
                         sendTo: result.data.userEmail,
@@ -1056,7 +1056,7 @@ export async function webhookStripe(request, response) {
                     if (stripeSession.metadata?.tempOrderIds && stripeSession.metadata?.userId) {
                         try {
                             const orderIds = JSON.parse(stripeSession.metadata.tempOrderIds);
-                            const orders = await OrderModel.find({ _id: { $in: orderIds } }).populate('delivery_address');
+                            const orders = await OrderModel.find({ _id: { $in: orderIds } });
                             const user = await UserModel.findById(stripeSession.metadata.userId);
 
                             if (orders.length > 0 && user && user.email) {
@@ -1136,7 +1136,6 @@ export async function getOrderDetailsController(request, response) {
         const orderlist = await OrderModel.find({ userId })
             .sort({ createdAt: -1 })
             .populate('userId', 'name mobile email')
-            .populate('delivery_address')
             .populate({
                 path: 'voucherId',
                 select: 'code name description discountType discountValue minOrderValue maxDiscount startDate endDate',
@@ -1336,8 +1335,7 @@ export async function getAllOrdersController(request, response) {
 
         const orderlist = await OrderModel.find(query)
             .sort({ createdAt: -1 })
-            .populate('userId', 'name mobile email')
-            .populate('delivery_address');
+            .populate('userId', 'name mobile email');
 
         return response.json({
             message: "Tất cả đơn hàng",

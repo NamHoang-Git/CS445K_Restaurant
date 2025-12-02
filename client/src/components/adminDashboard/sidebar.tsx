@@ -160,7 +160,6 @@ const navigationSections: NavigationSection[] = [
         icon: '⚙️',
         roles: ['USER'],
         items: [
-            { name: 'Địa chỉ', href: '/dashboard/address', icon: LocateIcon },
             {
                 name: 'Lịch sử mua hàng',
                 href: '/dashboard/my-orders',
