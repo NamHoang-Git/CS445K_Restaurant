@@ -4,6 +4,7 @@ import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
 import successAlert from '../utils/successAlert';
+import toast from 'react-hot-toast';
 import {
     Card,
     CardContent,
@@ -66,6 +67,46 @@ const EmployeeManagementPage = () => {
 
     const roles = ['ADMIN', 'MANAGER', 'WAITER', 'CHEF', 'CASHIER'];
 
+    // Email validation function
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
+
+        const validTLDs = [
+            'com',
+            'net',
+            'org',
+            'io',
+            'co',
+            'ai',
+            'vn',
+            'com.vn',
+            'edu.vn',
+            'gov.vn',
+        ];
+
+        if (!emailRegex.test(email)) {
+            return false;
+        }
+
+        const domain = email.split('@')[1];
+        const tld = domain.split('.').slice(1).join('.');
+
+        if (!validTLDs.includes(tld)) {
+            return false;
+        }
+
+        if (
+            email.includes('..') ||
+            email.startsWith('.') ||
+            email.endsWith('.') ||
+            email.split('@')[0].endsWith('.')
+        ) {
+            return false;
+        }
+
+        return true;
+    };
+
     // Fetch all employees
     const fetchEmployees = async () => {
         try {
@@ -112,6 +153,20 @@ const EmployeeManagementPage = () => {
     const handleCreateEmployee = async (e) => {
         e.preventDefault();
 
+        // Validate email
+        if (!validateEmail(formData.email)) {
+            toast.error(
+                'Email không hợp lệ. Vui lòng kiểm tra lại định dạng email.'
+            );
+            return;
+        }
+
+        // Validate password length
+        if (formData.password && formData.password.length < 6) {
+            toast.error('Mật khẩu phải có ít nhất 6 ký tự');
+            return;
+        }
+
         try {
             const response = await Axios({
                 ...SummaryApi.create_employee,
@@ -141,6 +196,14 @@ const EmployeeManagementPage = () => {
     // Update employee
     const handleUpdateEmployee = async (e) => {
         e.preventDefault();
+
+        // Validate email
+        if (!validateEmail(formData.email)) {
+            toast.error(
+                'Email không hợp lệ. Vui lòng kiểm tra lại định dạng email.'
+            );
+            return;
+        }
 
         try {
             const response = await Axios({
@@ -418,8 +481,8 @@ const EmployeeManagementPage = () => {
         }
 
         // 4. Filter by Search Term
-        if (searchTerm) {
-            const lowerTerm = searchTerm.toLowerCase();
+        if (searchTerm.trim()) {
+            const lowerTerm = searchTerm.trim().toLowerCase();
             filtered = filtered.filter(
                 (emp) =>
                     (emp.name && emp.name.toLowerCase().includes(lowerTerm)) ||
@@ -427,7 +490,7 @@ const EmployeeManagementPage = () => {
                         emp.email.toLowerCase().includes(lowerTerm)) ||
                     (emp.employeeId &&
                         emp.employeeId.toLowerCase().includes(lowerTerm)) ||
-                    (emp.mobile && emp.mobile.includes(searchTerm))
+                    (emp.mobile && emp.mobile.includes(lowerTerm))
             );
         }
 

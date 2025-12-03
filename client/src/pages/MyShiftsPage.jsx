@@ -3,7 +3,14 @@ import { useSelector } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardFooter,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
     Dialog,
@@ -152,44 +159,41 @@ const MyShiftsPage = () => {
     const weekDays = ['CN', 'T2', 'T3', 'T4', 'T5', 'T6', 'T7'];
 
     return (
-        <div className="container mx-auto py-8 px-4">
-            <Card>
+        <section className="container mx-auto grid gap-2 z-10">
+            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
-                    <div className="flex justify-between items-center">
-                        <CardTitle className="text-2xl font-bold">
-                            Ca làm của tôi
-                        </CardTitle>
-                        <div className="flex items-center gap-4">
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={goToPreviousMonth}
-                            >
-                                <FaChevronLeft />
-                            </Button>
-                            <span className="font-semibold text-lg min-w-[150px] text-center">
-                                Tháng {currentDate.getMonth() + 1}/
-                                {currentDate.getFullYear()}
-                            </span>
-                            <Button
-                                variant="outline"
-                                size="sm"
-                                onClick={goToNextMonth}
-                            >
-                                <FaChevronRight />
-                            </Button>
-                        </div>
-                    </div>
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
+                        Ca làm của tôi
+                    </CardTitle>
+                    <CardDescription>Quản lý danh sách ca làm</CardDescription>
                 </CardHeader>
+                <CardFooter className="flex items-center gap-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={goToPreviousMonth}
+                    >
+                        <FaChevronLeft />
+                    </Button>
+                    <span className="font-semibold text-lg min-w-28 text-center">
+                        Tháng {currentDate.getMonth() + 1}/
+                        {currentDate.getFullYear()}
+                    </span>
+                    <Button variant="outline" size="sm" onClick={goToNextMonth}>
+                        <FaChevronRight />
+                    </Button>
+                </CardFooter>
+            </Card>
+            <Card className="py-4">
                 <CardContent>
                     {loading ? (
                         <div className="flex justify-center py-8">
                             <Loading />
                         </div>
                     ) : (
-                        <div className="border rounded-lg overflow-hidden">
+                        <div className="border border-card-foreground rounded-lg overflow-hidden">
                             {/* Week days header */}
-                            <div className="grid grid-cols-7 bg-gray-100">
+                            <div className="grid grid-cols-7 bg-border border-b-2 border-card-foreground">
                                 {weekDays.map((day, index) => (
                                     <div
                                         key={index}
@@ -216,8 +220,12 @@ const MyShiftsPage = () => {
                                         <div
                                             key={index}
                                             className={`min-h-[100px] p-2 border-r border-b last:border-r-0 ${
-                                                !day ? 'bg-gray-50' : ''
-                                            } ${isToday ? 'bg-blue-50' : ''}`}
+                                                !day ? 'bg-input' : ''
+                                            } ${
+                                                isToday
+                                                    ? 'dark:bg-gray-800 bg-amber-100'
+                                                    : ''
+                                            }`}
                                         >
                                             {day && (
                                                 <>
@@ -326,7 +334,7 @@ const MyShiftsPage = () => {
                     )}
                 </DialogContent>
             </Dialog>
-        </div>
+        </section>
     );
 };
 

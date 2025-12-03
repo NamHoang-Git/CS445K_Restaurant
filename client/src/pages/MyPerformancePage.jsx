@@ -9,6 +9,7 @@ import {
     CardHeader,
     CardTitle,
     CardDescription,
+    CardFooter,
 } from '@/components/ui/card';
 import {
     Select,
@@ -130,19 +131,28 @@ const MyPerformancePage = () => {
         : 0;
 
     return (
-        <div className="container mx-auto py-8 px-4">
-            <div className="flex justify-between items-center mb-6">
-                <h1 className="text-2xl font-bold">Hiệu suất của tôi</h1>
-                <Select value={timeRange} onValueChange={setTimeRange}>
-                    <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Chọn thời gian" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="week">7 ngày qua</SelectItem>
-                        <SelectItem value="month">30 ngày qua</SelectItem>
-                    </SelectContent>
-                </Select>
-            </div>
+        <section className="container mx-auto grid gap-2 z-10">
+            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
+                <CardHeader>
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
+                        Hiệu suất của tôi
+                    </CardTitle>
+                    <CardDescription>
+                        Quản lý hiệu suất làm việc
+                    </CardDescription>
+                </CardHeader>
+                <CardFooter>
+                    <Select value={timeRange} onValueChange={setTimeRange}>
+                        <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder="Chọn thời gian" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="week">7 ngày qua</SelectItem>
+                            <SelectItem value="month">30 ngày qua</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </CardFooter>
+            </Card>
 
             {loading ? (
                 <div className="flex justify-center py-8">
@@ -152,7 +162,7 @@ const MyPerformancePage = () => {
                 <div className="space-y-6">
                     {/* Summary Cards */}
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <Card>
+                        <Card className="py-4">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
                                     Tổng giờ làm việc
@@ -169,7 +179,7 @@ const MyPerformancePage = () => {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="py-4">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
                                     {user.role === 'CHEF'
@@ -196,7 +206,7 @@ const MyPerformancePage = () => {
                             </CardContent>
                         </Card>
 
-                        <Card>
+                        <Card className="py-4">
                             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                                 <CardTitle className="text-sm font-medium">
                                     Đánh giá trung bình
@@ -219,7 +229,7 @@ const MyPerformancePage = () => {
                     {/* Charts */}
                     <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                         {/* Working Hours Chart */}
-                        <Card>
+                        <Card className="py-4">
                             <CardHeader>
                                 <CardTitle>Biểu đồ giờ làm việc</CardTitle>
                                 <CardDescription>
@@ -256,7 +266,7 @@ const MyPerformancePage = () => {
                         </Card>
 
                         {/* Performance Chart (Placeholder for now as we don't have daily order data yet) */}
-                        <Card>
+                        <Card className="py-4">
                             <CardHeader>
                                 <CardTitle>
                                     {user.role === 'CHEF'
@@ -300,7 +310,7 @@ const MyPerformancePage = () => {
                     </div>
                 </div>
             )}
-        </div>
+        </section>
     );
 };
 

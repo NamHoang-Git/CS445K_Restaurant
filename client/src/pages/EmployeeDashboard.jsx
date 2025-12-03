@@ -4,7 +4,13 @@ import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
 import successAlert from '../utils/successAlert';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+    Card,
+    CardContent,
+    CardDescription,
+    CardHeader,
+    CardTitle,
+} from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { FaClock, FaCheckCircle } from 'react-icons/fa';
 import Loading from '../components/Loading';
@@ -152,12 +158,19 @@ const EmployeeDashboard = () => {
     };
 
     return (
-        <div className="container mx-auto py-8 px-4">
-            <h1 className="text-3xl font-bold mb-6">Dashboard Nhân viên</h1>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="container mx-auto grid gap-2 z-10">
+            {/* Header */}
+            <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
+                <CardHeader>
+                    <CardTitle className="text-lg text-highlight font-bold uppercase">
+                        Dashboard Nhân viên
+                    </CardTitle>
+                    <CardDescription>Dashboard của nhân viên</CardDescription>
+                </CardHeader>
+            </Card>
+            <Card className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-background/80 p-2 rounded-lg">
                 {/* Check-in/out Card */}
-                <Card>
+                <Card className="p-4">
                     <CardHeader>
                         <CardTitle>Chấm công</CardTitle>
                     </CardHeader>
@@ -206,7 +219,7 @@ const EmployeeDashboard = () => {
                 </Card>
 
                 {/* Today's Shift */}
-                <Card>
+                <Card className="p-4">
                     <CardHeader>
                         <CardTitle>Ca làm hôm nay</CardTitle>
                     </CardHeader>
@@ -236,7 +249,7 @@ const EmployeeDashboard = () => {
                 </Card>
 
                 {/* Performance Stats */}
-                <Card>
+                <Card className="p-4">
                     <CardHeader>
                         <CardTitle>Hiệu suất</CardTitle>
                     </CardHeader>
@@ -279,8 +292,8 @@ const EmployeeDashboard = () => {
                         )}
                     </CardContent>
                 </Card>
-            </div>
-        </div>
+            </Card>
+        </section>
     );
 };
 
