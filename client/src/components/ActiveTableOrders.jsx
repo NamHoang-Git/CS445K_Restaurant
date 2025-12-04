@@ -1,38 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import Axios from '../utils/Axios';
-import SummaryApi from '../common/SummaryApi';
-import AxiosToastError from '../utils/AxiosToastError';
+import React from 'react';
 import Loading from '../components/Loading';
 import { format } from 'date-fns';
 
-const ActiveTableOrders = () => {
-    const [orders, setOrders] = useState([]);
-    const [loading, setLoading] = useState(false);
-
-    const fetchOrders = async () => {
-        try {
-            setLoading(true);
-            const response = await Axios({
-                ...SummaryApi.get_all_active_table_orders,
-            });
-
-            if (response.data.success) {
-                setOrders(response.data.data);
-            }
-        } catch (error) {
-            AxiosToastError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    useEffect(() => {
-        fetchOrders();
-        // Poll for updates every 30 seconds
-        const interval = setInterval(fetchOrders, 30000);
-        return () => clearInterval(interval);
-    }, []);
-
+const ActiveTableOrders = ({ orders, loading }) => {
     if (loading && orders.length === 0) {
         return <Loading />;
     }
