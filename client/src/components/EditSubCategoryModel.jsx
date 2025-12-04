@@ -120,7 +120,7 @@ const EditSubCategoryModel = ({ close, fetchData, data: SubCategoryData }) => {
                 <CardHeader className="pt-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-lg text-highlight font-bold uppercase">
-                            Sửa danh mục phụ
+                            Sửa loại sản phẩm
                         </CardTitle>
                         <Button
                             onClick={close}
@@ -142,7 +142,7 @@ const EditSubCategoryModel = ({ close, fetchData, data: SubCategoryData }) => {
                                 type="text"
                                 className="text-sm h-12"
                                 id="name"
-                                placeholder="Nhập tên danh mục phụ"
+                                placeholder="Nhập tên loại sản phẩm"
                                 name="name"
                                 value={data.name}
                                 onChange={handleOnChange}

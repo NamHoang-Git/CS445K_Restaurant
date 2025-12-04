@@ -310,7 +310,7 @@ const UserMenu = ({ close }) => {
                         }`}
                     >
                         <span className="text-white font-medium text-sm">
-                            Quản lý Danh mục phụ
+                            Quản lý Loại sản phẩm
                         </span>
                     </Link>
                     <Link

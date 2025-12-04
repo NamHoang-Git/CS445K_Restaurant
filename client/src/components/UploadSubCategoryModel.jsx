@@ -117,7 +117,7 @@ const UploadSubCategoryModel = ({ close, fetchData }) => {
                 <CardHeader className="pt-4">
                     <div className="flex items-center justify-between">
                         <CardTitle className="text-lg text-highlight font-bold uppercase">
-                            Thêm danh mục phụ
+                            Thêm loại sản phẩm
                         </CardTitle>
                         <Button
                             onClick={close}
@@ -139,7 +139,7 @@ const UploadSubCategoryModel = ({ close, fetchData }) => {
                                 type="text"
                                 className="text-sm h-12"
                                 id="name"
-                                placeholder="Nhập tên danh mục phụ"
+                                placeholder="Nhập tên loại sản phẩm"
                                 name="name"
                                 value={subCategoryData.name}
                                 onChange={handleOnChange}

@@ -29,7 +29,7 @@ export const addSubCategoryController = async (req, res) => {
         }
 
         return res.json({
-            message: "Thêm danh mục phụ thành công",
+            message: "Thêm loại sản phẩm thành công",
             data: saveCategory,
             error: false,
             success: true
@@ -49,7 +49,7 @@ export const getSubCategoryController = async (req, res) => {
         const data = await SubCategoryModel.find().sort({ createdAt: -1 }).populate('category')
 
         return res.json({
-            message: 'Danh mục phụ Data',
+            message: 'Loại sản phẩm Data',
             data: data,
             error: false,
             success: true
@@ -85,7 +85,7 @@ export const updateSubCategoryController = async (req, res) => {
         );
 
         return res.json({
-            message: 'Cập nhật danh mục phụ thành công',
+            message: 'Cập nhật loại sản phẩm thành công',
             error: false,
             success: true,
             data: update
@@ -107,7 +107,7 @@ export const deleteSubCategoryController = async (req, res) => {
         const deleteSubCategory = await SubCategoryModel.findByIdAndDelete(_id)
 
         return res.json({
-            message: 'Xóa danh mục phụ thành công',
+            message: 'Xóa loại sản phẩm thành công',
             data: deleteSubCategory,
             error: false,
             success: true

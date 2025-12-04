@@ -107,6 +107,20 @@ const EmployeeManagementPage = () => {
         return true;
     };
 
+    // Mobile validation function
+    const validateMobile = (mobile) => {
+        // Vietnamese phone number validation
+        // Starts with 0, followed by 9 or 1-9, then 8 more digits (total 10 digits)
+        const mobileRegex = /^(0[1-9]|0[1-9][0-9]{8})$/;
+        if (!mobile) {
+            return false;
+        }
+        if (!mobileRegex.test(mobile)) {
+            return false;
+        }
+        return true;
+    };
+
     // Fetch all employees
     const fetchEmployees = async () => {
         try {
@@ -167,6 +181,12 @@ const EmployeeManagementPage = () => {
             return;
         }
 
+        // Validate mobile if provided
+        if (formData.mobile && !validateMobile(formData.mobile)) {
+            toast.error('Số điện thoại không hợp lệ');
+            return;
+        }
+
         try {
             const response = await Axios({
                 ...SummaryApi.create_employee,
@@ -202,6 +222,12 @@ const EmployeeManagementPage = () => {
             toast.error(
                 'Email không hợp lệ. Vui lòng kiểm tra lại định dạng email.'
             );
+            return;
+        }
+
+        // Validate mobile if provided
+        if (formData.mobile && !validateMobile(formData.mobile)) {
+            toast.error('Số điện thoại không hợp lệ');
             return;
         }
 

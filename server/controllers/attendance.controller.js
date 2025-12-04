@@ -8,8 +8,12 @@ import PerformanceModel from "../models/performance.model.js";
  */
 export const checkIn = async (req, res) => {
     try {
-        const { shiftId } = req.body;
-        const userId = req.userId;
+        const { shiftId, userId: targetUserId } = req.body;
+        const currentUserId = req.userId;
+
+        // If userId is provided in body, use it (for Admin/Manager checking in for others)
+        // Otherwise, use the current user's ID (self check-in)
+        const userId = targetUserId || currentUserId;
 
         if (!shiftId) {
             return res.status(400).json({
@@ -35,7 +39,7 @@ export const checkIn = async (req, res) => {
 
         if (!isAssigned) {
             return res.status(403).json({
-                message: "Bạn không được phân công vào ca làm việc này",
+                message: "Nhân viên không được phân công vào ca làm việc này",
                 error: true,
                 success: false
             });
@@ -49,13 +53,13 @@ export const checkIn = async (req, res) => {
 
         if (existingAttendance) {
             return res.status(400).json({
-                message: "Bạn đã check-in cho ca làm việc này rồi",
+                message: "Nhân viên đã check-in cho ca làm việc này rồi",
                 error: true,
                 success: false
             });
         }
 
-        // Calculate status
+        // Calculate status (keep for salary calculation later)
         let status = 'on_time';
         const [startHour, startMinute] = shift.startTime.split(':').map(Number);
 
@@ -63,19 +67,7 @@ export const checkIn = async (req, res) => {
         const shiftStart = new Date(shift.date);
         shiftStart.setHours(startHour, startMinute, 0, 0);
 
-        // Check if check-in is too early (more than 30 minutes before shift start)
-        const allowedCheckInTime = new Date(shiftStart.getTime() - 30 * 60 * 1000);
-        const now = new Date();
-
-        if (now < allowedCheckInTime) {
-            return res.status(400).json({
-                message: "Chưa đến giờ check-in (chỉ được check-in trước 30 phút)",
-                error: true,
-                success: false
-            });
-        }
-
-        // Add 15 minutes grace period
+        // Add 15 minutes grace period for late status
         const gracePeriod = 15 * 60 * 1000;
         const lateThreshold = new Date(shiftStart.getTime() + gracePeriod);
 
@@ -118,18 +110,29 @@ export const checkIn = async (req, res) => {
  */
 export const checkOut = async (req, res) => {
     try {
-        const { attendanceId } = req.body;
-        const userId = req.userId;
+        const { attendanceId, userId: targetUserId, shiftId } = req.body;
+        const currentUserId = req.userId;
 
-        if (!attendanceId) {
+        // Support two modes:
+        // 1. attendanceId provided (direct checkout)
+        // 2. userId + shiftId provided (find attendance and checkout)
+        let attendance;
+
+        if (attendanceId) {
+            attendance = await AttendanceModel.findById(attendanceId);
+        } else if (targetUserId && shiftId) {
+            // Find attendance by userId and shiftId
+            attendance = await AttendanceModel.findOne({
+                userId: targetUserId,
+                shiftId: shiftId
+            });
+        } else {
             return res.status(400).json({
-                message: "Thiếu thông tin chấm công",
+                message: "Thiếu thông tin chấm công (cần attendanceId hoặc userId + shiftId)",
                 error: true,
                 success: false
             });
         }
-
-        const attendance = await AttendanceModel.findById(attendanceId);
 
         if (!attendance) {
             return res.status(404).json({
@@ -139,79 +142,25 @@ export const checkOut = async (req, res) => {
             });
         }
 
-        // Verify ownership
-        if (attendance.userId.toString() !== userId) {
-            return res.status(403).json({
-                message: "Bạn không có quyền check-out bản ghi này",
-                error: true,
-                success: false
-            });
-        }
-
         if (attendance.checkOutTime) {
             return res.status(400).json({
-                message: "Bạn đã check-out rồi",
+                message: "Nhân viên đã check-out rồi",
                 error: true,
                 success: false
             });
         }
 
-        // Check if shift has ended
-        const shift = await ShiftModel.findById(attendance.shiftId);
-        if (shift) {
-            const [endHour, endMinute] = shift.endTime.split(':').map(Number);
-            const shiftEnd = new Date(shift.date);
-            shiftEnd.setHours(endHour, endMinute, 0, 0);
-
-            if (new Date() < shiftEnd) {
-                return res.status(400).json({
-                    message: "Chưa đến giờ kết thúc ca làm việc",
-                    error: true,
-                    success: false
-                });
-            }
-        }
+        // Extract userId for later use
+        const userId = attendance.userId.toString();
 
         // Update check-out time
         attendance.checkOutTime = new Date();
         const savedAttendance = await attendance.save(); // Pre-save hook will calculate working hours
 
-        // Update PerformanceModel
-        const performanceDate = new Date(savedAttendance.checkInTime);
-        performanceDate.setHours(0, 0, 0, 0);
+        // Note: Performance tracking removed to avoid duplicate key errors
+        // Performance metrics can be calculated from attendance records when needed
 
-        // Find user to get role
-        const user = await UserModel.findById(userId);
-
-        let performance = await PerformanceModel.findOne({
-            userId,
-            date: performanceDate
-        });
-
-        if (!performance) {
-            performance = new PerformanceModel({
-                userId,
-                date: performanceDate,
-                role: user.role,
-                metrics: {
-                    ordersHandled: 0,
-                    dishesCooked: 0,
-                    workingHours: 0,
-                    customerRating: 0
-                }
-            });
-        }
-
-        performance.metrics.workingHours += savedAttendance.workingHours || 0;
-        await performance.save();
-
-        // Update user's total working hours
-        await UserModel.findByIdAndUpdate(
-            userId,
-            { $inc: { 'performanceStats.totalWorkingHours': savedAttendance.workingHours || 0 } }
-        );
-
-        const populatedAttendance = await AttendanceModel.findById(attendanceId)
+        const populatedAttendance = await AttendanceModel.findById(attendance._id)
             .populate('userId', 'name email role employeeId')
             .populate('shiftId');
 

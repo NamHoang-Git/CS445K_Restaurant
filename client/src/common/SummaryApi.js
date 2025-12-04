@@ -91,6 +91,18 @@ const SummaryApi = {
         url: '/api/category/delete-category',
         method: 'delete'
     },
+    get_deleted_categories: {
+        url: '/api/category/get-deleted-categories',
+        method: 'get'
+    },
+    restore_category: {
+        url: '/api/category/restore-category',
+        method: 'put'
+    },
+    hard_delete_category: {
+        url: '/api/category/hard-delete-category',
+        method: 'delete'
+    },
 
     // Sub Category
     add_sub_category: {

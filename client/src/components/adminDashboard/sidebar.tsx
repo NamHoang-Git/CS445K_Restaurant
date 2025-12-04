@@ -56,7 +56,7 @@ const navigationSections: NavigationSection[] = [
         items: [
             { name: 'Danh mục', href: '/dashboard/category', icon: Layers },
             {
-                name: 'Danh mục phụ',
+                name: 'Loại sản phẩm',
                 href: '/dashboard/sub-category',
                 icon: Layers,
             },

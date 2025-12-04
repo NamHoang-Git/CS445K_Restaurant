@@ -3,7 +3,6 @@ import { useSelector } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
-import successAlert from '../utils/successAlert';
 import {
     Card,
     CardContent,
@@ -11,13 +10,10 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { FaClock, FaCheckCircle } from 'react-icons/fa';
-import Loading from '../components/Loading';
 
 const EmployeeDashboard = () => {
     const user = useSelector((state) => state.user);
-    const [loading, setLoading] = useState(false);
     const [currentAttendance, setCurrentAttendance] = useState(null);
     const [todayShifts, setTodayShifts] = useState([]);
     const [stats, setStats] = useState(null);
@@ -90,66 +86,6 @@ const EmployeeDashboard = () => {
         }
     }, [user]);
 
-    // Handle check-in
-    const handleCheckIn = async () => {
-        if (todayShifts.length === 0) {
-            AxiosToastError({
-                response: {
-                    data: {
-                        message: 'Bạn không có ca làm việc hôm nay',
-                    },
-                },
-            });
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await Axios({
-                ...SummaryApi.check_in,
-                data: {
-                    shiftId: todayShifts[0]._id,
-                },
-            });
-
-            if (response.data.success) {
-                successAlert(response.data.message);
-                fetchCurrentAttendance();
-            }
-        } catch (error) {
-            AxiosToastError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    // Handle check-out
-    const handleCheckOut = async () => {
-        if (!currentAttendance) {
-            return;
-        }
-
-        try {
-            setLoading(true);
-            const response = await Axios({
-                ...SummaryApi.check_out,
-                data: {
-                    attendanceId: currentAttendance._id,
-                },
-            });
-
-            if (response.data.success) {
-                successAlert(response.data.message);
-                setCurrentAttendance(null);
-                fetchStats();
-            }
-        } catch (error) {
-            AxiosToastError(error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const formatTime = (dateString) => {
         return new Date(dateString).toLocaleTimeString('vi-VN', {
             hour: '2-digit',
@@ -169,47 +105,67 @@ const EmployeeDashboard = () => {
                 </CardHeader>
             </Card>
             <Card className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 bg-background/80 p-2 rounded-lg">
-                {/* Check-in/out Card */}
+                {/* Attendance Status Card (Read-only) */}
                 <Card className="p-4">
                     <CardHeader>
                         <CardTitle>Chấm công</CardTitle>
+                        <CardDescription className="text-xs">
+                            Vui lòng liên hệ Quản lý để check-in/out
+                        </CardDescription>
                     </CardHeader>
                     <CardContent>
                         {currentAttendance ? (
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-green-600">
                                     <FaCheckCircle />
-                                    <span>Đã check-in</span>
+                                    <span className="font-semibold">
+                                        Đang làm việc
+                                    </span>
                                 </div>
-                                <p className="text-sm text-muted-foreground">
-                                    Giờ vào:{' '}
-                                    {formatTime(currentAttendance.checkInTime)}
-                                </p>
-                                <Button
-                                    onClick={handleCheckOut}
-                                    disabled={loading}
-                                    className="w-full bg-red-600 hover:bg-red-700"
-                                >
-                                    {loading ? <Loading /> : 'Check-out'}
-                                </Button>
+                                <div className="space-y-1">
+                                    <p className="text-sm text-muted-foreground">
+                                        Giờ vào:{' '}
+                                        <span className="font-medium text-foreground">
+                                            {formatTime(
+                                                currentAttendance.checkInTime
+                                            )}
+                                        </span>
+                                    </p>
+                                    {currentAttendance.checkOutTime && (
+                                        <p className="text-sm text-muted-foreground">
+                                            Giờ ra:{' '}
+                                            <span className="font-medium text-foreground">
+                                                {formatTime(
+                                                    currentAttendance.checkOutTime
+                                                )}
+                                            </span>
+                                        </p>
+                                    )}
+                                </div>
+                                {!currentAttendance.checkOutTime && (
+                                    <div className="p-3 bg-blue-50 border border-blue-200 rounded-md">
+                                        <p className="text-xs text-blue-800">
+                                            💡 Nhắc Quản lý check-out khi kết
+                                            thúc ca
+                                        </p>
+                                    </div>
+                                )}
                             </div>
                         ) : (
                             <div className="space-y-4">
                                 <div className="flex items-center gap-2 text-gray-500">
                                     <FaClock />
-                                    <span>Chưa check-in</span>
+                                    <span>Chưa vào ca</span>
                                 </div>
-                                <Button
-                                    onClick={handleCheckIn}
-                                    disabled={
-                                        loading || todayShifts.length === 0
-                                    }
-                                    className="w-full bg-green-600 hover:bg-green-700"
-                                >
-                                    {loading ? <Loading /> : 'Check-in'}
-                                </Button>
-                                {todayShifts.length === 0 && (
-                                    <p className="text-xs text-red-500">
+                                {todayShifts.length > 0 ? (
+                                    <div className="p-3 bg-yellow-50 border border-yellow-200 rounded-md">
+                                        <p className="text-xs text-yellow-800">
+                                            ⏰ Nhắc Quản lý check-in khi bắt đầu
+                                            ca
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <p className="text-xs text-muted-foreground">
                                         Không có ca làm việc hôm nay
                                     </p>
                                 )}

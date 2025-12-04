@@ -191,10 +191,10 @@ const SubCategoryPage = () => {
             <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
                     <CardTitle className="text-lg text-highlight font-bold uppercase">
-                        Danh mục phụ
+                        Loại sản phẩm
                     </CardTitle>
                     <CardDescription>
-                        Quản lý thông tin danh mục phụ
+                        Quản lý thông tin loại sản phẩm
                     </CardDescription>
                 </CardHeader>
 

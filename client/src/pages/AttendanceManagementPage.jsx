@@ -1,8 +1,9 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { useSelector } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import AxiosToastError from '../utils/AxiosToastError';
+import successAlert from '../utils/successAlert';
 import {
     Card,
     CardContent,
@@ -27,8 +28,10 @@ const AttendanceManagementPage = () => {
 
     const [showMyShifts, setShowMyShifts] = useState(false);
 
+    const [shifts, setShifts] = useState([]);
+
     // Fetch attendance by date
-    const fetchAttendance = async () => {
+    const fetchAttendance = useCallback(async () => {
         try {
             setLoading(true);
             const response = await Axios({
@@ -47,13 +50,32 @@ const AttendanceManagementPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [selectedDate]);
+
+    // Fetch shifts by date
+    const fetchShifts = useCallback(async () => {
+        try {
+            const response = await Axios({
+                ...SummaryApi.get_shifts_by_date,
+                params: {
+                    startDate: selectedDate,
+                    endDate: selectedDate,
+                },
+            });
+
+            if (response.data.success) {
+                setShifts(response.data.data);
+            }
+        } catch (error) {
+            AxiosToastError(error);
+        }
+    }, [selectedDate]);
 
     useEffect(() => {
         if (selectedDate) {
-            fetchAttendance();
+            Promise.all([fetchAttendance(), fetchShifts()]);
         }
-    }, [selectedDate]);
+    }, [selectedDate, fetchAttendance, fetchShifts]);
 
     const formatTime = (dateString) => {
         if (!dateString) return '-';
@@ -62,6 +84,52 @@ const AttendanceManagementPage = () => {
             minute: '2-digit',
         });
     };
+
+    // Handle Check In
+    const handleCheckIn = useCallback(
+        async (row) => {
+            try {
+                const response = await Axios({
+                    ...SummaryApi.check_in,
+                    data: {
+                        userId: row.userId._id,
+                        shiftId: row.shiftId,
+                    },
+                });
+
+                if (response.data.success) {
+                    successAlert(response.data.message);
+                    fetchAttendance();
+                }
+            } catch (error) {
+                AxiosToastError(error);
+            }
+        },
+        [fetchAttendance]
+    );
+
+    // Handle Check Out
+    const handleCheckOut = useCallback(
+        async (row) => {
+            try {
+                const response = await Axios({
+                    ...SummaryApi.check_out,
+                    data: {
+                        userId: row.userId._id,
+                        shiftId: row.shiftId,
+                    },
+                });
+
+                if (response.data.success) {
+                    successAlert(response.data.message);
+                    fetchAttendance();
+                }
+            } catch (error) {
+                AxiosToastError(error);
+            }
+        },
+        [fetchAttendance]
+    );
 
     // Column configuration for DynamicTable
     const columns = useMemo(
@@ -115,66 +183,85 @@ const AttendanceManagementPage = () => {
                 format: (value) => (value ? `${value.toFixed(2)}h` : '-'),
             },
             {
-                key: 'status',
-                label: 'Trạng thái',
-                type: 'string',
-                sortable: true,
-                format: (value) => {
-                    const statusMap = {
-                        on_time: {
-                            label: 'Đúng giờ',
-                            class: 'bg-green-100 text-green-800',
-                        },
-                        late: {
-                            label: 'Muộn',
-                            class: 'bg-yellow-100 text-yellow-800',
-                        },
-                        early_leave: {
-                            label: 'Về sớm',
-                            class: 'bg-orange-100 text-orange-800',
-                        },
-                        absent: {
-                            label: 'Vắng',
-                            class: 'bg-red-100 text-red-800',
-                        },
-                    };
-                    const s = statusMap[value] || {
-                        label: value,
-                        class: 'bg-gray-100 text-gray-800',
-                    };
+                key: 'actions',
+                label: 'Hành động',
+                type: 'component',
+                sortable: false,
+                format: (_, row) => {
+                    if (!row.checkInTime) {
+                        return (
+                            <Button
+                                size="sm"
+                                className="bg-green-600 hover:bg-green-700 text-white h-8"
+                                onClick={() => handleCheckIn(row.rawData)}
+                            >
+                                Check In
+                            </Button>
+                        );
+                    } else if (!row.checkOutTime) {
+                        return (
+                            <Button
+                                size="sm"
+                                className="bg-orange-600 hover:bg-orange-700 text-white h-8"
+                                onClick={() => handleCheckOut(row.rawData)}
+                            >
+                                Check Out
+                            </Button>
+                        );
+                    }
                     return (
-                        <span
-                            className={`px-2 py-1 rounded text-xs ${s.class}`}
-                        >
-                            {s.label}
+                        <span className="text-green-600 font-medium text-sm">
+                            Hoàn thành
                         </span>
                     );
                 },
             },
         ],
-        []
+        [handleCheckIn, handleCheckOut]
     );
 
     // Transform data for DynamicTable
     const tableData = useMemo(() => {
-        let filtered = attendances;
+        const data = [];
 
-        if (showMyShifts) {
-            filtered = filtered.filter((att) => att.userId?._id === user?._id);
-        }
+        shifts.forEach((shift) => {
+            if (shift.assignedStaff && shift.assignedStaff.length > 0) {
+                shift.assignedStaff.forEach((staff) => {
+                    if (!staff.userId) return;
 
-        return filtered.map((att, index) => ({
-            id: index + 1,
-            employeeName: att.userId?.name,
-            role: att.userId?.role,
-            shiftType: att.shiftId?.shiftType,
-            checkInTime: att.checkInTime,
-            checkOutTime: att.checkOutTime,
-            workingHours: att.workingHours,
-            status: att.status,
-            rawData: att,
-        }));
-    }, [attendances, showMyShifts, user?._id]);
+                    // Filter by My Shifts if enabled
+                    if (showMyShifts && staff.userId._id !== user?._id) {
+                        return;
+                    }
+
+                    // Find attendance record
+                    const attendance = attendances.find(
+                        (att) =>
+                            att.userId?._id === staff.userId._id &&
+                            att.shiftId?._id === shift._id
+                    );
+
+                    data.push({
+                        id: `${shift._id}-${staff.userId._id}`,
+                        employeeName: staff.userId.name,
+                        role: staff.role,
+                        shiftType: shift.shiftType,
+                        checkInTime: attendance?.checkInTime,
+                        checkOutTime: attendance?.checkOutTime,
+                        workingHours: attendance?.workingHours,
+                        rawData: {
+                            userId: staff.userId,
+                            shiftId: shift._id,
+                            checkInTime: attendance?.checkInTime,
+                            checkOutTime: attendance?.checkOutTime,
+                        },
+                    });
+                });
+            }
+        });
+
+        return data;
+    }, [shifts, attendances, showMyShifts, user?._id]);
 
     // Check permission
     if (!['ADMIN', 'MANAGER'].includes(user?.role)) {
