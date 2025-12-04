@@ -9,6 +9,7 @@ export const routePermissions = {
 
     // Restaurant Management
     '/dashboard/table': ['ADMIN', 'MANAGER'],
+    '/dashboard/table-orders': ['ADMIN', 'MANAGER', 'WAITER'],
     '/dashboard/booking': ['ADMIN', 'MANAGER', 'WAITER'],
     '/dashboard/bill': ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'],
     '/dashboard/report': ['ADMIN', 'MANAGER'],

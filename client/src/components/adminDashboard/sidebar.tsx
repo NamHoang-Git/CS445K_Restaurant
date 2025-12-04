@@ -76,6 +76,12 @@ const navigationSections: NavigationSection[] = [
                 roles: ['ADMIN', 'MANAGER'],
             },
             {
+                name: 'Đơn gọi món',
+                href: '/dashboard/table-orders',
+                icon: FileText,
+                roles: ['MANAGER', 'WAITER'],
+            },
+            {
                 name: 'Đặt bàn',
                 href: '/dashboard/booking',
                 icon: Calendar,

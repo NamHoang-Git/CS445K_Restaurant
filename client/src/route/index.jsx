@@ -15,6 +15,7 @@ import MyOrders from '../pages/MyOrders';
 import CategoryPage from './../pages/CategoryPage';
 import AdminPermission from '../layouts/AdminPermission';
 import ManagerPermission from '../layouts/ManagerPermission';
+import TableOrdersPermission from '../layouts/TableOrdersPermission';
 import ProductListPage from '../pages/ProductListPage';
 import ProductDisplayPage from '../pages/ProductDisplayPage';
 import CheckoutPage from './../pages/CheckoutPage';
@@ -30,6 +31,7 @@ import AdminDashboard from '@/layouts/AdminDashboard';
 import SubCategoryPage from '@/pages/SubCategoryPage';
 import ProductManagementPage from '../pages/ProductManagementPage';
 import TableManagementPage from '../pages/TableManagementPage';
+import TableOrdersPage from '../pages/TableOrdersPage';
 import BookingManagementPage from '../pages/BookingManagementPage';
 import BookingPage from '../pages/BookingPage';
 import BookingWithPreOrderPage from '../pages/BookingWithPreOrderPage';
@@ -187,6 +189,14 @@ const router = createBrowserRouter([
                             <AdminPermission>
                                 <TableManagementPage />
                             </AdminPermission>
+                        ),
+                    },
+                    {
+                        path: 'table-orders',
+                        element: (
+                            <TableOrdersPermission>
+                                <TableOrdersPage />
+                            </TableOrdersPermission>
                         ),
                     },
                     {

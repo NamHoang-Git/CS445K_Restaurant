@@ -20,10 +20,7 @@ import { Button } from '@/components/ui/button';
 import UploadTableModel from '@/components/UploadTableModel';
 import EditTableModel from '@/components/EditTableModel';
 
-import ActiveTableOrders from '@/components/ActiveTableOrders';
-
 const TableManagementPage = () => {
-    const [activeTab, setActiveTab] = useState('tables'); // 'tables' or 'orders'
     const [openAddTable, setOpenAddTable] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
@@ -71,10 +68,8 @@ const TableManagementPage = () => {
     };
 
     useEffect(() => {
-        if (activeTab === 'tables') {
-            fetchTables();
-        }
-    }, [activeTab]);
+        fetchTables();
+    }, []);
 
     const handleDeleteTable = async () => {
         try {
@@ -184,73 +179,41 @@ const TableManagementPage = () => {
                     <CardTitle className="text-lg text-highlight font-bold uppercase">
                         Quản lý bàn
                     </CardTitle>
-                    <CardDescription>
-                        Quản lý thông tin bàn ăn và đơn hàng tại bàn
-                    </CardDescription>
+                    <CardDescription>Quản lý thông tin bàn ăn</CardDescription>
                 </CardHeader>
 
-                <CardFooter className="flex gap-2">
-                    <div className="flex bg-gray-100 p-1 rounded-lg">
-                        <button
-                            onClick={() => setActiveTab('tables')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                                activeTab === 'tables'
-                                    ? 'bg-white text-orange-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
+                <CardFooter>
+                    <GlareHover
+                        background="transparent"
+                        glareOpacity={0.3}
+                        glareAngle={-30}
+                        glareSize={300}
+                        transitionDuration={800}
+                        playOnce={false}
+                    >
+                        <Button
+                            onClick={() => setOpenAddTable(true)}
+                            className="bg-foreground"
                         >
-                            Danh sách bàn
-                        </button>
-                        <button
-                            onClick={() => setActiveTab('orders')}
-                            className={`px-4 py-2 rounded-md text-sm font-medium transition-all ${
-                                activeTab === 'orders'
-                                    ? 'bg-white text-orange-600 shadow-sm'
-                                    : 'text-gray-600 hover:text-gray-900'
-                            }`}
-                        >
-                            Đơn gọi món
-                        </button>
-                    </div>
-
-                    {activeTab === 'tables' && (
-                        <GlareHover
-                            background="transparent"
-                            glareOpacity={0.3}
-                            glareAngle={-30}
-                            glareSize={300}
-                            transitionDuration={800}
-                            playOnce={false}
-                        >
-                            <Button
-                                onClick={() => setOpenAddTable(true)}
-                                className="bg-foreground ml-4"
-                            >
-                                Thêm Bàn Mới
-                            </Button>
-                        </GlareHover>
-                    )}
+                            Thêm Bàn Mới
+                        </Button>
+                    </GlareHover>
                 </CardFooter>
             </Card>
 
-            {activeTab === 'tables' ? (
-                <>
-                    <div className="overflow-auto w-full max-w-[95vw]">
-                        <DynamicTable
-                            data={data}
-                            columns={columns}
-                            pageSize={10}
-                            sortable={true}
-                            searchable={true}
-                            filterable={false}
-                            groupable={false}
-                        />
-                    </div>
-                    {loading && <Loading />}
-                </>
-            ) : (
-                <ActiveTableOrders />
-            )}
+            <div className="overflow-auto w-full max-w-[95vw]">
+                <DynamicTable
+                    data={data}
+                    columns={columns}
+                    pageSize={10}
+                    sortable={true}
+                    searchable={true}
+                    filterable={false}
+                    groupable={false}
+                />
+            </div>
+
+            {loading && <Loading />}
 
             {openAddTable && (
                 <UploadTableModel

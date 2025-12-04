@@ -348,7 +348,7 @@ export async function getAllActiveTableOrders(request, response) {
         const userId = request.userId;
 
         const user = await UserModel.findById(userId);
-        if (!user || !['ADMIN', 'MANAGER'].includes(user.role)) {
+        if (!user || !['ADMIN', 'MANAGER', 'WAITER', 'CHEF'].includes(user.role)) {
             return response.status(403).json({
                 message: 'Không có quyền truy cập',
                 error: true,

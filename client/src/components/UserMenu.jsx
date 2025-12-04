@@ -122,8 +122,13 @@ const UserMenu = ({ close }) => {
         // Exact match for root path
         if (path === '/dashboard' && location.pathname === '/dashboard')
             return true;
-        // Check if current path starts with the given path (for nested routes)
-        return location.pathname.startsWith(path) && path !== '/dashboard';
+        // Exact match
+        if (location.pathname === path) return true;
+        // Check if current path starts with the given path followed by a slash (for nested routes)
+        // This prevents /dashboard/table from matching /dashboard/table-orders
+        return (
+            location.pathname.startsWith(path + '/') && path !== '/dashboard'
+        );
     };
 
     const handleLogout = async () => {
@@ -352,6 +357,21 @@ const UserMenu = ({ close }) => {
                         >
                             <span className="text-white font-medium text-sm">
                                 Quản lý Bàn ăn
+                            </span>
+                        </Link>
+                    )}
+                    {['MANAGER', 'WAITER'].includes(user.role) && (
+                        <Link
+                            onClick={handleClose}
+                            to={'/dashboard/table-orders'}
+                            className={`flex items-center text-bl gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 ease-out cursor-pointer hover:bg-white/15 hover:scale-[1.01] active:scale-[0.99] ${
+                                isActive('/dashboard/table-orders')
+                                    ? 'bg-white/20 shadow-md'
+                                    : ''
+                            }`}
+                        >
+                            <span className="text-white font-medium text-sm">
+                                Quản lý Đơn gọi món
                             </span>
                         </Link>
                     )}
