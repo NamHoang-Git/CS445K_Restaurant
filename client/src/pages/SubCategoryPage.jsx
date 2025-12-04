@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { useEffect } from 'react';
 import { format } from 'date-fns';
 import UploadSubCategoryModel from '../components/UploadSubCategoryModel';
@@ -7,6 +7,7 @@ import Axios from '../utils/Axios';
 import AxiosToastError from '../utils/AxiosToastError';
 import ViewImage from '../components/ViewImage';
 import { LuPencil, LuTrash } from 'react-icons/lu';
+import { Search, FilterX } from 'lucide-react';
 import Loading from '../components/Loading';
 import ConfirmBox from '../components/ConfirmBox';
 import successAlert from '../utils/successAlert';
@@ -20,6 +21,14 @@ import {
     CardHeader,
     CardTitle,
 } from '@/components/ui/card';
+import {
+    Select,
+    SelectContent,
+    SelectItem,
+    SelectTrigger,
+    SelectValue,
+} from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
 import GlareHover from '@/components/GlareHover';
 import { Button } from '@/components/ui/button';
 
@@ -27,7 +36,10 @@ const SubCategoryPage = () => {
     const [openAddSubCategory, setOpenAddSubCategory] = useState(false);
     const [loading, setLoading] = useState(false);
     const [data, setData] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [imageURL, setImageURL] = useState('');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('all');
 
     const [openEdit, setOpenEdit] = useState(false);
     const [editData, setEditData] = useState({
@@ -40,6 +52,20 @@ const SubCategoryPage = () => {
     const [deleteSubCategory, setDeleteSubCategory] = useState({
         _id: '',
     });
+
+    const fetchCategories = async () => {
+        try {
+            const response = await Axios({
+                ...SummaryApi.get_category,
+            });
+
+            if (response.data.success) {
+                setCategories(response.data.data);
+            }
+        } catch (error) {
+            AxiosToastError(error);
+        }
+    };
 
     const fetchSubCategory = async () => {
         try {
@@ -71,6 +97,7 @@ const SubCategoryPage = () => {
     };
 
     useEffect(() => {
+        fetchCategories();
         fetchSubCategory();
     }, []);
 
@@ -92,6 +119,33 @@ const SubCategoryPage = () => {
             AxiosToastError(error);
         }
     };
+
+    // Filter data based on search term and selected category
+    const filteredData = useMemo(() => {
+        let filtered = data;
+
+        // Filter by search term
+        if (searchTerm.trim()) {
+            const lowerTerm = searchTerm.trim().toLowerCase();
+            filtered = filtered.filter((item) =>
+                item.name.toLowerCase().includes(lowerTerm)
+            );
+        }
+
+        // Filter by category
+        if (selectedCategory !== 'all') {
+            filtered = filtered.filter((item) => {
+                if (!item.categoryData || !Array.isArray(item.categoryData)) {
+                    return false;
+                }
+                return item.categoryData.some(
+                    (cat) => cat._id === selectedCategory
+                );
+            });
+        }
+
+        return filtered;
+    }, [data, searchTerm, selectedCategory]);
 
     const columns = [
         { key: 'id', label: 'ID', type: 'number', sortable: true },
@@ -198,7 +252,7 @@ const SubCategoryPage = () => {
                     </CardDescription>
                 </CardHeader>
 
-                <CardFooter>
+                <CardFooter className="flex flex-col sm:flex-row gap-2">
                     <GlareHover
                         background="transparent"
                         glareOpacity={0.3}
@@ -209,7 +263,7 @@ const SubCategoryPage = () => {
                     >
                         <Button
                             onClick={() => setOpenAddSubCategory(true)}
-                            className="bg-foreground"
+                            className="bg-foreground w-full sm:w-auto"
                         >
                             Thêm Mới
                         </Button>
@@ -217,9 +271,55 @@ const SubCategoryPage = () => {
                 </CardFooter>
             </Card>
 
+            <div className="flex flex-col sm:flex-row gap-2">
+                {/* Search Input */}
+                <div className="relative flex-1 sm:max-w-sm w-full">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                        type="text"
+                        placeholder="Tìm kiếm loại sản phẩm..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="pl-10"
+                    />
+                </div>
+
+                {/* Category Filter */}
+                <Select
+                    value={selectedCategory}
+                    onValueChange={setSelectedCategory}
+                >
+                    <SelectTrigger className="w-full sm:w-[200px]">
+                        <SelectValue placeholder="Lọc theo danh mục" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="all">Tất cả danh mục</SelectItem>
+                        {categories.map((cat) => (
+                            <SelectItem key={cat._id} value={cat._id}>
+                                {cat.name}
+                            </SelectItem>
+                        ))}
+                    </SelectContent>
+                </Select>
+
+                {/* Reset Filter Button */}
+                <Button
+                    variant="outline"
+                    onClick={() => {
+                        setSearchTerm('');
+                        setSelectedCategory('all');
+                    }}
+                    className="w-full sm:w-auto"
+                    title="Đặt lại bộ lọc"
+                >
+                    <FilterX className="h-4 w-4 mr-2" />
+                    Đặt lại
+                </Button>
+            </div>
+
             <div className="overflow-auto w-full max-w-[95vw]">
                 <DynamicTable
-                    data={data}
+                    data={filteredData}
                     columns={columns}
                     pageSize={5}
                     sortable={false}
