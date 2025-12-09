@@ -306,6 +306,10 @@ const router = createBrowserRouter([
                 element: <ProductListPage />,
             },
             {
+                path: ':category/:subCategory',
+                element: <ProductListPage />,
+            },
+            {
                 path: 'product/:product',
                 element: <ProductDisplayPage />,
             },

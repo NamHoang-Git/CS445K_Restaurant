@@ -179,7 +179,7 @@ const ProductDisplayPage = () => {
                 // API lấy sản phẩm tương tự là public, không cần authentication
                 const promises = data.category.map((cat) =>
                     Axios({
-                        ...SummaryApi.get_product_by_category_home,
+                        ...SummaryApi.get_product_by_category,
                         data: { id: cat?._id },
                     })
                 );

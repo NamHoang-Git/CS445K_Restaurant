@@ -217,6 +217,7 @@ const ProductListPage = () => {
         priceRange.max,
         sortBy,
         categoryId,
+        subCategoryId,
         validatePriceRange,
         fetchProduct,
     ]);
