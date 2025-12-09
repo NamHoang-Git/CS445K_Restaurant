@@ -40,6 +40,7 @@ import Loading from '../components/Loading';
 import DynamicTable from '@/components/table/dynamic-table';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
+import NoData from './NoData';
 
 // Register ChartJS components
 ChartJS.register(
@@ -222,7 +223,10 @@ const OrdersTab = () => {
                 type: 'string',
                 sortable: true,
                 format: (value) => (
-                    <div className="font-medium text-center text-rose-500">
+                    <div
+                        title={value}
+                        className="font-medium text-center text-rose-500 line-clamp-1 max-w-[100px] overflow-hidden text-ellipsis"
+                    >
                         {value}
                     </div>
                 ),
@@ -234,10 +238,15 @@ const OrdersTab = () => {
                 sortable: false,
                 format: (value, row) => (
                     <div>
-                        <div className="font-medium text-rose-500">
+                        <div className="font-medium text-rose-500 line-clamp-1 max-w-[100px] overflow-hidden text-ellipsis">
                             {row.rawData.userId?.name || 'Khách vãng lai'}
                         </div>
-                        <p className="text-sm">{row.rawData.userId?.email}</p>
+                        <p
+                            title={row.rawData.userId?.email}
+                            className="text-sm line-clamp-1 max-w-[100px] overflow-hidden text-ellipsis"
+                        >
+                            {row.rawData.userId?.email}
+                        </p>
                     </div>
                 ),
             },
@@ -264,8 +273,8 @@ const OrdersTab = () => {
                         />
                         <div>
                             <p
-                                className="line-clamp-2"
                                 title={row.rawData.product_details?.name}
+                                className="line-clamp-2 sm:max-w-[50px] 2xl:max-w-[250px] overflow-hidden text-ellipsis"
                             >
                                 {row.rawData.product_details?.name || 'N/A'}
                             </p>
@@ -712,7 +721,7 @@ const OrdersTab = () => {
             {/* Summary Cards */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-4 pb-2">
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <BsCoin className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -723,7 +732,7 @@ const OrdersTab = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <FaCoins className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -738,7 +747,7 @@ const OrdersTab = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -747,7 +756,7 @@ const OrdersTab = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <FaFilter className="h-6 w-6" />
                     </div>
                     <div className="mt-1 space-y-1">
@@ -1053,15 +1062,20 @@ const OrdersTab = () => {
                 {loading ? (
                     <Loading />
                 ) : (
-                    <DynamicTable
-                        data={tableData}
-                        columns={columns}
-                        pageSize={10}
-                        sortable={true}
-                        searchable={false}
-                        filterable={false}
-                        groupable={false}
-                    />
+                    <>
+                        <DynamicTable
+                            data={tableData}
+                            columns={columns}
+                            pageSize={10}
+                            sortable={true}
+                            searchable={false}
+                            filterable={false}
+                            groupable={false}
+                        />
+                        {tableData.length === 0 && (
+                            <NoData message="Không có hóa đơn" />
+                        )}
+                    </>
                 )}
 
                 {imageURL && (

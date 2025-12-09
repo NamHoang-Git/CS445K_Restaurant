@@ -34,6 +34,7 @@ import Loading from '../components/Loading';
 import GlareHover from '@/components/GlareHover';
 import { IoClose } from 'react-icons/io5';
 import { Button } from '@/components/ui/button';
+import NoData from '@/components/NoData';
 
 const ShiftManagementPage = () => {
     const user = useSelector((state) => state.user);
@@ -445,11 +446,13 @@ const ShiftManagementPage = () => {
                     <Loading />
                 </div>
             ) : (
-                <Card className="space-y-4 bg-background/80 p-2 rounded-lg">
+                <Card
+                    className={`${
+                        shifts.length === 0 ? 'p-0' : 'p-2'
+                    } flex flex-wrap gap-2`}
+                >
                     {shifts.length === 0 ? (
-                        <p className="text-center text-muted-foreground py-8">
-                            Không có ca làm việc nào
-                        </p>
+                        <NoData message="Không có ca làm việc nào" />
                     ) : (
                         shifts.map((shift) => (
                             <Card key={shift._id}>

@@ -235,13 +235,13 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
             >
                 <CardHeader className="pt-4">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                        <CardTitle className="text-lg text-highlight font-bold uppercase">
                             Chỉnh sửa sản phẩm
                         </CardTitle>
                         <Button
                             onClick={close}
                             className="bg-transparent hover:bg-transparent text-foreground
-                                hover:text-lime-300 h-12"
+                                hover:text-highlight h-12"
                         >
                             <IoClose />
                         </Button>
@@ -291,7 +291,7 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                                     className={`block border-2 border-dashed rounded-xl p-6 text-center cursor-pointer
                                         transition-all duration-200 group ${
                                             data.image.length
-                                                ? 'border-green-300 bg-black/50'
+                                                ? 'border-green-300 bg-green-100/50'
                                                 : 'border-gray-300 hover:border-red-500'
                                         } ${
                                         !data.name || loading
@@ -315,11 +315,11 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                                                 />
                                             )}
                                         </div>
-                                        <div className="sm text-xs text-rose-500">
+                                        <div className="sm text-xs text-rose-600 dark:text-white">
                                             <p className="font-medium">
                                                 Nhấn để chọn ảnh
                                             </p>
-                                            <p className="sm:text-xs text-[10px] text-rose-300">
+                                            <p className="sm:text-xs text-[10px] text-rose-400 dark:text-gray-300">
                                                 PNG, JPG (tối đa 10 ảnh, mỗi ảnh
                                                 tối đa 5MB)
                                             </p>
@@ -562,7 +562,7 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                                     </SelectContent>
                                 </Select>
                             ) : (
-                                <div className="w-full h-12 flex items-center justify-center border border-dashed border-gray-300 rounded-md bg-gray-50/50">
+                                <div className="w-full h-12 flex items-center justify-center border border-dashed border-gray-300 rounded-md opacity-50">
                                     <p className="text-sm text-muted-foreground">
                                         Vui lòng chọn danh mục trước
                                     </p>
@@ -741,7 +741,7 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                             <>
                                 <Divider />
                                 <div className="space-y-4">
-                                    <CardTitle className="text-sm text-lime-300 font-bold uppercase">
+                                    <CardTitle className="text-sm text-highlight font-bold uppercase">
                                         Thông tin bổ sung
                                     </CardTitle>
                                     {Object.keys(data.more_details).map(
@@ -819,7 +819,7 @@ const EditProductModel = ({ close, data: propsData, fetchProduct }) => {
                             <Button
                                 type="button"
                                 onClick={() => setOpenAddField(true)}
-                                className="flex items-center gap-2 font-semibold text-rose-300
+                                className="flex items-center gap-2 font-semibold text-rose-500
                                 hover:text-primary-700 transition-colors w-full
                                 px-3 py-2 rounded-lg border shadow-md hover:bg-transparent"
                             >

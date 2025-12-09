@@ -28,6 +28,7 @@ import {
 } from '@/components/ui/card';
 import { Label } from '@radix-ui/react-label';
 import DynamicTable from '@/components/table/dynamic-table';
+import NoData from '@/components/NoData';
 
 const BillPage = () => {
     const dispatch = useDispatch();
@@ -222,7 +223,10 @@ const BillPage = () => {
                 type: 'string',
                 sortable: true,
                 format: (value) => (
-                    <div className="font-medium text-center text-rose-500">
+                    <div
+                        title={value}
+                        className="font-medium text-center text-rose-500 line-clamp-1 max-w-[100px] overflow-hidden text-ellipsis"
+                    >
                         {value}
                     </div>
                 ),
@@ -234,10 +238,15 @@ const BillPage = () => {
                 sortable: false,
                 format: (value, row) => (
                     <div>
-                        <div className="font-medium text-rose-500">
+                        <div className="font-medium text-rose-500 line-clamp-1 max-w-[100px] overflow-hidden text-ellipsis">
                             {row.rawData.userId?.name || 'Khách vãng lai'}
                         </div>
-                        <p className="text-sm">{row.rawData.userId?.email}</p>
+                        <p
+                            title={row.rawData.userId?.email}
+                            className="text-sm line-clamp-1 max-w-[100px] overflow-hidden text-ellipsis"
+                        >
+                            {row.rawData.userId?.email}
+                        </p>
                     </div>
                 ),
             },
@@ -264,7 +273,7 @@ const BillPage = () => {
                         />
                         <div>
                             <p
-                                className="line-clamp-2"
+                                className="line-clamp-2 sm:max-w-[50px] 2xl:max-w-[250px] overflow-hidden text-ellipsis"
                                 title={row.rawData.product_details?.name}
                             >
                                 {row.rawData.product_details?.name || 'N/A'}
@@ -581,7 +590,7 @@ const BillPage = () => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 py-2">
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div>
@@ -590,7 +599,7 @@ const BillPage = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <FaFileInvoice className="h-6 w-6" />
                     </div>
                     <div>
@@ -601,7 +610,7 @@ const BillPage = () => {
                     </div>
                 </div>
                 <div className="liquid-glass rounded-lg shadow-md p-3 flex items-center gap-4">
-                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight_2">
+                    <div className="p-3 rounded-full border-[3px] liquid-glass text-highlight">
                         <FaFilter className="h-6 w-6" />
                     </div>
                     <div>
@@ -758,6 +767,9 @@ const BillPage = () => {
                     filterable={false}
                     groupable={false}
                 />
+                {tableData.length === 0 && (
+                    <NoData message="Không có hóa đơn" />
+                )}
             </div>
 
             {loading && <Loading />}

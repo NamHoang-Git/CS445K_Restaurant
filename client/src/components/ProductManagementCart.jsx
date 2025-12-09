@@ -77,7 +77,7 @@ const ProductManagementCart = ({ data, fetchProduct }) => {
                         <div className="flex-1 space-y-2">
                             <h3
                                 title={data?.name}
-                                className="text-highlight_2 font-bold sm:text-base text-xs line-clamp-2 h-8 sm:h-12 md:h-11 lg:h-12"
+                                className="text-foreground font-bold sm:text-base text-xs line-clamp-2 h-8 sm:h-12 md:h-11 lg:h-12"
                             >
                                 {data?.name}
                             </h3>
@@ -95,7 +95,7 @@ const ProductManagementCart = ({ data, fetchProduct }) => {
                         <div className="flex py-1 gap-3 md:text-base text-sm justify-between items-baseline">
                             <p
                                 title={data?.unit}
-                                className="font-semibold line-clamp-1 text-highlight_2"
+                                className="font-semibold line-clamp-1 text-foreground"
                             >
                                 {data?.unit}
                             </p>

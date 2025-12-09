@@ -243,21 +243,21 @@ const SearchPage = () => {
 
     // Add filter UI component
     const renderFilterControls = () => (
-        <div className="mb-6 liquid-glass-menu text-white p-4 rounded-lg mt-3">
+        <div className="mb-6 liquid-glass-menu text-foreground p-4 rounded-lg mt-3">
             <div className="flex items-center justify-between mb-4">
-                <h2 className="uppercase text-lime-300 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
+                <h2 className="uppercase text-highlight drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
                     Bộ lọc
                 </h2>
                 <button
                     onClick={resetFilters}
                     className="hover:bg-zinc-800 hover:border-emerald-500 flex items-center gap-2
-                    transition-all duration-300 text-lime-300 border-2 border-zinc-400 px-4 py-1.5 rounded-md"
+                    transition-all duration-300 text-highlight border-2 border-zinc-400 px-4 py-1.5 rounded-md"
                 >
                     <RiResetLeftFill />
                     Đặt lại
                 </button>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-4">
+            <div className="flex flex-wrap items-center justify-between gap-4 text-foreground">
                 <div className="flex items-center gap-2.5 sm:text-sm text-xs">
                     <Label htmlFor="email">Giá từ</Label>
                     <Input
@@ -266,7 +266,7 @@ const SearchPage = () => {
                         value={filters.minPrice}
                         onChange={handleFilterChange}
                         placeholder="Thấp nhất"
-                        className="w-24 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="w-24 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3] placeholder:text-orange-600"
                     />
                     <span>-</span>
                     <Input
@@ -275,7 +275,7 @@ const SearchPage = () => {
                         value={filters.maxPrice}
                         onChange={handleFilterChange}
                         placeholder="Cao nhất"
-                        className="w-24 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]"
+                        className="w-24 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3] placeholder:text-orange-600"
                     />
                     <span className="">VNĐ</span>
                 </div>
@@ -290,11 +290,11 @@ const SearchPage = () => {
                             })
                         }
                     >
-                        <SelectTrigger className="w-32 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]">
+                        <SelectTrigger className="w-32 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3] placeholder:text-orange-600">
                             <SelectValue placeholder="Sắp xếp" />
                         </SelectTrigger>
 
-                        <SelectContent className="liquid-glass-2 text-white cursor-pointer">
+                        <SelectContent className="liquid-glass-2 cursor-pointer">
                             <SelectItem
                                 value="newest"
                                 className="cursor-pointer"
@@ -322,11 +322,11 @@ const SearchPage = () => {
                             })
                         }
                     >
-                        <SelectTrigger className="w-40 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3]">
+                        <SelectTrigger className="w-40 text-sm border-gray-200 focus:ring-0 shadow-none rounded-lg bg-white/20 focus:border-[#3F3FF3] placeholder:text-orange-600">
                             <SelectValue placeholder="Danh mục" />
                         </SelectTrigger>
 
-                        <SelectContent className="liquid-glass-2 text-white cursor-pointer">
+                        <SelectContent className="liquid-glass-2 cursor-pointer">
                             <SelectItem value="all" className="cursor-pointer">
                                 Tất cả
                             </SelectItem>
@@ -408,9 +408,9 @@ const SearchPage = () => {
                     }`}
                 >
                     {!loading && searchQuery && data.length > 0 && (
-                        <p className="mt-2 text-sm text-white">
+                        <p className="mt-2 text-sm text-foreground">
                             Tìm thấy{' '}
-                            <span className="font-semibold text-lime-300">
+                            <span className="font-semibold text-highlight">
                                 {totalCount}
                             </span>{' '}
                             kết quả cho "{searchQuery}"
@@ -445,13 +445,13 @@ const SearchPage = () => {
                             )}
                         </>
                     ) : (
-                        <div className="text-center text-white pt-6 pb-4 grid gap-1">
+                        <div className="text-center text-foreground pt-6 pb-4 grid gap-1">
                             <h3 className="text-xl font-semibold">
                                 Không tìm thấy sản phẩm
                             </h3>
                             <p className="text-sm">
                                 Không có sản phẩm nào phù hợp với từ khóa "
-                                <span className="font-semibold text-lime-300">
+                                <span className="font-semibold text-highlight">
                                     {searchQuery}
                                 </span>
                                 "
@@ -466,10 +466,10 @@ const SearchPage = () => {
                         hasMore={hasMore}
                     >
                         <div className="rounded-md pb-2 liquid-glass-menu p-4 mb-4">
-                            <h2 className="border-b-4 py-2 uppercase text-lime-300 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
+                            <h2 className="border-b-4 py-2 uppercase text-highlight drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
                                 Sản phẩm nổi bật
                             </h2>
-                            <div className="text-center text-white pt-6 pb-4 grid gap-1">
+                            <div className="text-center text-foreground pt-6 pb-4 grid gap-1">
                                 <h3 className="text-xl font-semibold">
                                     Nhập từ khóa để tìm kiếm
                                 </h3>
@@ -505,7 +505,7 @@ const SearchPage = () => {
                     <button
                         onClick={scrollToTop}
                         className="fixed bottom-32 sm:bottom-28 right-4 sm:right-8 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2
-                                focus:ring-purple-500 liquid-glass-2 rounded-full p-3 sm:p-4 md:p-4 hover:bg-purple-600/30 text-white z-50"
+                                focus:ring-purple-500 liquid-glass-2 rounded-full p-3 sm:p-4 md:p-4 hover:bg-purple-600/30 text-foreground z-50"
                         aria-label="Lên đầu trang"
                     >
                         <FaArrowUp size={24} className="hidden sm:block" />

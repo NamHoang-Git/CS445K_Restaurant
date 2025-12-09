@@ -17,13 +17,6 @@ const features = [
         bgColor: 'bg-blue-50',
     },
     {
-        icon: FaShippingFast,
-        title: 'Giao Hàng Nhanh',
-        description: 'Giao hàng tận nơi trong 30 phút, đảm bảo món ăn nóng hổi',
-        color: 'text-green-600',
-        bgColor: 'bg-green-50',
-    },
-    {
         icon: FaLeaf,
         title: 'Nguyên Liệu Tươi',
         description: 'Cam kết sử dụng nguyên liệu tươi ngon, an toàn vệ sinh',
@@ -55,7 +48,7 @@ export const FeaturesSection = () => {
                 </div>
 
                 {/* Features Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-3 gap-6">
                     {features.map((feature, index) => {
                         const Icon = feature.icon;
                         return (

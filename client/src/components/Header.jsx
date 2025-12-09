@@ -142,7 +142,7 @@ export default function Header() {
                                         key={l.href}
                                         to={l.href}
                                         onClick={scrollToTop}
-                                        className="hover:text-purple-300 transition-colors flex items-center gap-[6px]"
+                                        className="hover:text-foreground/80 transition-colors flex items-center gap-[6px]"
                                     >
                                         {/* {l.icon} */}
                                         {l.label}
@@ -241,7 +241,7 @@ export default function Header() {
                                 ) : (
                                     <button
                                         onClick={redirectToLoginPage}
-                                        className="underline text-sm hover:text-purple-300 transition-colors"
+                                        className="underline text-sm hover:text-foreground transition-colors"
                                     >
                                         Đăng nhập
                                     </button>
@@ -255,8 +255,8 @@ export default function Header() {
                                         }
                                         className={`${
                                             cartItem[0] ? ' py-1.5' : ' py-3'
-                                        } flex items-center gap-2 bg-background text-highlight font-medium rounded-lg px-3.5
-                                hover:bg-lime-300 hover:shadow-md hover:scale-[1.02] transition-all`}
+                                        } flex items-center gap-2 bg-orange-600/90 text-background font-medium rounded-lg px-3.5
+                                    hover:shadow-md hover:scale-[1.02] transition-all`}
                                     >
                                         <div className="animate-bounce">
                                             <FaCartPlus size={20} />

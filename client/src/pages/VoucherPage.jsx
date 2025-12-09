@@ -274,8 +274,8 @@ const VoucherPage = () => {
                     <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                             value
-                                ? 'bg-white/10 text-emerald-300 border border-emerald-200 px-2 py-0.5'
-                                : 'bg-white/10 text-rose-300 border border-rose-200 px-2 py-0.5'
+                                ? 'bg-white/10 text-emerald-500 border border-emerald-600 px-2 py-0.5'
+                                : 'bg-white/10 text-rose-500 border border-rose-600 px-2 py-0.5'
                         }`}
                     >
                         {value ? 'Đang hoạt động' : 'Đã tắt'}
@@ -321,7 +321,7 @@ const VoucherPage = () => {
                                 });
                                 setOpenEditVoucher(true);
                             }}
-                            className="liquid-glass text-white p-1 rounded-md"
+                            className="liquid-glass text-foreground p-1 rounded-md"
                         >
                             <IoPencil size={18} />
                         </button>
@@ -332,7 +332,7 @@ const VoucherPage = () => {
                                 });
                                 setOpenConfirmBoxDelete(true);
                             }}
-                            className="liquid-glass text-rose-400 p-1 rounded-md"
+                            className="liquid-glass text-rose-500 p-1 rounded-md"
                         >
                             <IoTrash size={18} />
                         </button>
@@ -826,7 +826,8 @@ const VoucherPage = () => {
 
                         <button
                             onClick={handleExportPDF}
-                            className="flex items-center gap-2 justify-center h-12 px-4 py-2 border border-transparent rounded-md shadow-sm sm:text-sm text-xs font-medium text-white bg-red-600/60 hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-red-500"
+                            className="flex items-center gap-2 justify-center h-12 px-4 py-2 border border-transparent rounded-md shadow-sm
+                            sm:text-sm text-xs font-medium text-white bg-red-600/80 hover:bg-red-700 focus:outline-none focus:ring-1 focus:ring-offset-2 focus:ring-red-500"
                         >
                             <FaFilePdf size={15} />
                             <p>Xuất PDF</p>
@@ -841,7 +842,7 @@ const VoucherPage = () => {
                                 placeholder="Tìm kiếm mã giảm giá..."
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
-                                className="w-full pl-10 h-12 text-sm placeholder:text-foreground border-foreground bg-foreground/30"
+                                className="w-full pl-10 h-12 text-sm placeholder:text-foreground border-foreground bg-background/50"
                             />
                             <FaSearch className="absolute left-4 top-1/2 transform -translate-y-1/2" />
                         </div>
@@ -895,6 +896,9 @@ const VoucherPage = () => {
                                 filterable={false}
                                 groupable={false}
                             />
+                            {tableData.length === 0 && (
+                                <NoData message="Không có voucher" />
+                            )}
                         </div>
                     )}
                 </div>

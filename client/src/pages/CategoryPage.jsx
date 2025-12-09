@@ -256,7 +256,7 @@ const CategoryPage = () => {
                                                 e.stopPropagation();
                                                 handleRestore(category);
                                             }}
-                                            className="bg-green-600 hover:bg-green-700 w-full"
+                                            className="bg-green-400/80 text-foreground hover:bg-green-700 w-full"
                                             title="Khôi phục"
                                         >
                                             <RotateCcw className="h-4 w-4" />
@@ -279,7 +279,7 @@ const CategoryPage = () => {
                                                 );
                                                 setDeleteCategory(category);
                                             }}
-                                            className="bg-red-600 hover:bg-red-700 w-full"
+                                            className="bg-red-400/80 text-foreground hover:bg-red-700 w-full"
                                             title="Xóa vĩnh viễn"
                                         >
                                             <Trash2 className="h-4 w-4" />

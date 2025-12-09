@@ -17,6 +17,7 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import Loading from '../components/Loading';
 import DynamicTable from '@/components/table/dynamic-table';
+import NoData from '@/components/NoData';
 
 const AttendanceManagementPage = () => {
     const user = useSelector((state) => state.user);
@@ -333,6 +334,12 @@ const AttendanceManagementPage = () => {
                         filterable={false}
                         groupable={false}
                     />
+                    {tableData.length === 0 && (
+                        // <p className="text-sm text-center text-foreground">
+                        //     Không có dữ liệu
+                        // </p>
+                        <NoData message="Không có dữ liệu" />
+                    )}
                 </>
             )}
         </section>

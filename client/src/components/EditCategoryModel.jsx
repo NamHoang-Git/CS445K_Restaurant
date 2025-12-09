@@ -111,13 +111,13 @@ const EditCategoryModel = ({ close, fetchData, data: CategoryData }) => {
                 {/* Header */}
                 <CardHeader className="pt-4">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                        <CardTitle className="text-lg text-hightlight font-bold uppercase">
                             Sửa danh mục
                         </CardTitle>
                         <Button
                             onClick={close}
                             className="bg-transparent hover:bg-transparent text-foreground
-                        hover:text-lime-300 h-12"
+                        hover:text-highlight h-12"
                         >
                             <IoClose />
                         </Button>

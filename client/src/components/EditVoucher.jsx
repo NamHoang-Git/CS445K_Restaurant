@@ -192,13 +192,13 @@ const EditVoucher = ({
                 <div className="">
                     <CardHeader className="pt-4">
                         <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg text-lime-300 font-bold uppercase">
+                            <CardTitle className="text-lg text-highlight font-bold uppercase">
                                 Sửa mã giảm giá
                             </CardTitle>
                             <Button
                                 onClick={() => onClose()}
                                 className="bg-transparent hover:bg-transparent text-foreground
-                                            hover:text-lime-300 h-12"
+                                            hover:text-highlight h-12"
                             >
                                 <IoClose />
                             </Button>
@@ -269,15 +269,15 @@ const EditVoucher = ({
                                         <div
                                             className={`w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[6px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all ${
                                                 editFormData.isActive
-                                                    ? 'bg-green-300'
-                                                    : 'bg-red-300'
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
                                             }`}
                                         ></div>
                                         <span
                                             className={`px-2 inline-flex leading-5 font-semibold rounded-full ${
                                                 editFormData.isActive
-                                                    ? 'bg-white/20 text-lime-300 border border-lime-200'
-                                                    : 'bg-white/20 text-rose-300 border border-rose-200'
+                                                    ? 'bg-white/20 text-lime-500 border border-lime-600'
+                                                    : 'bg-white/20 text-rose-500 border border-rose-600'
                                             }`}
                                         >
                                             {editFormData.isActive
@@ -296,7 +296,7 @@ const EditVoucher = ({
                                         name="discountType"
                                         value={editFormData.discountType}
                                         onChange={handleOnChange}
-                                        className="text-sm h-9 w-full border-gray-700 border bg-neutral-950
+                                        className="text-sm h-9 w-full border bg-transparent
                                     px-3 py-1 rounded-md"
                                         required
                                     >
@@ -448,7 +448,7 @@ const EditVoucher = ({
                                             name="startDate"
                                             value={editFormData.startDate}
                                             onChange={handleOnChange}
-                                            className="text-sm h-10 w-full border-gray-700 border bg-neutral-950
+                                            className="text-sm h-10 w-full border bg-transparent
                                                                     px-3 py-1 rounded-md pr-16 appearance-none"
                                             required
                                         />
@@ -499,7 +499,7 @@ const EditVoucher = ({
                                             value={editFormData.endDate}
                                             onChange={handleOnChange}
                                             min={editFormData.startDate}
-                                            className="text-sm h-10 w-full border-gray-700 border bg-neutral-950
+                                            className="text-sm h-10 w-full border bg-transparent
                                                                         px-3 py-1 rounded-md pr-8 appearance-none"
                                             required
                                         />

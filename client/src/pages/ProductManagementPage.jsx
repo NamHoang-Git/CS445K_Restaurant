@@ -200,20 +200,20 @@ const ProductManagementPage = () => {
             className="liquid-glass-header p-4 rounded-lg shadow-lg mb-4 border border-secondary-100
         text-secondary-200 sm:text-base text-sm"
         >
-            <div className="flex justify-between items-center mb-4">
-                <h2 className="uppercase text-highlight_2 drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
+            <div className="flex justify-between items-center mb-4 text-foreground">
+                <h2 className="uppercase drop-shadow-[0_0_20px_rgba(132,204,22,0.35)]">
                     Bộ lọc
                 </h2>
                 <button
                     onClick={resetFilters}
-                    className="hover:bg-zinc-800 hover:border-emerald-500 flex items-center gap-2 bg-background/20
-                    transition-all duration-300 text-highlight_2 border-2 border-highlight px-4 py-1.5 rounded-md"
+                    className="hover:bg-background/80 hover:border-emerald-500 flex items-center gap-2 bg-background/20
+                    transition-all duration-300 border-2 border-highlight px-4 py-1.5 rounded-md"
                 >
                     <RiResetLeftFill />
                     Đặt lại
                 </button>
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-4 text-highlight_2">
+            <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex items-center gap-2.5 sm:text-sm text-xs">
                     <Label htmlFor="email">Giá từ</Label>
                     <Input
@@ -222,7 +222,7 @@ const ProductManagementPage = () => {
                         value={filters.minPrice}
                         onChange={handleFilterChange}
                         placeholder="Thấp nhất"
-                        className="w-24 text-sm placeholder:text-highlight_2"
+                        className="w-24 text-sm placeholder:text-highlight"
                     />
                     <span>-</span>
                     <Input
@@ -231,7 +231,7 @@ const ProductManagementPage = () => {
                         value={filters.maxPrice}
                         onChange={handleFilterChange}
                         placeholder="Cao nhất"
-                        className="w-24 text-sm placeholder:text-highlight_2"
+                        className="w-24 text-sm placeholder:text-highlight"
                     />
                     <span className="">VNĐ</span>
                 </div>

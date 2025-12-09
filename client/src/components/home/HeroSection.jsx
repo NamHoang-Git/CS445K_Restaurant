@@ -89,7 +89,7 @@ export const HeroSection = () => {
                         </div>
                         <div className="text-center border-x border-orange-400">
                             <div className="text-3xl md:text-4xl font-bold text-orange-600">
-                                5★
+                                4.9★
                             </div>
                             <div className="text-sm md:text-base text-foreground mt-1">
                                 Đánh giá

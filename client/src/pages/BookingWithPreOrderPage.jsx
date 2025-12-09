@@ -333,7 +333,7 @@ const BookingWithPreOrderPage = () => {
 
     return (
         <section className="container mx-auto py-8 px-4">
-            <Card className="max-w-5xl mx-auto border-foreground border-2">
+            <Card className="max-w-5xl mx-auto border-foreground border-2 py-6">
                 <CardHeader>
                     <CardTitle className="text-2xl text-highlight font-bold text-center">
                         Đặt bàn & Đặt món trước
@@ -343,7 +343,7 @@ const BookingWithPreOrderPage = () => {
                     </CardDescription>
 
                     {/* Step Indicator */}
-                    <div className="flex justify-center items-center gap-4 mt-6">
+                    <div className="flex justify-center items-center gap-4 my-6">
                         {steps.map((step, index) => (
                             <React.Fragment key={step.number}>
                                 <div className="flex flex-col items-center">

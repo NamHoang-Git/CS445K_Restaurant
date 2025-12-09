@@ -20,7 +20,7 @@ const AddFieldComponent = ({ close, value, onChange, onSubmit }) => {
                 {/* Header */}
                 <CardHeader className="border-b border-gray-200 py-2">
                     <div className="flex items-center justify-between">
-                        <CardTitle className="text-base text-lime-300 font-bold uppercase">
+                        <CardTitle className="text-base text-highlight font-bold uppercase">
                             Thêm trường mới
                         </CardTitle>
                         <Button

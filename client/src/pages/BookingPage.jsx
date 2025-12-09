@@ -315,7 +315,7 @@ const BookingPage = () => {
 
     return (
         <section className="container mx-auto py-8 px-4">
-            <Card className="max-w-3xl mx-auto border-foreground border-2">
+            <Card className="max-w-3xl mx-auto border-foreground border-2 py-6">
                 <CardHeader>
                     <CardTitle className="text-2xl text-highlight font-bold text-center">
                         Đặt bàn trực tuyến

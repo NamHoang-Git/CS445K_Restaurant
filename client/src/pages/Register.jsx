@@ -32,19 +32,21 @@ export default function RegisterPage() {
                                 EatEase
                             </Link>
                         </div>
-                        <h1 className="px-4 text-highlight_2 font-bold text-2xl flex flex-1 items-center justify-center">
-                            <TypeAnimation
-                                sequence={[
-                                    'Chào mừng đến với EatEase!',
-                                    800,
-                                    '',
-                                    500,
-                                ]}
-                                wrapper="span"
-                                speed={75}
-                                repeat={Infinity}
-                            />
-                        </h1>
+                        <div className="px-4 py-2 text-foreground font-bold text-2xl flex flex-1 items-center justify-center">
+                            <h1 className="px-4 py-2 text-foreground bg-background/90 rounded-md">
+                                <TypeAnimation
+                                    sequence={[
+                                        'Chào mừng đến với EatEase!',
+                                        800,
+                                        '',
+                                        500,
+                                    ]}
+                                    wrapper="span"
+                                    speed={75}
+                                    repeat={Infinity}
+                                />
+                            </h1>
+                        </div>
                     </div>
                 </div>
                 <div className="flex flex-col gap-4 p-6 md:p-10">

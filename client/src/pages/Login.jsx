@@ -33,7 +33,7 @@ export default function LoginPage() {
                         backgroundRepeat: 'no-repeat',
                     }}
                 >
-                    <h1 className="px-4 text-highlight_2 font-bold text-2xl">
+                    <h1 className="px-4 py-2 text-foreground bg-background/90 rounded-md font-bold text-2xl">
                         <TypeAnimation
                             sequence={['Chào mừng bạn trở lại!', 800, '', 500]}
                             wrapper="span"

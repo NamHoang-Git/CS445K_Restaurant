@@ -9,6 +9,8 @@ import { FaArrowUp, FaSort, FaChevronDown } from 'react-icons/fa';
 import CardLoading from '../components/CardLoading';
 import { IoFilter } from 'react-icons/io5';
 import ProductCard from '@/components/product/product-card';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 
 const ProductListPage = () => {
     const [data, setData] = useState([]);
@@ -284,7 +286,9 @@ const ProductListPage = () => {
                         className="lg:hidden flex items-center justify-between w-full p-3 liquid-glass rounded-lg shadow-lg
                         text-secondary-200 font-bold text-sm"
                     >
-                        <span className="font-medium">Danh mục sản phẩm</span>
+                        <span className="font-medium text-orange-800 dark:text-orange-500">
+                            Danh mục sản phẩm
+                        </span>
                         <FaChevronDown
                             className={`transition-transform ${
                                 showSidebar ? 'transform rotate-180' : ''
@@ -299,7 +303,7 @@ const ProductListPage = () => {
                         } lg:block w-full lg:w-72 flex-shrink-0`}
                     >
                         <div className="liquid-glass rounded-lg shadow-lg lg:sticky lg:top-24 p-2">
-                            <h3 className="font-bold text-lg text-secondary-200 hidden lg:block shadow-lg p-3 rounded-lg">
+                            <h3 className="font-bold text-lg text-orange-800 dark:text-orange-500 hidden lg:block shadow-lg p-3 rounded-lg">
                                 Danh mục
                             </h3>
                             <div className="space-y-2 max-h-[calc(100vh-200px)] overflow-y-auto p-4">
@@ -329,8 +333,8 @@ const ProductListPage = () => {
                                                     to={link}
                                                     className={`flex items-center gap-4 p-2 rounded-lg transition-colors flex-1 ${
                                                         categoryId === s._id
-                                                            ? 'bg-white/50 text-black'
-                                                            : 'hover:bg-black/50 text-lime-300'
+                                                            ? 'bg-foreground text-background'
+                                                            : 'hover:bg-black/20 text-foreground'
                                                     }`}
                                                     onClick={() =>
                                                         setShowSidebar(false)
@@ -368,7 +372,7 @@ const ProductListPage = () => {
                                                         }
                                                     >
                                                         <FaChevronDown
-                                                            className={`transition-transform text-lime-300 ${
+                                                            className={`transition-transform text-foreground ${
                                                                 isExpanded
                                                                     ? 'transform rotate-180'
                                                                     : ''
@@ -401,7 +405,7 @@ const ProductListPage = () => {
                                                                         subCategoryId ===
                                                                         subCat._id
                                                                             ? 'bg-rose-200/50 text-black'
-                                                                            : 'hover:bg-black/30 text-lime-200'
+                                                                            : 'hover:bg-black/30 text-foreground'
                                                                     }`}
                                                                     onClick={() =>
                                                                         setShowSidebar(
@@ -503,7 +507,7 @@ const ProductListPage = () => {
                                                 ? 'Đang lọc...'
                                                 : 'Lọc theo giá'}
                                         </h4>
-                                        <button
+                                        <Button
                                             onClick={() => {
                                                 setPriceRange({
                                                     min: '',
@@ -511,37 +515,37 @@ const ProductListPage = () => {
                                                 });
                                                 setSortBy('newest');
                                             }}
-                                            className="hover:opacity-80 sm:text-sm text-xs text-white bg-secondary-200 px-4 sm:py-[6px] py-1
-                                        rounded-md font-medium"
+                                            className="hover:opacity-80 sm:text-sm text-xs text-foreground bg-secondary-200 px-4 sm:py-[6px] py-1
+                                        rounded-md font-medium border-2 border-orange-500"
                                         >
                                             Đặt lại bộ lọc
-                                        </button>
+                                        </Button>
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-secondary-200 font-medium sm:text-sm text-xs">
                                         <div>
                                             <label className="block font-medium mb-1">
                                                 Giá thấp nhất
                                             </label>
-                                            <input
+                                            <Input
                                                 type="number"
                                                 name="min"
                                                 value={priceRange.min}
                                                 onChange={handlePriceChange}
                                                 placeholder="Từ"
-                                                className="w-full p-2 border no-spinner border-gray-300 rounded-md focus:ring-rose-500 focus:border-rose-500"
+                                                className="w-full p-2 border no-spinner rounded-md focus:ring-rose-500 focus:border-rose-500 bg-background/70"
                                             />
                                         </div>
                                         <div>
                                             <label className="block font-medium mb-1">
                                                 Giá cao nhất
                                             </label>
-                                            <input
+                                            <Input
                                                 type="number"
                                                 name="max"
                                                 value={priceRange.max}
                                                 onChange={handlePriceChange}
                                                 placeholder="Đến"
-                                                className="w-full p-2 border no-spinner border-gray-300 rounded-md focus:ring-rose-500 focus:border-rose-500"
+                                                className="w-full p-2 border no-spinner rounded-md focus:ring-rose-500 focus:border-rose-500 bg-background/70"
                                             />
                                         </div>
                                     </div>

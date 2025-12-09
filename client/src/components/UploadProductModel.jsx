@@ -300,7 +300,7 @@ const UploadProductModel = ({ close, fetchData }) => {
                                     className={`block border-2 border-dashed rounded-xl p-6 text-center cursor-pointer
                                 transition-all duration-200 group ${
                                     data.image.length
-                                        ? 'border-green-300 bg-black/50'
+                                        ? 'border-green-300 bg-green-100/50'
                                         : 'border-gray-300 hover:border-red-500'
                                 } ${
                                         !data.name || loading
@@ -324,11 +324,11 @@ const UploadProductModel = ({ close, fetchData }) => {
                                                 />
                                             )}
                                         </div>
-                                        <div className="sm text-xs text-rose-500">
+                                        <div className="sm text-xs text-rose-600">
                                             <p className="font-medium">
                                                 Nhấn để chọn ảnh
                                             </p>
-                                            <p className="sm:text-xs text-[10px] text-rose-300">
+                                            <p className="sm:text-xs text-[10px] text-rose-400">
                                                 PNG, JPG (tối đa 10 ảnh, mỗi ảnh
                                                 tối đa 5MB)
                                             </p>
@@ -570,7 +570,7 @@ const UploadProductModel = ({ close, fetchData }) => {
                                     </SelectContent>
                                 </Select>
                             ) : (
-                                <div className="w-full h-12 flex items-center justify-center border border-dashed border-gray-300 rounded-md bg-gray-50/50">
+                                <div className="w-full h-12 flex items-center justify-center border border-dashed border-gray-300 rounded-md opacity-50">
                                     <p className="text-sm text-muted-foreground">
                                         Vui lòng chọn danh mục trước
                                     </p>
@@ -827,7 +827,7 @@ const UploadProductModel = ({ close, fetchData }) => {
                             <Button
                                 type="button"
                                 onClick={() => setOpenAddField(true)}
-                                className="flex items-center gap-2 font-semibold text-rose-300
+                                className="flex items-center gap-2 font-semibold text-rose-600
                         hover:text-primary-700 transition-colors w-full
                         px-3 py-2 rounded-lg border shadow-md hover:bg-transparent"
                             >

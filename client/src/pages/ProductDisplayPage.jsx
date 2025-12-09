@@ -21,6 +21,7 @@ import ProductCard from '@/components/product/product-card';
 import GlareHover from '@/components/GlareHover';
 import { Button } from '@/components/ui/button';
 import ViewImage from '@/components/ViewImage';
+import NoData from '@/components/NoData';
 
 const ProductDisplayPage = () => {
     const params = useParams();
@@ -239,7 +240,7 @@ const ProductDisplayPage = () => {
                             <div
                                 ref={imageContainer}
                                 className="grid grid-flow-col auto-cols-[minmax(70px,70px)] sm:auto-cols-[minmax(85px,85px)]
-                            sm:gap-4 gap-2 overflow-x-auto scroll-smooth scrollbar-hide"
+                                    sm:gap-4 gap-2 overflow-x-auto scroll-smooth scrollbar-hide"
                             >
                                 {data.image.map((img, index) => (
                                     <div
@@ -259,25 +260,29 @@ const ProductDisplayPage = () => {
                                 ))}
                             </div>
 
-                            <div className="left-0 absolute hidden lg:block cursor-pointer text-white hover:opacity-80">
-                                <button
-                                    onClick={handleScrollLeft}
-                                    className="z-10 bg-rose-600/80 shadow-md shadow-secondary-200 text-lg
+                            {data.image.length > 6 && (
+                                <>
+                                    <div className="left-0 absolute hidden lg:block cursor-pointer text-foreground hover:opacity-80">
+                                        <button
+                                            onClick={handleScrollLeft}
+                                            className="z-10 bg-rose-600/80 shadow-md shadow-secondary-200 text-lg
                                                p-2 rounded-full "
-                                >
-                                    <FaAngleLeft size={16} />
-                                </button>
-                            </div>
+                                        >
+                                            <FaAngleLeft size={16} />
+                                        </button>
+                                    </div>
 
-                            <div className="right-0 absolute hidden lg:block cursor-pointer text-white hover:opacity-80">
-                                <button
-                                    onClick={handleScrollRight}
-                                    className="z-10 bg-rose-600/80 shadow-md shadow-secondary-200 text-lg
+                                    <div className="right-0 absolute hidden lg:block cursor-pointer text-foreground hover:opacity-80">
+                                        <button
+                                            onClick={handleScrollRight}
+                                            className="z-10 bg-rose-600/80 shadow-md shadow-secondary-200 text-lg
                                                p-2 rounded-full "
-                                >
-                                    <FaAngleRight size={16} />
-                                </button>
-                            </div>
+                                        >
+                                            <FaAngleRight size={16} />
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
 
@@ -289,8 +294,8 @@ const ProductDisplayPage = () => {
                                     onClick={() => setTab('detail')}
                                     className={`pb-2 font-bold text-lg px-2 ${
                                         tab === 'detail'
-                                            ? 'border-b-[3px] border-lime-300 text-lime-300'
-                                            : 'text-white'
+                                            ? 'border-b-[3px] border-highlight text-highlight'
+                                            : 'text-foreground'
                                     }`}
                                 >
                                     Chi tiết
@@ -299,8 +304,8 @@ const ProductDisplayPage = () => {
                                     onClick={() => setTab('description')}
                                     className={`pb-2 font-bold text-lg px-2 ${
                                         tab === 'description'
-                                            ? 'border-b-[3px] border-lime-300 text-lime-300'
-                                            : 'text-white'
+                                            ? 'border-b-[3px] border-highlight text-highlight'
+                                            : 'text-foreground'
                                     }`}
                                 >
                                     Mô tả
@@ -309,8 +314,8 @@ const ProductDisplayPage = () => {
                                     onClick={() => setTab('reviews')}
                                     className={`pb-2 font-bold text-lg px-2 ${
                                         tab === 'reviews'
-                                            ? 'border-b-[3px] border-lime-300 text-lime-300'
-                                            : 'text-white'
+                                            ? 'border-b-[3px] border-highlight text-highlight'
+                                            : 'text-foreground'
                                     }`}
                                 >
                                     Đánh giá
@@ -319,7 +324,7 @@ const ProductDisplayPage = () => {
 
                             <div className="mt-6 px-4">
                                 {tab === 'detail' && (
-                                    <div className="text-white leading-relaxed break-words flex flex-col gap-3">
+                                    <div className="text-foreground leading-relaxed break-words flex flex-col gap-3">
                                         <div className="flex gap-4">
                                             <span className="font-semibold text-nowrap">
                                                 Danh mục:{' '}
@@ -343,14 +348,14 @@ const ProductDisplayPage = () => {
                                                                         cat.name
                                                                     )
                                                                 }
-                                                                className="hover:underline text-lime-300 font-semibold px-4"
+                                                                className="hover:underline text-orange-500 font-semibold px-4"
                                                             >
                                                                 {cat.name}
                                                             </Link>
                                                         )
                                                     )
                                                 ) : (
-                                                    <span className="italic text-white break-words">
+                                                    <span className="italic text-foreground break-words">
                                                         Không có danh mục
                                                     </span>
                                                 )}
@@ -372,7 +377,7 @@ const ProductDisplayPage = () => {
                                     </div>
                                 )}
                                 {tab === 'description' && (
-                                    <div className="text-white leading-relaxed break-words space-y-2">
+                                    <div className="text-foreground leading-relaxed break-words space-y-2">
                                         {data?.description &&
                                         data.description.trim() !== '' ? (
                                             data.description
@@ -386,14 +391,14 @@ const ProductDisplayPage = () => {
                                                     </div>
                                                 ))
                                         ) : (
-                                            <span className="italic text-white">
+                                            <span className="italic text-foreground">
                                                 Sản phẩm này hiện chưa có mô tả.
                                             </span>
                                         )}
                                     </div>
                                 )}
                                 {tab === 'reviews' && (
-                                    <p className="italic text-white break-words">
+                                    <p className="italic text-foreground break-words">
                                         Chưa có đánh giá nào.
                                     </p>
                                 )}
@@ -406,7 +411,7 @@ const ProductDisplayPage = () => {
                                 Object.keys(data.more_details).length > 0
                                     ? 'flex'
                                     : 'hidden'
-                            } bg-white p-4 rounded-lg flex-col gap-6`}
+                            } glass-border liquid-glass-2 p-4 rounded-lg flex-col gap-6`}
                         >
                             {data?.more_details &&
                                 Object.keys(data.more_details).map(
@@ -425,8 +430,8 @@ const ProductDisplayPage = () => {
                     </div>
                 </div>
 
-                <div className="flex flex-col sm:gap-4 gap-2 mt-6 text-white">
-                    <h1 className="text-lg lg:text-3xl font-bold">
+                <div className="flex flex-col sm:gap-4 gap-2 mt-6 text-foreground">
+                    <h1 className="text-2xl lg:text-3xl text-red-700 dark:text-orange-600 font-bold">
                         {data.name}
                     </h1>
                     <p className="text-secondary-100 font-bold sm:text-xl text-base">
@@ -441,13 +446,13 @@ const ProductDisplayPage = () => {
                             )}
                         </p>
                         {data.discount > 0 && (
-                            <div className="flex items-center gap-3 sm:text-base text-sm">
-                                <p className="line-through text-rose-400 font-semibold">
+                            <div className="flex items-center gap-3 sm:text-lg text-sm">
+                                <p className="line-through text-rose-600 font-semibold">
                                     {DisplayPriceInVND(data.price)}
                                 </p>
                                 <span
-                                    className="border-2 border-lime-300 text-lime-300 font-semibold
-                                px-3 rounded-full shadow sm:text-base text-xs bg-lime-300/30"
+                                    className="border-2 border-orange-500 text-foreground font-semibold
+                                px-3 rounded-full shadow sm:text-base text-xs bg-orange-500/30"
                                 >
                                     -{data.discount}%
                                 </span>
@@ -461,7 +466,7 @@ const ProductDisplayPage = () => {
                             <div className="mb-6">
                                 {data.options.map((option, idx) => (
                                     <div key={idx} className="mb-4">
-                                        <h3 className="font-semibold mb-2 text-white">
+                                        <h3 className="font-semibold mb-2 text-foreground">
                                             {option.name}
                                         </h3>
                                         <div className="flex flex-wrap gap-3">
@@ -510,11 +515,11 @@ const ProductDisplayPage = () => {
 
                         {/* Notes Section */}
                         <div className="mb-6">
-                            <h3 className="font-semibold mb-2 text-white">
+                            <h3 className="font-semibold mb-2 text-foreground">
                                 Ghi chú cho món ăn
                             </h3>
                             <textarea
-                                className="w-full p-3 rounded-lg bg-white/10 border border-gray-600 text-white placeholder-gray-400 focus:outline-none focus:border-lime-300"
+                                className="w-full p-3 rounded-lg bg-white/10 border border-gray-600 text-foreground placeholder-foreground/90 focus:outline-none focus:border-lime-300"
                                 rows="3"
                                 placeholder="Ví dụ: Không hành, ít đá..."
                                 value={notes}
@@ -542,7 +547,7 @@ const ProductDisplayPage = () => {
                                     >
                                         <Button
                                             onClick={redirectToCartPage}
-                                            className="bg-white/30 hover:bg-transparent text-white px-4 sm:px-6 sm:py-3 py-2
+                                            className="bg-background/95 hover:bg-background text-foreground px-4 sm:px-6 sm:py-3 py-2
                                 rounded-lg font-bold shadow-md shadow-secondary-100 text-center"
                                         >
                                             {loading ? <Loading /> : 'Mua ngay'}
@@ -555,7 +560,7 @@ const ProductDisplayPage = () => {
 
                     <div className="mt-4 liquid-glass p-4 rounded-lg shadow-md">
                         <h2 className="font-semibold sm:text-lg text-sm">
-                            Tại sao nên mua sắm tại TechSpace?{' '}
+                            Tại sao nên chọn EatEase?{' '}
                         </h2>
                         <div className="sm:text-base text-sm">
                             <div className="flex items-center gap-4 my-4">
@@ -566,11 +571,11 @@ const ProductDisplayPage = () => {
                                 />
                                 <div className="flex flex-col gap-1">
                                     <div className="font-semibold">
-                                        Giao hàng siêu tốc
+                                        Thức ăn tươi ngon
                                     </div>
                                     <p className="sm:text-sm text-xs">
-                                        Nhận hàng ngay tại cửa trong thời gian
-                                        ngắn nhất, từ các kho gần bạn.
+                                        Chất lượng sản phẩm đảm bảo, từ các nhà
+                                        cung cấp uy tín.
                                     </p>
                                 </div>
                             </div>
@@ -620,8 +625,8 @@ const ProductDisplayPage = () => {
                             onClick={() => setTab('detail')}
                             className={`pb-2 font-bold px-2 ${
                                 tab === 'detail'
-                                    ? 'border-b-[3px] border-lime-300 text-lime-300'
-                                    : 'text-white'
+                                    ? 'border-b-[3px] border-highlight text-highlight'
+                                    : 'text-foreground'
                             }`}
                         >
                             Chi tiết
@@ -630,8 +635,8 @@ const ProductDisplayPage = () => {
                             onClick={() => setTab('description')}
                             className={`pb-2 font-bold px-2 ${
                                 tab === 'description'
-                                    ? 'border-b-[3px] border-lime-300 text-lime-300'
-                                    : 'text-white'
+                                    ? 'border-b-[3px] border-highlight text-highlight'
+                                    : 'text-foreground'
                             }`}
                         >
                             Mô tả
@@ -640,8 +645,8 @@ const ProductDisplayPage = () => {
                             onClick={() => setTab('reviews')}
                             className={`pb-2 font-bold px-2 ${
                                 tab === 'reviews'
-                                    ? 'border-b-[3px] border-lime-300 text-lime-300'
-                                    : 'text-white'
+                                    ? 'border-b-[3px] border-highlight text-highlight'
+                                    : 'text-foreground'
                             }`}
                         >
                             Đánh giá
@@ -650,7 +655,7 @@ const ProductDisplayPage = () => {
 
                     <div className="mt-6 px-4">
                         {tab === 'detail' && (
-                            <div className="text-sm text-white leading-relaxed break-words flex flex-col gap-3">
+                            <div className="text-sm text-foreground leading-relaxed break-words flex flex-col gap-3">
                                 <div className="flex gap-4">
                                     <span className="font-semibold text-nowrap">
                                         Danh mục:{' '}
@@ -668,13 +673,13 @@ const ProductDisplayPage = () => {
                                                             cat.name
                                                         )
                                                     }
-                                                    className="hover:underline text-lime-300 font-semibold px-2"
+                                                    className="hover:underline text-orange-600 font-semibold px-2"
                                                 >
                                                     {cat.name}
                                                 </Link>
                                             ))
                                         ) : (
-                                            <span className="italic text-white break-words">
+                                            <span className="italic text-foreground break-words">
                                                 Không có danh mục
                                             </span>
                                         )}
@@ -695,7 +700,7 @@ const ProductDisplayPage = () => {
                             </div>
                         )}
                         {tab === 'description' && (
-                            <div className="text-white leading-relaxed break-words space-y-2 text-sm">
+                            <div className="text-foreground leading-relaxed break-words space-y-2 text-sm">
                                 {data?.description &&
                                 data.description.trim() !== '' ? (
                                     data.description
@@ -709,14 +714,14 @@ const ProductDisplayPage = () => {
                                             </div>
                                         ))
                                 ) : (
-                                    <span className="italic text-white">
+                                    <span className="italic text-foreground">
                                         Sản phẩm này hiện chưa có mô tả.
                                     </span>
                                 )}
                             </div>
                         )}
                         {tab === 'reviews' && (
-                            <p className="italic text-white text-sm break-words">
+                            <p className="italic text-foreground text-sm break-words">
                                 Chưa có đánh giá nào.
                             </p>
                         )}
@@ -749,18 +754,23 @@ const ProductDisplayPage = () => {
                 className="sm:mt-10 mt-6 lg:mb-4 liquid-glass sm:p-4 p-2 py-6 shadow-md rounded-lg
             flex flex-col gap-4"
             >
-                <h2 className="sm:text-xl text-base font-bold sm:p-0 px-2 text-white">
+                <h2 className="sm:text-xl text-base font-bold sm:p-0 px-2 text-foreground">
                     Sản phẩm tương tự
                 </h2>
-                <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4 gap-[10px]">
+
+                <div
+                    className={`${
+                        relatedProducts.length > 0
+                            ? 'grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 sm:gap-4 gap-[10px]'
+                            : ''
+                    } flex flex-wrap gap-2`}
+                >
                     {relatedProducts.length > 0 ? (
                         relatedProducts.map((item) => (
                             <ProductCard key={item._id} data={item} />
                         ))
                     ) : (
-                        <p className="text-white">
-                            Không có sản phẩm tương tự.
-                        </p>
+                        <NoData message="Không có sản phẩm tương tự" />
                     )}
                 </div>
             </div>

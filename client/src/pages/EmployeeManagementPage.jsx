@@ -37,6 +37,7 @@ import GlareHover from '@/components/GlareHover';
 import { IoClose } from 'react-icons/io5';
 import DynamicTable from '@/components/table/dynamic-table';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import NoData from '@/components/NoData';
 
 const EmployeeManagementPage = () => {
     const user = useSelector((state) => state.user);
@@ -822,15 +823,20 @@ const EmployeeManagementPage = () => {
                     <Loading />
                 </div>
             ) : (
-                <DynamicTable
-                    data={tableData}
-                    columns={columns}
-                    pageSize={10}
-                    sortable={true}
-                    searchable={false}
-                    filterable={false}
-                    groupable={false}
-                />
+                <>
+                    <DynamicTable
+                        data={tableData}
+                        columns={columns}
+                        pageSize={10}
+                        sortable={true}
+                        searchable={false}
+                        filterable={false}
+                        groupable={false}
+                    />
+                    {tableData.length === 0 && (
+                        <NoData message="Không có nhân viên" />
+                    )}
+                </>
             )}
 
             {/* Edit Modal */}

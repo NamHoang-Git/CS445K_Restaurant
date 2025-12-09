@@ -103,7 +103,12 @@ const AddToCartButton = ({ data }) => {
 
         // Optimistic update - update local state immediately
         const newQty = qty + 1;
-        dispatch(updateCartItemQuantity({ itemId: cartItemDetails._id, newQuantity: newQty }));
+        dispatch(
+            updateCartItemQuantity({
+                itemId: cartItemDetails._id,
+                newQuantity: newQty,
+            })
+        );
         setQty(newQty);
 
         // Then sync with server
@@ -111,7 +116,12 @@ const AddToCartButton = ({ data }) => {
 
         if (!response.success) {
             // Rollback on error
-            dispatch(updateCartItemQuantity({ itemId: cartItemDetails._id, newQuantity: qty }));
+            dispatch(
+                updateCartItemQuantity({
+                    itemId: cartItemDetails._id,
+                    newQuantity: qty,
+                })
+            );
             setQty(qty);
         }
     };
@@ -141,7 +151,12 @@ const AddToCartButton = ({ data }) => {
         } else {
             // Optimistic update - update local state immediately
             const newQty = qty - 1;
-            dispatch(updateCartItemQuantity({ itemId: cartItemDetails._id, newQuantity: newQty }));
+            dispatch(
+                updateCartItemQuantity({
+                    itemId: cartItemDetails._id,
+                    newQuantity: newQty,
+                })
+            );
             setQty(newQty);
 
             // Then sync with server
@@ -149,7 +164,12 @@ const AddToCartButton = ({ data }) => {
 
             if (!response.success) {
                 // Rollback on error
-                dispatch(updateCartItemQuantity({ itemId: cartItemDetails._id, newQuantity: qty }));
+                dispatch(
+                    updateCartItemQuantity({
+                        itemId: cartItemDetails._id,
+                        newQuantity: qty,
+                    })
+                );
                 setQty(qty);
             }
         }
@@ -160,26 +180,26 @@ const AddToCartButton = ({ data }) => {
             {isAvailableCart && cartItemDetails ? (
                 <div
                     className="flex items-center justify-center w-full border-gray-200 focus:ring-0 shadow-none rounded-lg
-                focus:border-[#3F3FF3] liquid-glass-2"
+                focus:border-[#3F3FF3] liquid-glass"
                 >
                     <Button
                         onClick={decreaseQty}
-                        className="flex items-center justify-center flex-1 w-full bg-gradient-to-r from-emerald-300 to-cyan-600 hover:from-emerald-600
-                    hover:to-cyan-600 transition-all duration-300 shadow-lg shadow-emerald-500/20"
+                        className="flex items-center justify-center flex-1 w-full bg-gradient-to-r dark:from-emerald-600 dark:to-cyan-500 from-orange-600 to-amber-500 dark:hover:from-emerald-600 dark:hover:to-cyan-600
+                    hover:from-orange-600 hover:to-amber-600 transition-all duration-300 shadow-lg shadow-emerald-500/20"
                         disabled={loading}
                     >
                         <FaMinus className="sm:hidden" size={10} />
                         <FaMinus className="hidden sm:block" size={14} />
                     </Button>
 
-                    <p className="flex-1 text-sm text-lime-100 w-9 flex items-center justify-center">
+                    <p className="flex-1 text-sm text-red-500 dark:text-white w-9 flex items-center justify-center">
                         {qty}
                     </p>
 
                     <Button
                         onClick={increaseQty}
-                        className="flex items-center justify-center flex-1 w-full bg-gradient-to-r from-emerald-300 to-cyan-600 hover:from-emerald-600
-                    hover:to-cyan-600 transition-all duration-300 shadow-lg shadow-emerald-500/20"
+                        className="flex items-center justify-center flex-1 w-full bg-gradient-to-r dark:from-emerald-600 dark:to-cyan-500 from-orange-600 to-amber-500 dark:hover:from-emerald-600 dark:hover:to-cyan-600
+                    hover:from-orange-600 hover:to-amber-600 transition-all duration-300 shadow-lg shadow-emerald-500/20"
                         disabled={loading}
                     >
                         <FaPlus className="sm:hidden" size={10} />
@@ -189,8 +209,8 @@ const AddToCartButton = ({ data }) => {
             ) : (
                 <Button
                     onClick={handleADDTocart}
-                    className="w-full bg-gradient-to-r from-emerald-600 to-cyan-500 hover:from-emerald-600 hover:to-cyan-600 transition-all
-                    duration-300 shadow-lg shadow-emerald-500/20"
+                    className="w-full bg-gradient-to-r dark:from-emerald-600 dark:to-cyan-500 from-orange-600 to-amber-500 dark:hover:from-emerald-600 dark:hover:to-cyan-600
+                hover:from-orange-600 hover:to-amber-600 transition-all duration-300 shadow-lg shadow-emerald-500/20"
                     disabled={loading || !data?._id || data?.stock <= 0}
                 >
                     {loading ? (

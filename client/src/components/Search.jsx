@@ -67,15 +67,15 @@ const Search = () => {
                         >
                             <TypeAnimation
                                 sequence={[
-                                    'Tìm kiếm "điện thoại"',
+                                    'Tìm kiếm "thịt..."',
                                     1000,
-                                    'Tìm kiếm "iPad"',
+                                    'Tìm kiếm "kem..."',
                                     1000,
-                                    'Tìm kiếm "máy tính xách tay"',
+                                    'Tìm kiếm "tôm..."',
                                     1000,
-                                    'Tìm kiếm "bàn phím"',
+                                    'Tìm kiếm "mực..."',
                                     1000,
-                                    'Tìm kiếm "bộ xử lý"',
+                                    'Tìm kiếm "combo..."',
                                     1000,
                                 ]}
                                 wrapper="span"
@@ -90,7 +90,7 @@ const Search = () => {
                                 type="text"
                                 placeholder="Bạn muốn mua gì hôm nay?"
                                 autoFocus={true}
-                                className="w-full h-full bg-transparent text-white outline-none"
+                                className="w-full h-full bg-transparent outline-none"
                                 defaultValue={searchText}
                                 onChange={handleOnChange}
                                 spellCheck={false}

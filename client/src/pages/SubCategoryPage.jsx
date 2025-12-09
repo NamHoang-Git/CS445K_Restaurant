@@ -280,7 +280,7 @@ const SubCategoryPage = () => {
                         placeholder="Tìm kiếm loại sản phẩm..."
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
-                        className="pl-10"
+                        className="pl-10 bg-background/60 placeholder:text-foreground"
                     />
                 </div>
 
@@ -289,7 +289,7 @@ const SubCategoryPage = () => {
                     value={selectedCategory}
                     onValueChange={setSelectedCategory}
                 >
-                    <SelectTrigger className="w-full sm:w-[200px]">
+                    <SelectTrigger className="w-full sm:w-[200px] bg-background/60">
                         <SelectValue placeholder="Lọc theo danh mục" />
                     </SelectTrigger>
                     <SelectContent>

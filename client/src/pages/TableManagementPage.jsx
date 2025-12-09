@@ -19,6 +19,7 @@ import GlareHover from '@/components/GlareHover';
 import { Button } from '@/components/ui/button';
 import UploadTableModel from '@/components/UploadTableModel';
 import EditTableModel from '@/components/EditTableModel';
+import NoData from '@/components/NoData';
 
 const TableManagementPage = () => {
     const [openAddTable, setOpenAddTable] = useState(false);
@@ -212,6 +213,7 @@ const TableManagementPage = () => {
                     groupable={false}
                 />
             </div>
+            {data.length === 0 && <NoData message="Không có bàn" />}
 
             {loading && <Loading />}
 

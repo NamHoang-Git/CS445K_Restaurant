@@ -58,7 +58,7 @@ export function ProductCard({ data }: ProductCardProps) {
                 >
                     {/* Glow effect on hover */}
                     <div
-                        className={`absolute inset-0 bg-gradient-to-r from-emerald-500/20 to-cyan-500/20 opacity-0 transition-opacity duration-500 pointer-events-none ${
+                        className={`absolute inset-0 bg-gradient-to-r dark:from-emerald-500/20 dark:to-cyan-500/20 from-orange-500/10 to-amber-500/10 opacity-0 transition-opacity duration-500 pointer-events-none ${
                             isHovered ? 'opacity-100' : ''
                         }`}
                     />
@@ -67,7 +67,7 @@ export function ProductCard({ data }: ProductCardProps) {
                     <div
                         className={`absolute inset-0 rounded-3xl border-2 border-emerald-500/0 transition-all duration-500 ${
                             isHovered
-                                ? 'border-emerald-500/70 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
+                                ? 'dark:border-emerald-500/70 border-orange-500/70 shadow-[0_0_15px_rgba(16,185,129,0.3)]'
                                 : ''
                         }`}
                     />
@@ -96,7 +96,7 @@ export function ProductCard({ data }: ProductCardProps) {
                                         repeatDelay: 2,
                                     }}
                                 >
-                                    <Badge className="bg-gradient-to-r from-emerald-700 to-cyan-500 shadow-lg shadow-emerald-500/20 font-bold text-white">
+                                    <Badge className="bg-gradient-to-r dark:from-emerald-700 dark:to-cyan-500 from-orange-700 to-amber-500 shadow-lg shadow-emerald-500/20 font-bold text-white">
                                         -{data.discount}%
                                     </Badge>
                                 </motion.div>
@@ -104,11 +104,13 @@ export function ProductCard({ data }: ProductCardProps) {
                         )}
                     </div>
 
-                    <CardContent className="p-3 relative z-10 text-white flex flex-col gap-1.5 justify-between h-36 w-full">
+                    <CardContent className="p-3 relative z-10 text-foreground flex flex-col gap-1.5 justify-between h-36 w-full">
                         <div className="">
                             <h3
                                 className={`font-semibold mb-1 transition-colors duration-300 line-clamp-2 h-fit w-full ${
-                                    isHovered ? 'text-emerald-200' : ''
+                                    isHovered
+                                        ? 'text-orange-600 dark:text-emerald-300'
+                                        : ''
                                 }`}
                             >
                                 {data.name}
@@ -118,10 +120,10 @@ export function ProductCard({ data }: ProductCardProps) {
                                 <div className="flex items-center justify-between gap-2 w-full">
                                     {data.discount > 0 ? (
                                         <>
-                                            <span className="text-gray-300 line-through text-sm">
+                                            <span className="text-highlight line-through text-sm">
                                                 {DisplayPriceInVND(data.price)}
                                             </span>
-                                            <span className="text-emerald-300 font-bold text-lg">
+                                            <span className="dark:text-emerald-300 text-orange-500 font-bold text-lg">
                                                 {DisplayPriceInVND(
                                                     pricewithDiscount(
                                                         data.price,
@@ -131,7 +133,7 @@ export function ProductCard({ data }: ProductCardProps) {
                                             </span>
                                         </>
                                     ) : (
-                                        <span className="text-emerald-500 font-bold text-lg">
+                                        <span className="dark:text-emerald-300 text-orange-500 font-bold text-lg">
                                             {DisplayPriceInVND(data.price)}
                                         </span>
                                     )}
