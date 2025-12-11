@@ -44,8 +44,8 @@ function App() {
         '/reset-password',
         '/verify-email',
     ].some((path) => location.pathname.startsWith(path));
-    const dashBoardLayout = ['/admin', '/dashboard'].some((path) =>
-        location.pathname.startsWith(path)
+    const dashBoardLayout = ['/admin', '/dashboard', '/table-menu'].some(
+        (path) => location.pathname.startsWith(path)
     );
 
     useEffect(() => {

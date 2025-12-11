@@ -4,13 +4,14 @@ import { useSelector, useDispatch } from 'react-redux';
 import Axios from '../utils/Axios';
 import SummaryApi from '../common/SummaryApi';
 import toast from 'react-hot-toast';
-import { FiShoppingCart, FiLogOut, FiMinus, FiPlus } from 'react-icons/fi';
 import {
-    handleAddItemCart,
-    updateCartItemQuantity,
-    removeFromCart,
-    clearCart,
-} from '../store/cartProduct';
+    FiShoppingCart,
+    FiLogOut,
+    FiMinus,
+    FiPlus,
+    FiList,
+} from 'react-icons/fi';
+import { handleAddItemCart, clearCart } from '../store/cartProduct';
 
 const TableMenuPage = () => {
     const navigate = useNavigate();
@@ -23,7 +24,9 @@ const TableMenuPage = () => {
     const [selectedCategory, setSelectedCategory] = useState(null);
     const [loading, setLoading] = useState(true);
     const [showCart, setShowCart] = useState(false);
+    const [showCurrentOrder, setShowCurrentOrder] = useState(false);
     const [tableInfo, setTableInfo] = useState(null);
+    const [currentOrder, setCurrentOrder] = useState(null);
 
     // Check if user is a table account
     useEffect(() => {
@@ -35,6 +38,8 @@ const TableMenuPage = () => {
 
         // Get table session info
         fetchTableSession();
+        // Get current order
+        fetchCurrentOrder();
     }, [user, navigate]);
 
     const fetchTableSession = async () => {
@@ -47,6 +52,20 @@ const TableMenuPage = () => {
             }
         } catch (error) {
             console.error('Error fetching table session:', error);
+        }
+    };
+
+    const fetchCurrentOrder = async () => {
+        try {
+            const response = await Axios({
+                ...SummaryApi.get_current_table_order,
+            });
+            if (response.data.success) {
+                setCurrentOrder(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching current order:', error);
+            // Don't show error toast as there might not be an order yet
         }
     };
 
@@ -200,8 +219,10 @@ const TableMenuPage = () => {
                 toast.success('Đã thêm món vào đơn!');
                 dispatch(clearCart()); // Clear cart in Redux
                 setShowCart(false);
-                // Navigate to order management page
-                navigate('/table-order-management');
+                // Refresh current order
+                fetchCurrentOrder();
+                // Show current order
+                setShowCurrentOrder(true);
             }
         } catch (error) {
             console.error('Error adding items to order:', error);
@@ -249,8 +270,21 @@ const TableMenuPage = () => {
                     </div>
                     <div className="flex items-center gap-4">
                         <button
+                            onClick={() => setShowCurrentOrder(true)}
+                            className="relative bg-white text-blue-500 p-3 rounded-full hover:bg-blue-50 transition-colors"
+                            title="Xem đơn gọi món"
+                        >
+                            <FiList size={24} />
+                            {currentOrder?.items?.length > 0 && (
+                                <span className="absolute -top-1 -right-1 bg-blue-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                                    {currentOrder.items.length}
+                                </span>
+                            )}
+                        </button>
+                        <button
                             onClick={() => setShowCart(true)}
                             className="relative bg-white text-orange-500 p-3 rounded-full hover:bg-orange-50 transition-colors"
+                            title="Giỏ hàng"
                         >
                             <FiShoppingCart size={24} />
                             {cartItems.length > 0 && (
@@ -262,6 +296,7 @@ const TableMenuPage = () => {
                         <button
                             onClick={handleLogout}
                             className="bg-white text-orange-500 p-3 rounded-full hover:bg-orange-50 transition-colors"
+                            title="Đăng xuất"
                         >
                             <FiLogOut size={24} />
                         </button>
@@ -459,6 +494,182 @@ const TableMenuPage = () => {
                                     </button>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {/* Current Order Sidebar */}
+            {showCurrentOrder && (
+                <div
+                    className="fixed inset-0 bg-black bg-opacity-50 z-50"
+                    onClick={() => setShowCurrentOrder(false)}
+                >
+                    <div
+                        className="absolute right-0 top-0 h-full w-full max-w-md bg-white shadow-xl"
+                        onClick={(e) => e.stopPropagation()}
+                    >
+                        <div className="flex flex-col h-full">
+                            {/* Order Header */}
+                            <div className="bg-blue-500 text-white p-4">
+                                <div className="flex justify-between items-center">
+                                    <h2 className="text-xl font-bold">
+                                        Đơn gọi món của bạn
+                                    </h2>
+                                    <button
+                                        onClick={() =>
+                                            setShowCurrentOrder(false)
+                                        }
+                                        className="text-2xl"
+                                    >
+                                        &times;
+                                    </button>
+                                </div>
+                                {currentOrder && (
+                                    <p className="text-sm opacity-90 mt-1">
+                                        Trạng thái:{' '}
+                                        {currentOrder.status === 'pending'
+                                            ? 'Đang chờ'
+                                            : currentOrder.status ===
+                                              'confirmed'
+                                            ? 'Đã xác nhận'
+                                            : currentOrder.status}
+                                    </p>
+                                )}
+                            </div>
+
+                            {/* Order Items */}
+                            <div className="flex-1 overflow-y-auto p-4">
+                                {!currentOrder ||
+                                !currentOrder.items ||
+                                currentOrder.items.length === 0 ? (
+                                    <div className="text-center text-gray-500 mt-8">
+                                        <FiList
+                                            size={48}
+                                            className="mx-auto mb-4 opacity-50"
+                                        />
+                                        <p>Chưa có món nào trong đơn</p>
+                                        <p className="text-sm mt-2">
+                                            Hãy thêm món từ menu vào giỏ hàng và
+                                            gọi món!
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="space-y-4">
+                                        {currentOrder.items.map(
+                                            (item, index) => (
+                                                <div
+                                                    key={index}
+                                                    className="flex gap-3 bg-gray-50 p-3 rounded-lg"
+                                                >
+                                                    <div className="w-20 h-20 bg-gray-200 rounded-lg overflow-hidden flex-shrink-0">
+                                                        {item.productId
+                                                            ?.image?.[0] && (
+                                                            <img
+                                                                src={
+                                                                    item
+                                                                        .productId
+                                                                        .image[0]
+                                                                }
+                                                                alt={
+                                                                    item
+                                                                        .productId
+                                                                        .name
+                                                                }
+                                                                className="w-full h-full object-cover"
+                                                            />
+                                                        )}
+                                                    </div>
+                                                    <div className="flex-1">
+                                                        <h3 className="font-semibold text-gray-800">
+                                                            {item.productId
+                                                                ?.name ||
+                                                                'Sản phẩm'}
+                                                        </h3>
+                                                        <p className="text-blue-500 font-bold">
+                                                            {item.price?.toLocaleString(
+                                                                'vi-VN'
+                                                            )}
+                                                            đ
+                                                        </p>
+                                                        <div className="flex items-center gap-2 mt-2">
+                                                            <span className="text-sm text-gray-600">
+                                                                Số lượng:{' '}
+                                                                <span className="font-semibold">
+                                                                    {
+                                                                        item.quantity
+                                                                    }
+                                                                </span>
+                                                            </span>
+                                                        </div>
+                                                        <p className="text-sm text-gray-600 mt-1">
+                                                            Thành tiền:{' '}
+                                                            <span className="font-semibold text-gray-800">
+                                                                {(
+                                                                    (item.price ||
+                                                                        0) *
+                                                                    item.quantity
+                                                                ).toLocaleString(
+                                                                    'vi-VN'
+                                                                )}
+                                                                đ
+                                                            </span>
+                                                        </p>
+                                                    </div>
+                                                </div>
+                                            )
+                                        )}
+                                    </div>
+                                )}
+                            </div>
+
+                            {/* Order Footer */}
+                            {currentOrder &&
+                                currentOrder.items &&
+                                currentOrder.items.length > 0 && (
+                                    <div className="border-t p-4 space-y-3">
+                                        <div className="space-y-2">
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">
+                                                    Tổng số món:
+                                                </span>
+                                                <span className="font-semibold">
+                                                    {currentOrder.items.length}
+                                                </span>
+                                            </div>
+                                            <div className="flex justify-between text-sm">
+                                                <span className="text-gray-600">
+                                                    Tổng số lượng:
+                                                </span>
+                                                <span className="font-semibold">
+                                                    {currentOrder.items.reduce(
+                                                        (sum, item) =>
+                                                            sum + item.quantity,
+                                                        0
+                                                    )}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="border-t pt-3">
+                                            <div className="flex justify-between items-center text-lg font-bold">
+                                                <span>Tổng cộng:</span>
+                                                <span className="text-blue-500">
+                                                    {currentOrder.total?.toLocaleString(
+                                                        'vi-VN'
+                                                    )}
+                                                    đ
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
+                                            <p className="text-sm text-blue-800">
+                                                <strong>Lưu ý:</strong> Đây là
+                                                đơn gọi món tạm thời. Bạn có thể
+                                                tiếp tục gọi thêm món từ menu.
+                                            </p>
+                                        </div>
+                                    </div>
+                                )}
                         </div>
                     </div>
                 </div>
