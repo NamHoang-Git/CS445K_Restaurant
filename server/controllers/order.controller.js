@@ -945,6 +945,62 @@ export async function webhookStripe(request, response) {
                             return; // Exit after handling booking
                         }
 
+                        // Handle Table Order (Dine-in)
+                        const { tableOrderId, orderType } = stripeSession.metadata || {};
+                        if (tableOrderId && orderType === 'dine_in') {
+                            const TableOrderModel = (await import('../models/tableOrder.model.js')).default;
+
+                            const tableOrder = await TableOrderModel.findById(tableOrderId)
+                                .populate('items.productId', 'name image')
+                                .session(dbSession);
+
+                            if (!tableOrder) {
+                                throw new Error('Table order not found');
+                            }
+
+                            // Check if already processed
+                            if (tableOrder.status === 'paid') {
+                                console.log(`Table order ${tableOrderId} already processed`);
+                                return;
+                            }
+
+                            // Create order records from table order items
+                            const orderItems = tableOrder.items.map(item => ({
+                                userId: userId,
+                                orderId: `ORD-${new mongoose.Types.ObjectId()}`,
+                                productId: item.productId._id || item.productId,
+                                product_details: {
+                                    name: item.name,
+                                    image: item.productId?.image || []
+                                },
+                                quantity: item.quantity,
+                                payment_status: 'Đã thanh toán',
+                                delivery_address: null,
+                                customerContact: null,
+                                subTotalAmt: item.price * item.quantity,
+                                totalAmt: item.price * item.quantity,
+                                status: 'pending',
+                                tableNumber: tableOrder.tableNumber,
+                                orderType: 'dine_in',
+                                paymentId: stripeSession.payment_intent,
+                                invoice_receipt: stripeSession.id
+                            }));
+
+                            await OrderModel.insertMany(orderItems, { session: dbSession });
+
+                            // Update table order status
+                            tableOrder.status = 'paid';
+                            tableOrder.paymentMethod = 'online';
+                            tableOrder.paidAt = new Date();
+                            await tableOrder.save({ session: dbSession });
+
+                            // Clear cart
+                            await CartProductModel.deleteMany({ userId: userId }, { session: dbSession });
+
+                            console.log(`✅ Table order ${tableOrderId} processed successfully`);
+                            return; // Exit after handling table order
+                        }
+
                         if (!userId || !tempOrderIds) {
                             throw new Error('Missing required metadata in Stripe session');
                         }

@@ -43,13 +43,13 @@ const DisplayCartItem = ({ close }) => {
                 className="liquid-glass w-full max-w-lg min-h-screen max-h-screen ml-auto p-3 text-white"
             >
                 <div className="flex items-center py-3 gap-3 justify-between">
-                    <h2 className="font-bold text-lime-300 text-lg">
+                    <h2 className="font-bold text-highlight text-lg">
                         Giỏ hàng
                     </h2>
                     <Link
                         to={'/cart'}
                         onClick={close}
-                        className="flex items-center gap-1 text-lime-300 font-bold"
+                        className="flex items-center gap-1 text-highlight font-bold"
                     >
                         Xem tất cả
                         <span>
@@ -160,7 +160,7 @@ const DisplayCartItem = ({ close }) => {
                                                 (item) =>
                                                     item.productId?.discount > 0
                                             ) && (
-                                                <span className="line-through text-gray-400">
+                                                <span className="line-through text-foreground/80">
                                                     {DisplayPriceInVND(
                                                         notDiscountTotalPrice
                                                     )}
@@ -217,7 +217,7 @@ const DisplayCartItem = ({ close }) => {
 
                 {cartItem[0] && (
                     <div
-                        className="liquid-glass text-lime-300 px-6 py-3 mt-4 font-bold text-base
+                        className="liquid-glass text-orange-600 px-6 py-3 mt-4 font-bold text-base
                         rounded flex items-center gap-4 justify-between shadow-md shadow-secondary-100"
                     >
                         <div>{DisplayPriceInVND(totalPrice)}</div>

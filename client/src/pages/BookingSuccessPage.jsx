@@ -17,7 +17,7 @@ const BookingSuccessPage = () => {
 
     return (
         <section className="container mx-auto py-12 px-4">
-            <Card className="max-w-2xl mx-auto border-green-600 border-2">
+            <Card className="max-w-2xl mx-auto border-green-600 border-2 py-6">
                 <CardHeader className="text-center">
                     <CardTitle className="text-3xl text-green-600 font-bold">
                         🎉 Đặt bàn thành công!
@@ -30,8 +30,8 @@ const BookingSuccessPage = () => {
                 </CardHeader>
 
                 <CardContent className="space-y-6">
-                    <div className="bg-green-50 p-6 rounded-lg space-y-3 text-center">
-                        <p className="text-green-800">
+                    <div className="bg-foreground/20 p-6 rounded-lg space-y-3 text-center">
+                        <p className="text-foreground">
                             Chúng tôi đã gửi email xác nhận đến hộp thư của bạn.
                             <br />
                             Vui lòng kiểm tra cả hộp thư Spam nếu không thấy

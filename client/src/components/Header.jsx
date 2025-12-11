@@ -137,17 +137,31 @@ export default function Header() {
                         {/* Desktop Nav */}
                         <div className="hidden md:flex items-center gap-6">
                             <nav className="flex items-center gap-6 text-sm">
-                                {links.map((l) => (
-                                    <Link
-                                        key={l.href}
-                                        to={l.href}
-                                        onClick={scrollToTop}
-                                        className="hover:text-foreground/80 transition-colors flex items-center gap-[6px]"
-                                    >
-                                        {/* {l.icon} */}
-                                        {l.label}
-                                    </Link>
-                                ))}
+                                {links.map((l) => {
+                                    const isBookingLink =
+                                        l.href === '/booking' ||
+                                        l.href === '/booking-with-preorder';
+                                    const handleClick = (e) => {
+                                        if (isBookingLink && !user?._id) {
+                                            e.preventDefault();
+                                            redirectToLoginPage();
+                                        } else {
+                                            scrollToTop();
+                                        }
+                                    };
+
+                                    return (
+                                        <Link
+                                            key={l.href}
+                                            to={l.href}
+                                            onClick={handleClick}
+                                            className="hover:text-foreground/80 transition-colors flex items-center gap-[6px]"
+                                        >
+                                            {/* {l.icon} */}
+                                            {l.label}
+                                        </Link>
+                                    );
+                                })}
                             </nav>
                             {/* <div className="flex items-center gap-3">
                                 <Link to="/search">
@@ -323,25 +337,46 @@ export default function Header() {
                                         <Search />
                                     </div>
                                     <nav className="flex flex-col gap-1 mt-2 text-gray-200">
-                                        {links.map((l) => (
-                                            <Link
-                                                key={l.href}
-                                                to={l.href}
-                                                onClick={() => {
+                                        {links.map((l) => {
+                                            const isBookingLink =
+                                                l.href === '/booking' ||
+                                                l.href ===
+                                                    '/booking-with-preorder';
+                                            const handleClick = () => {
+                                                if (
+                                                    isBookingLink &&
+                                                    !user?._id
+                                                ) {
+                                                    redirectToLoginPage();
+                                                    closeMobileMenu();
+                                                } else {
                                                     closeMenu();
                                                     closeMobileMenu();
                                                     scrollToTop();
-                                                }}
-                                                className="flex items-center gap-3 px-4 py-3 hover:bg-gray-900 hover:text-purple-400 transition-colors"
-                                            >
-                                                <span className="inline-flex items-center justify-center w-5 h-5">
-                                                    {l.icon}
-                                                </span>
-                                                <span className="text-sm">
-                                                    {l.label}
-                                                </span>
-                                            </Link>
-                                        ))}
+                                                }
+                                            };
+
+                                            return (
+                                                <Link
+                                                    key={l.href}
+                                                    to={
+                                                        isBookingLink &&
+                                                        !user?._id
+                                                            ? '#'
+                                                            : l.href
+                                                    }
+                                                    onClick={handleClick}
+                                                    className="flex items-center gap-3 px-4 py-3 hover:bg-gray-900 hover:text-purple-400 transition-colors"
+                                                >
+                                                    <span className="inline-flex items-center justify-center w-5 h-5">
+                                                        {l.icon}
+                                                    </span>
+                                                    <span className="text-sm">
+                                                        {l.label}
+                                                    </span>
+                                                </Link>
+                                            );
+                                        })}
                                     </nav>
                                     <div className="mt-auto border-t border-gray-800 p-4">
                                         <div className="flex items-center justify-center w-full gap-5">

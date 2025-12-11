@@ -45,6 +45,7 @@ import MyPerformancePage from '../pages/MyPerformancePage';
 import TableLoginPage from '../pages/TableLoginPage';
 import TableMenuPage from '../pages/TableMenuPage';
 import TableOrderManagementPage from '../pages/TableOrderManagementPage';
+import TablePaymentSuccessPage from '../pages/TablePaymentSuccessPage';
 
 const router = createBrowserRouter([
     {
@@ -61,11 +62,19 @@ const router = createBrowserRouter([
             },
             {
                 path: 'booking',
-                element: <BookingPage />,
+                element: (
+                    <ProtectedRoute>
+                        <BookingPage />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: 'booking-with-preorder',
-                element: <BookingWithPreOrderPage />,
+                element: (
+                    <ProtectedRoute>
+                        <BookingWithPreOrderPage />
+                    </ProtectedRoute>
+                ),
             },
             {
                 path: 'booking/success',
@@ -88,6 +97,14 @@ const router = createBrowserRouter([
                 element: (
                     <ProtectedRoute>
                         <TableOrderManagementPage />
+                    </ProtectedRoute>
+                ),
+            },
+            {
+                path: 'table-payment-success',
+                element: (
+                    <ProtectedRoute>
+                        <TablePaymentSuccessPage />
                     </ProtectedRoute>
                 ),
             },

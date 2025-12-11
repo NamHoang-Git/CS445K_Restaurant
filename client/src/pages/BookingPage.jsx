@@ -240,7 +240,7 @@ const BookingPage = () => {
     if (bookingSuccess) {
         return (
             <section className="container mx-auto py-8 px-4">
-                <Card className="max-w-2xl mx-auto border-green-600 border-2">
+                <Card className="max-w-2xl mx-auto border-green-600 border-2 py-6">
                     <CardHeader className="text-center">
                         <CardTitle className="text-2xl text-green-600 font-bold">
                             🎉 Đặt bàn thành công!
@@ -251,17 +251,17 @@ const BookingPage = () => {
                     </CardHeader>
 
                     <CardContent className="space-y-6">
-                        <div className="bg-green-50 p-6 rounded-lg space-y-3">
+                        <div className="bg-foreground/20 p-6 rounded-lg space-y-3">
                             <div className="text-center">
-                                <Label className="text-sm text-muted-foreground">
+                                <Label className="text-sm text-foreground">
                                     Mã đặt bàn của bạn
                                 </Label>
-                                <p className="text-xl font-bold text-green-700 mt-2 break-all">
+                                <p className="text-xl font-bold text-green-500 mt-2 break-all">
                                     {bookingId}
                                 </p>
                             </div>
                             <Divider />
-                            <p className="text-sm text-center text-muted-foreground">
+                            <p className="text-sm text-center text-foreground">
                                 Vui lòng lưu lại mã này để tra cứu hoặc hủy đặt
                                 bàn
                             </p>

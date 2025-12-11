@@ -134,7 +134,7 @@ export async function getAllBookingsController(request, response) {
                 path: 'preOrderId',
                 select: 'totalAmt product_details payment_status'
             })
-            .sort({ bookingDate: -1, bookingTime: -1 });
+            .sort({ createdAt: -1 });
 
         return response.status(200).json({
             message: "Lấy danh sách đặt bàn thành công",

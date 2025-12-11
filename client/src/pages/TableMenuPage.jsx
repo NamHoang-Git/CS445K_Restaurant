@@ -27,9 +27,21 @@ const TableMenuPage = () => {
     const [showCurrentOrder, setShowCurrentOrder] = useState(false);
     const [tableInfo, setTableInfo] = useState(null);
     const [currentOrder, setCurrentOrder] = useState(null);
+    const [isCheckingAuth, setIsCheckingAuth] = useState(true);
 
     // Check if user is a table account
     useEffect(() => {
+        // Give time for user data to load
+        const timer = setTimeout(() => {
+            setIsCheckingAuth(false);
+        }, 1000);
+
+        return () => clearTimeout(timer);
+    }, []);
+
+    useEffect(() => {
+        if (isCheckingAuth) return; // Wait for auth check
+
         if (!user || user.role !== 'TABLE') {
             toast.error('Vui lòng quét mã QR tại bàn để đặt món');
             navigate('/');
@@ -40,7 +52,7 @@ const TableMenuPage = () => {
         fetchTableSession();
         // Get current order
         fetchCurrentOrder();
-    }, [user, navigate]);
+    }, [user, navigate, isCheckingAuth]);
 
     const fetchTableSession = async () => {
         try {
@@ -140,7 +152,7 @@ const TableMenuPage = () => {
             }
         } catch (error) {
             console.error('Error adding to cart:', error);
-            toast.error('Không thể thêm vào giỏ hàng');
+            toast.error('Sản phẩm này đã được thêm vào giỏ hàng');
         }
     };
 
@@ -428,7 +440,7 @@ const TableMenuPage = () => {
                                                         )}
                                                         đ
                                                     </p>
-                                                    <div className="flex items-center gap-2 mt-2">
+                                                    <div className="flex items-center gap-4 mt-2">
                                                         <button
                                                             onClick={() =>
                                                                 handleUpdateQuantity(
@@ -437,11 +449,11 @@ const TableMenuPage = () => {
                                                                         1
                                                                 )
                                                             }
-                                                            className="bg-gray-200 p-1 rounded"
+                                                            className="bg-gray-500 text-white p-1 rounded"
                                                         >
                                                             <FiMinus />
                                                         </button>
-                                                        <span className="font-semibold">
+                                                        <span className="font-semibold text-orange-500">
                                                             {item.quantity}
                                                         </span>
                                                         <button
@@ -452,7 +464,7 @@ const TableMenuPage = () => {
                                                                         1
                                                                 )
                                                             }
-                                                            className="bg-gray-200 p-1 rounded"
+                                                            className="bg-gray-500 text-white p-1 rounded"
                                                         >
                                                             <FiPlus />
                                                         </button>
@@ -478,7 +490,9 @@ const TableMenuPage = () => {
                             {cartItems.length > 0 && (
                                 <div className="border-t p-4 space-y-4">
                                     <div className="flex justify-between items-center text-lg font-bold">
-                                        <span>Tổng cộng:</span>
+                                        <span className="text-orange-700">
+                                            Tổng cộng:
+                                        </span>
                                         <span className="text-orange-500">
                                             {totalAmount.toLocaleString(
                                                 'vi-VN'
@@ -633,7 +647,7 @@ const TableMenuPage = () => {
                                                 <span className="text-gray-600">
                                                     Tổng số món:
                                                 </span>
-                                                <span className="font-semibold">
+                                                <span className="font-semibold text-blue-800">
                                                     {currentOrder.items.length}
                                                 </span>
                                             </div>
@@ -641,7 +655,7 @@ const TableMenuPage = () => {
                                                 <span className="text-gray-600">
                                                     Tổng số lượng:
                                                 </span>
-                                                <span className="font-semibold">
+                                                <span className="font-semibold text-blue-800">
                                                     {currentOrder.items.reduce(
                                                         (sum, item) =>
                                                             sum + item.quantity,
@@ -652,7 +666,9 @@ const TableMenuPage = () => {
                                         </div>
                                         <div className="border-t pt-3">
                                             <div className="flex justify-between items-center text-lg font-bold">
-                                                <span>Tổng cộng:</span>
+                                                <span className="text-blue-800">
+                                                    Tổng cộng:
+                                                </span>
                                                 <span className="text-blue-500">
                                                     {currentOrder.total?.toLocaleString(
                                                         'vi-VN'
@@ -661,6 +677,17 @@ const TableMenuPage = () => {
                                                 </span>
                                             </div>
                                         </div>
+                                        <button
+                                            onClick={() => {
+                                                setShowCurrentOrder(false);
+                                                navigate(
+                                                    '/table-order-management'
+                                                );
+                                            }}
+                                            className="w-full bg-gradient-to-r from-green-500 to-green-600 text-white py-3 rounded-lg font-semibold text-lg hover:from-green-600 hover:to-green-700 transition-all shadow-md"
+                                        >
+                                            Thanh toán
+                                        </button>
                                         <div className="bg-blue-50 border border-blue-200 rounded-lg p-3">
                                             <p className="text-sm text-blue-800">
                                                 <strong>Lưu ý:</strong> Đây là

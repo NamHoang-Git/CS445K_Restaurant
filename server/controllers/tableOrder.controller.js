@@ -180,7 +180,7 @@ export async function checkoutTableOrder(request, response) {
         const tableOrder = await TableOrderModel.findOne({
             tableId: user.linkedTableId,
             status: 'active'
-        });
+        }).populate('items.productId', 'name image');
 
         if (!tableOrder || tableOrder.items.length === 0) {
             return response.status(404).json({
@@ -199,10 +199,10 @@ export async function checkoutTableOrder(request, response) {
                     const orderItems = tableOrder.items.map(item => ({
                         userId: userId,
                         orderId: `ORD-${new mongoose.Types.ObjectId()}`,
-                        productId: item.productId,
+                        productId: item.productId._id || item.productId,
                         product_details: {
                             name: item.name,
-                            image: []
+                            image: item.productId?.image || []
                         },
                         quantity: item.quantity,
                         payment_status: 'Chờ thanh toán',

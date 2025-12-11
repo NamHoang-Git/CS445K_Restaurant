@@ -220,7 +220,7 @@ const TableOrderManagementPage = () => {
                 {/* Total */}
                 <div className="bg-white rounded-xl shadow-sm p-6">
                     <div className="flex justify-between items-center text-xl font-bold">
-                        <span>Tổng cộng:</span>
+                        <span className="text-orange-700">Tổng cộng:</span>
                         <span className="text-orange-500">
                             {tableOrder.total.toLocaleString('vi-VN')}đ
                         </span>
@@ -257,7 +257,7 @@ const TableOrderManagementPage = () => {
 
                     <button
                         onClick={handleCancelOrder}
-                        className="w-full bg-gray-200 text-gray-700 py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-300 transition-all"
+                        className="w-full bg-gray-400 text-white py-3 rounded-xl font-semibold flex items-center justify-center gap-2 hover:bg-gray-300 transition-all"
                     >
                         <FiX size={20} />
                         Hủy đơn

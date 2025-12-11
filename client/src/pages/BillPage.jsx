@@ -398,90 +398,6 @@ const BillPage = () => {
         );
     };
 
-    const exportToPDF = async () => {
-        try {
-            if (!window.jsPDF) throw new Error('Thư viện PDF chưa tải');
-
-            const { jsPDF } = window.jsPDF;
-            const doc = new jsPDF({
-                orientation: 'landscape',
-                unit: 'mm',
-                format: 'a4',
-            });
-
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(18);
-            doc.text('DANH SÁCH HÓA ĐƠN', 148, 15, { align: 'center' });
-
-            doc.setFontSize(10);
-            doc.text(
-                `Ngày xuất: ${format(new Date(), 'dd/MM/yyyy HH:mm', {
-                    locale: vi,
-                })}`,
-                14,
-                25
-            );
-
-            const headers = [
-                'Mã Đơn',
-                'Ngày tạo',
-                'Khách hàng',
-                'Sản phẩm',
-                'SL',
-                'Tổng tiền',
-                'Trạng thái',
-            ];
-            const data = filteredOrders.map((order) => [
-                order.orderId,
-                format(new Date(order.createdAt), 'dd/MM/yyyy', { locale: vi }),
-                order.userId?.name || 'Khách vãng lai',
-                (order.product_details?.name?.substring(0, 20) || '') +
-                    (order.product_details?.name?.length > 20 ? '...' : ''),
-                order.quantity,
-                DisplayPriceInVND(order.totalAmt || 0),
-                order.payment_status || 'Chưa xác định',
-            ]);
-
-            doc.autoTable({
-                head: [headers],
-                body: data,
-                startY: 30,
-                styles: { fontSize: 8, cellPadding: 2, overflow: 'linebreak' },
-                headStyles: {
-                    fillColor: [41, 128, 185],
-                    textColor: [255, 255, 255],
-                },
-                columnStyles: {
-                    0: { cellWidth: 20 },
-                    1: { cellWidth: 25 },
-                    2: { cellWidth: 35 },
-                    3: { cellWidth: 'auto' },
-                    4: { cellWidth: 10, halign: 'center' },
-                    5: { cellWidth: 25, halign: 'right' },
-                    6: { cellWidth: 30 },
-                },
-            });
-
-            const finalY = doc.lastAutoTable.finalY;
-            doc.text(`Tổng số hóa đơn: ${orderCount}`, 14, finalY + 10);
-            doc.text(
-                `Tổng doanh thu: ${DisplayPriceInVND(totalRevenue)}`,
-                14,
-                finalY + 20
-            );
-
-            doc.save(
-                `danh-sach-hoa-don-${format(
-                    new Date(),
-                    'yyyy-MM-dd-HH-mm-ss'
-                )}.pdf`
-            );
-            toast.success('Xuất PDF thành công!');
-        } catch (error) {
-            toast.error(`Xuất PDF thất bại: ${error.message}`);
-        }
-    };
-
     const handleOpenConfirmBox = (orderId) => {
         setSelectedOrderId(orderId);
         setOpenUpdateStatus(true);
@@ -582,9 +498,9 @@ const BillPage = () => {
             <Card className="py-6 flex-row justify-between gap-6 border-card-foreground">
                 <CardHeader>
                     <CardTitle className="text-lg text-highlight font-bold uppercase">
-                        Quản lý đơn hàng
+                        Quản lý hoá đơn
                     </CardTitle>
-                    <CardDescription>Quản lý đơn hàng hệ thống</CardDescription>
+                    <CardDescription>Quản lý hoá đơn hệ thống</CardDescription>
                 </CardHeader>
             </Card>
 
@@ -746,12 +662,6 @@ const BillPage = () => {
                         className="flex items-center px-4 h-9 text-white bg-green-600/80 rounded-lg hover:bg-green-700"
                     >
                         <FaFileExcel className="mr-2" /> Xuất Excel
-                    </button>
-                    <button
-                        onClick={exportToPDF}
-                        className="flex items-center px-4 h-9 text-white bg-red-600/80 rounded-lg hover:bg-red-700"
-                    >
-                        <FaFilePdf className="mr-2" /> Xuất PDF
                     </button>
                 </div>
             </div>
