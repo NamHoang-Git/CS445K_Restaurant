@@ -346,3 +346,22 @@ input[type='datetime-local']::-webkit-calendar-picker-indicator {
 .no-spinner {
     -moz-appearance: textfield;
 }
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+.scrollbar-hide {
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none; /* Firefox */
+}
+
+.scrollbarCustom::-webkit-scrollbar {
+    width: 10px;
+    height: 12px;
+    @apply bg-slate-200;
+}
+
+.scrollbarCustom::-webkit-scrollbar-thumb {
+    @apply bg-rose-200 rounded-full;
+}

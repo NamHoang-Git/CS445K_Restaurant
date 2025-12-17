@@ -84,14 +84,14 @@ const VerifyEmailForm: FC = () => {
                 ) : isSuccess ? (
                     <>
                         <div className="flex justify-center">
-                            <div className="bg-lime-500 rounded-full p-3">
-                                <FaCheckCircle className="h-12 w-12 text-highlight" />
+                            <div className="bg-orange-50 rounded-full p-3">
+                                <FaCheckCircle className="h-12 w-12 text-orange-700" />
                             </div>
                         </div>
-                        <h2 className="mt-6 text-xl font-extrabold text-lime-300">
+                        <h2 className="mt-6 pb-2 text-xl uppercase font-extrabold text-orange-700">
                             Xác nhận thành công!
                         </h2>
-                        <p className="mt-4 font-bold text-lime-300 sm:text-base text-sm">
+                        <p className="mt-4 font-bold text-orange-700 sm:text-base text-sm">
                             {message}
                         </p>
                     </>

@@ -21,9 +21,16 @@ const forgotPasswordTemplate = ({ name, otp }) => {
                 <p>Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này hoặc liên hệ với bộ phận hỗ trợ nếu bạn nghi ngờ có hoạt động đáng ngờ.</p>
 
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e9ecef; font-size: 12px; color: #6c757d;">
-                    <p>Trân trọng,<br/>Đội ngũ Tech EcomSpace</p>
-                    <p>📧 support@techspace.vn<br/>
-                    🌐 https://tech-ecomspace-shop-fullstack-4xd5.vercel.app/</p>
+                    <p>Trân trọng,<br/>Đội ngũ EatEase Restaurant</p>
+                    <a href="${process.env.FRONTEND_URL}"
+                        target="_blank"
+                        style="color:#0d6efd; text-decoration:none;">
+                        🌐 eatease.com
+                    </a>
+
+                    <p>EatEase Restaurant - 123 Ẩm Thực, Quang Trung, TP.Đà Nẵng</p>
+                    <p>Hotline: 1900 1234 | Email: support@eatease.com</p>
+                    <p>&copy; ${new Date().getFullYear()} EatEase Restaurant. All rights reserved.</p>
                 </div>
             </div>
         </div>

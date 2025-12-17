@@ -112,12 +112,12 @@ const bookingWithPreOrderEmailTemplate = (booking, order) => {
             <div style="${headerStyle}">
                 <a href="${process.env.FRONTEND_URL}" style="${logoStyle}">EatEase Restaurant</a>
             </div>
-            
+
             <div style="${contentStyle}">
                 <h2 style="color: ${color}; text-align: center;">${title}</h2>
                 <p>Xin chào <strong>${customerName}</strong>,</p>
                 <p>${message}</p>
-                
+
                 <div style="${detailBoxStyle}">
                     <h3 style="margin-top: 0; color: #333;">Chi tiết đặt bàn:</h3>
                     <p style="margin: 5px 0;"><strong>Mã đặt bàn:</strong> #${_id.toString().slice(-6).toUpperCase()}</p>
@@ -139,14 +139,21 @@ const bookingWithPreOrderEmailTemplate = (booking, order) => {
                 ` : ''}
 
                 <p>Vui lòng đến đúng giờ để chúng tôi có thể phục vụ bạn tốt nhất. Bàn của bạn sẽ được giữ trong vòng 15 phút.</p>
-                
+
                 <div style="text-align: center;">
                     <a href="${process.env.FRONTEND_URL}/my-orders" style="${buttonStyle}">Xem đơn hàng của tôi</a>
                 </div>
             </div>
 
             <div style="${footerStyle}">
-                <p>EatEase Restaurant - 123 Ẩm Thực, Quận 1, TP.HCM</p>
+                <p>Trân trọng,<br/>Đội ngũ EatEase Restaurant</p>
+                <a href="${process.env.FRONTEND_URL}"
+                    target="_blank"
+                    style="color:#0d6efd; text-decoration:none;">
+                    🌐 eatease.com
+                </a>
+
+                <p>EatEase Restaurant - 123 Ẩm Thực, Quang Trung, TP.Đà Nẵng</p>
                 <p>Hotline: 1900 1234 | Email: support@eatease.com</p>
                 <p>&copy; ${new Date().getFullYear()} EatEase Restaurant. All rights reserved.</p>
             </div>

@@ -616,7 +616,7 @@ const BookingWithPreOrderPage = () => {
 
                                 {/* Cart Summary */}
                                 {cart.length > 0 && (
-                                    <div className="bg-lime-50 p-4 rounded-lg mb-4">
+                                    <div className="bg-foreground/10 p-4 rounded-lg mb-4">
                                         <h4 className="font-semibold mb-2">
                                             Giỏ hàng
                                         </h4>
@@ -754,7 +754,7 @@ const BookingWithPreOrderPage = () => {
                                                                     )}
                                                                 </p>
                                                             )}
-                                                            <p className="text-xs text-muted-foreground mt-1">
+                                                            <p className="text-xs text-orange-600 font-semibold mt-1">
                                                                 Kho:{' '}
                                                                 {product.stock}
                                                             </p>
@@ -807,7 +807,7 @@ const BookingWithPreOrderPage = () => {
                                 </h3>
 
                                 {/* Booking Info */}
-                                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                                <div className="bg-foreground/10 p-4 rounded-lg mb-4">
                                     <h4 className="font-semibold mb-2">
                                         Thông tin đặt bàn
                                     </h4>
@@ -858,7 +858,7 @@ const BookingWithPreOrderPage = () => {
                                 </div>
 
                                 {/* Order Items */}
-                                <div className="bg-gray-50 p-4 rounded-lg mb-4">
+                                <div className="bg-foreground/10 p-4 rounded-lg mb-4">
                                     <h4 className="font-semibold mb-2">
                                         Món đã chọn
                                     </h4>
@@ -885,7 +885,7 @@ const BookingWithPreOrderPage = () => {
                                 </div>
 
                                 {/* Payment Summary */}
-                                <div className="bg-lime-50 p-4 rounded-lg">
+                                <div className="liquid-glass p-4 rounded-lg">
                                     <h4 className="font-semibold mb-2">
                                         Tổng thanh toán
                                     </h4>
