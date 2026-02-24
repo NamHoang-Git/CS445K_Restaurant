@@ -38,7 +38,13 @@ const userSchema = new mongoose.Schema({
     },
     password: {
         type: String,
-        required: [true, "Provide password"],
+        default: null,
+    },
+    googleId: {
+        type: String,
+        unique: true,
+        sparse: true,
+        default: null,
     },
     avatar: {
         type: String,

@@ -4,16 +4,20 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
-import GlareHover from '../GlareHover';
-import { FaFacebookSquare, FaGoogle } from 'react-icons/fa';
-import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
+import { setUserDetails } from '@/store/userSlice';
+import fetchUserDetails from '@/utils/fetchUserDetails';
+import { Eye, EyeOff } from 'lucide-react';
+import GlareHover from '../GlareHover';
+import { FaFacebookSquare } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
 import Axios from '@/utils/Axios';
 import SummaryApi from '@/common/SummaryApi';
 import toast from 'react-hot-toast';
 import AxiosToastError from '@/utils/AxiosToastError';
 import Loading from '../Loading';
+import { useGoogleLogin } from '@react-oauth/google';
+import { FaGoogle } from 'react-icons/fa';
 
 export function RegisterForm({
     className,
@@ -30,22 +34,17 @@ export function RegisterForm({
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        setData((prev) => {
-            return {
-                ...prev,
-                [name]: value,
-            };
-        });
+        setData((prev) => ({ ...prev, [name]: value }));
     };
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-
         const validTLDs = [
             'com',
             'net',
@@ -58,41 +57,24 @@ export function RegisterForm({
             'edu.vn',
             'gov.vn',
         ];
-
-        if (!emailRegex.test(email)) {
-            return false;
-        }
-
+        if (!emailRegex.test(email)) return false;
         const domain = email.split('@')[1];
         const tld = domain.split('.').slice(1).join('.');
-
-        if (!validTLDs.includes(tld)) {
-            return false;
-        }
-
+        if (!validTLDs.includes(tld)) return false;
         if (
             email.includes('..') ||
             email.startsWith('.') ||
             email.endsWith('.') ||
             email.split('@')[0].endsWith('.')
-        ) {
+        )
             return false;
-        }
-
         return true;
     };
 
     const validateMobile = (mobile) => {
-        // Vietnamese phone number validation
-        // Starts with 0, followed by 9 or 1-9, then 8 more digits (total 10 digits)
-        const mobileRegex = /^(0[1-9]|0[1-9][0-9]{8})$/;
-        if (!mobile) {
-            return false;
-        }
-        if (!mobileRegex.test(mobile)) {
-            return false;
-        }
-        return true;
+        // Vietnamese phone number: 10 digits, starts with 0
+        const mobileRegex = /^0[1-9][0-9]{8}$/;
+        return mobile && mobileRegex.test(mobile);
     };
 
     const handleSubmit = async (e) => {
@@ -102,7 +84,6 @@ export function RegisterForm({
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
         }
-
         if (!data.email) {
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
@@ -110,7 +91,6 @@ export function RegisterForm({
             toast.error('Vui lòng nhập địa chỉ email hợp lệ');
             return;
         }
-
         if (!data.mobile) {
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
@@ -118,7 +98,6 @@ export function RegisterForm({
             toast.error('Số điện thoại không hợp lệ');
             return;
         }
-
         if (!data.password) {
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
@@ -126,7 +105,6 @@ export function RegisterForm({
             toast.error('Mật khẩu phải có ít nhất 6 ký tự');
             return;
         }
-
         if (!data.confirmPassword) {
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
@@ -137,18 +115,13 @@ export function RegisterForm({
 
         try {
             setLoading(true);
-            const response = await Axios({
-                ...SummaryApi.register,
-                data: data,
-            });
+            const response = await Axios({ ...SummaryApi.register, data });
 
             if (response.data.error) {
                 toast.error(response.data.message);
             }
-
             if (response.data.success) {
                 toast.success(response.data.message);
-
                 navigate('/registration-success', {
                     state: { email: data.email },
                     replace: true,
@@ -160,6 +133,48 @@ export function RegisterForm({
             setLoading(false);
         }
     };
+
+    // Google OAuth — dùng useGoogleLogin (implicit flow) + custom button
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                setGoogleLoading(true);
+                const response = await Axios({
+                    ...SummaryApi.google_login,
+                    data: { accessToken: tokenResponse.access_token },
+                });
+
+                if (response.data.error) {
+                    toast.error(response.data.message);
+                    return;
+                }
+
+                if (response.data.success) {
+                    toast.success('Đăng ký và đăng nhập Google thành công!');
+                    localStorage.setItem(
+                        'accesstoken',
+                        response.data.data.accessToken
+                    );
+                    localStorage.setItem(
+                        'refreshToken',
+                        response.data.data.refreshToken
+                    );
+                    const userDetails = await fetchUserDetails();
+                    dispatch(setUserDetails(userDetails.data));
+                    navigate('/');
+                }
+            } catch (error) {
+                AxiosToastError(error);
+            } finally {
+                setGoogleLoading(false);
+            }
+        },
+        onError: () => {
+            toast.error('Đăng ký Google thất bại. Vui lòng thử lại.');
+            setGoogleLoading(false);
+        },
+        flow: 'implicit',
+    });
 
     return (
         <form
@@ -286,32 +301,34 @@ export function RegisterForm({
                         {loading ? <Loading /> : 'Đăng ký'}
                     </Button>
                 </GlareHover>
+
                 <>
-                    <div
-                        className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center
-                    after:border-t after:border-foreground"
-                    >
+                    <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-foreground">
                         <span className="relative z-10 bg-background px-2 py-1 rounded-md text-foreground uppercase">
                             Hoặc đăng ký với
                         </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-foreground">
+                    <div className="text-foreground">
+                        {/* Google — custom button */}
                         <Button
+                            type="button"
                             variant="outline"
-                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
-                        shadow-none cursor-pointer"
+                            className="w-full flex items-center justify-center gap-2 h-12 border-muted-foreground border-2 rounded-lg shadow-none cursor-pointer"
+                            onClick={() => {
+                                setGoogleLoading(true);
+                                googleLogin();
+                            }}
+                            disabled={googleLoading}
                         >
-                            <FaGoogle className="mb-1" />
-                            Google
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
-                        shadow-none cursor-pointer"
-                        >
-                            <FaFacebookSquare className="mb-1" />
-                            Facebook
+                            {googleLoading ? (
+                                <Loading />
+                            ) : (
+                                <>
+                                    <FaGoogle className="text-red-500" />
+                                    Google
+                                </>
+                            )}
                         </Button>
                     </div>
                 </>

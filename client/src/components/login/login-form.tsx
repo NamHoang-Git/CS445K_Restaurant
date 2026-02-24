@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useState } from 'react';
-import { Eye, EyeOff, ArrowLeft } from 'lucide-react';
+import { Eye, EyeOff } from 'lucide-react';
 import GlareHover from '../GlareHover';
-import { FaFacebookSquare, FaGoogle } from 'react-icons/fa';
+import { FaFacebookSquare } from 'react-icons/fa';
 import { Link, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import Axios from '@/utils/Axios';
@@ -16,6 +16,8 @@ import fetchUserDetails from '@/utils/fetchUserDetails';
 import { setUserDetails } from '@/store/userSlice';
 import AxiosToastError from '@/utils/AxiosToastError';
 import Loading from '../Loading';
+import { useGoogleLogin } from '@react-oauth/google';
+import { FaGoogle } from 'react-icons/fa';
 
 export function LoginForm({
     className,
@@ -29,21 +31,16 @@ export function LoginForm({
     const navigate = useNavigate();
     const dispatch = useDispatch();
     const [loading, setLoading] = useState(false);
+    const [googleLoading, setGoogleLoading] = useState(false);
+    const [showPassword, setShowPassword] = useState(false);
 
     const handleChange = (e) => {
         const { name, value } = e.target;
-
-        setData((prev) => {
-            return {
-                ...prev,
-                [name]: value,
-            };
-        });
+        setData((prev) => ({ ...prev, [name]: value }));
     };
 
     const validateEmail = (email) => {
         const emailRegex = /^[^\s@]+@[^\s@]+\.[a-zA-Z]{2,}$/;
-
         const validTLDs = [
             'com',
             'net',
@@ -56,27 +53,17 @@ export function LoginForm({
             'edu.vn',
             'gov.vn',
         ];
-
-        if (!emailRegex.test(email)) {
-            return false;
-        }
-
+        if (!emailRegex.test(email)) return false;
         const domain = email.split('@')[1];
         const tld = domain.split('.').slice(1).join('.');
-
-        if (!validTLDs.includes(tld)) {
-            return false;
-        }
-
+        if (!validTLDs.includes(tld)) return false;
         if (
             email.includes('..') ||
             email.startsWith('.') ||
             email.endsWith('.') ||
             email.split('@')[0].endsWith('.')
-        ) {
+        )
             return false;
-        }
-
         return true;
     };
 
@@ -87,7 +74,6 @@ export function LoginForm({
             toast.error('Vui lòng nhập đầy đủ thông tin.');
             return;
         }
-
         if (!data.email) {
             toast.error('Vui lòng nhập email');
             return;
@@ -95,7 +81,6 @@ export function LoginForm({
             toast.error('Vui lòng nhập địa chỉ email hợp lệ');
             return;
         }
-
         if (!data.password) {
             toast.error('Vui lòng nhập mật khẩu');
             return;
@@ -103,10 +88,7 @@ export function LoginForm({
 
         try {
             setLoading(true);
-            const response = await Axios({
-                ...SummaryApi.login,
-                data: data,
-            });
+            const response = await Axios({ ...SummaryApi.login, data });
 
             if (response.data.error) {
                 toast.error(response.data.message);
@@ -125,12 +107,7 @@ export function LoginForm({
 
                 const userDetails = await fetchUserDetails();
                 dispatch(setUserDetails(userDetails.data));
-
-                // Reset form
-                setData({
-                    email: '',
-                    password: '',
-                });
+                setData({ email: '', password: '' });
                 navigate('/');
             }
         } catch (error) {
@@ -140,7 +117,47 @@ export function LoginForm({
         }
     };
 
-    const [showPassword, setShowPassword] = useState(false);
+    // Google OAuth — dùng useGoogleLogin (implicit flow) + custom button
+    const googleLogin = useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            try {
+                setGoogleLoading(true);
+                const response = await Axios({
+                    ...SummaryApi.google_login,
+                    data: { accessToken: tokenResponse.access_token },
+                });
+
+                if (response.data.error) {
+                    toast.error(response.data.message);
+                    return;
+                }
+
+                if (response.data.success) {
+                    toast.success(response.data.message);
+                    localStorage.setItem(
+                        'accesstoken',
+                        response.data.data.accessToken
+                    );
+                    localStorage.setItem(
+                        'refreshToken',
+                        response.data.data.refreshToken
+                    );
+                    const userDetails = await fetchUserDetails();
+                    dispatch(setUserDetails(userDetails.data));
+                    navigate('/');
+                }
+            } catch (error) {
+                AxiosToastError(error);
+            } finally {
+                setGoogleLoading(false);
+            }
+        },
+        onError: () => {
+            toast.error('Đăng nhập Google thất bại. Vui lòng thử lại.');
+            setGoogleLoading(false);
+        },
+        flow: 'implicit',
+    });
 
     return (
         <form
@@ -235,32 +252,34 @@ export function LoginForm({
                         {loading ? <Loading /> : 'Đăng nhập'}
                     </Button>
                 </GlareHover>
+
                 <>
-                    <div
-                        className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center
-                    after:border-t after:border-foreground"
-                    >
+                    <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-foreground">
                         <span className="relative z-10 bg-background px-2 py-1 rounded-md text-foreground uppercase">
                             Hoặc đăng nhập với
                         </span>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4 text-foreground">
+                    <div className="text-foreground">
+                        {/* Google — custom button */}
                         <Button
+                            type="button"
                             variant="outline"
-                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
-                        shadow-none cursor-pointer"
+                            className="w-full flex items-center justify-center gap-2 h-12 border-muted-foreground border-2 rounded-lg shadow-none cursor-pointer"
+                            onClick={() => {
+                                setGoogleLoading(true);
+                                googleLogin();
+                            }}
+                            disabled={googleLoading}
                         >
-                            <FaGoogle className="mb-1" />
-                            Google
-                        </Button>
-                        <Button
-                            variant="outline"
-                            className="flex items-center gap-2 h-12 border-muted-foreground border-2 rounded-lg
-                        shadow-none cursor-pointer"
-                        >
-                            <FaFacebookSquare className="mb-1" />
-                            Facebook
+                            {googleLoading ? (
+                                <Loading />
+                            ) : (
+                                <>
+                                    <FaGoogle className="text-red-500" />
+                                    Google
+                                </>
+                            )}
                         </Button>
                     </div>
                 </>

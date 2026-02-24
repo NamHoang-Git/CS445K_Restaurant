@@ -9,6 +9,9 @@ import generatedOtp from '../utils/generatedOtp.js';
 import forgotPasswordTemplate from '../utils/forgotPasswordTemplate.js';
 import jwt from 'jsonwebtoken'
 import OrderModel from '../models/order.model.js'
+import { OAuth2Client } from 'google-auth-library'
+
+const googleClient = new OAuth2Client(process.env.GOOGLE_CLIENT_ID)
 
 // Register Controller
 export async function registerUserController(req, res) {
@@ -642,7 +645,120 @@ export async function userPoints(req, res) {
     }
 }
 
+// Google OAuth Login/Register Controller
+export async function googleLoginController(req, res) {
+    try {
+        const { accessToken } = req.body;
+
+        if (!accessToken) {
+            return res.status(400).json({
+                message: "Thiếu Google Access Token",
+                error: true,
+                success: false
+            });
+        }
+
+        // Gọi Google userinfo endpoint để lấy thông tin user
+        const userInfoResponse = await fetch(
+            `https://www.googleapis.com/oauth2/v3/userinfo?access_token=${accessToken}`
+        );
+
+        if (!userInfoResponse.ok) {
+            return res.status(401).json({
+                message: "Access Token Google không hợp lệ hoặc đã hết hạn",
+                error: true,
+                success: false
+            });
+        }
+
+        const { sub: googleId, email, name, picture } = await userInfoResponse.json();
+
+        if (!email) {
+            return res.status(400).json({
+                message: "Không lấy được email từ tài khoản Google",
+                error: true,
+                success: false
+            });
+        }
+
+        // Tìm user theo googleId trước, sau đó theo email
+        let user = await UserModel.findOne({ googleId });
+
+        if (!user) {
+            user = await UserModel.findOne({ email });
+
+            if (user) {
+                // Email đã tồn tại — liên kết googleId
+                if (user.status !== "Active") {
+                    return res.status(403).json({
+                        message: "Tài khoản đã bị khóa. Vui lòng liên hệ Admin",
+                        error: true,
+                        success: false
+                    });
+                }
+                user.googleId = googleId;
+                if (!user.avatar) user.avatar = picture || "";
+                await user.save();
+            } else {
+                // User mới — tự động đăng ký
+                user = new UserModel({
+                    name,
+                    email,
+                    googleId,
+                    avatar: picture || "",
+                    verify_email: true,
+                    role: "USER",
+                    status: "Active"
+                });
+                await user.save();
+            }
+        }
+
+        if (user.status !== "Active") {
+            return res.status(403).json({
+                message: "Tài khoản đã bị khóa. Vui lòng liên hệ Admin",
+                error: true,
+                success: false
+            });
+        }
+
+        const accessTokenJWT = await generatedAccessToken(user._id);
+        const refreshToken = await generatedRefreshToken(user._id);
+
+        await UserModel.findByIdAndUpdate(user._id, {
+            last_login_date: new Date()
+        });
+
+        const cookiesOption = {
+            httpOnly: true,
+            secure: true,
+            sameSite: "None"
+        };
+
+        res.cookie('accessToken', accessTokenJWT, cookiesOption);
+        res.cookie('refreshToken', refreshToken, cookiesOption);
+
+        return res.json({
+            message: "Đăng nhập Google thành công",
+            error: false,
+            success: true,
+            data: {
+                accessToken: accessTokenJWT,
+                refreshToken
+            }
+        });
+
+    } catch (error) {
+        return res.status(500).json({
+            message: error.message || "Lỗi xác thực Google",
+            error: true,
+            success: false
+        });
+    }
+}
+
 // Get customer analytics for reports
+
 export async function getCustomerAnalytics(req, res) {
     try {
         const { startDate, endDate } = req.query;

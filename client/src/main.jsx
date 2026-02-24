@@ -7,13 +7,16 @@ import router from './route/index.jsx';
 import { Provider } from 'react-redux';
 import { store } from './store/store.js';
 import { ThemeProvider } from '@/components/adminDashboard/theme-provider';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
 createRoot(document.getElementById('root')).render(
     // <StrictMode>
-    <Provider store={store}>
-        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
-            <RouterProvider router={router} />
-        </ThemeProvider>
-    </Provider>
+    <GoogleOAuthProvider clientId={import.meta.env.VITE_GOOGLE_CLIENT_ID}>
+        <Provider store={store}>
+            <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+                <RouterProvider router={router} />
+            </ThemeProvider>
+        </Provider>
+    </GoogleOAuthProvider>
     // </StrictMode>,
 );
