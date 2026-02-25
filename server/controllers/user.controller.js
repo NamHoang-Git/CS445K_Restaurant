@@ -7,6 +7,7 @@ import generatedRefreshToken from '../utils/generatedRefreshToken.js';
 import uploadImageCloudinary from '../utils/uploadImageCloudinary.js';
 import generatedOtp from '../utils/generatedOtp.js';
 import forgotPasswordTemplate from '../utils/forgotPasswordTemplate.js';
+import welcomeEmailTemplate from '../utils/welcomeEmailTemplate.js';
 import jwt from 'jsonwebtoken'
 import OrderModel from '../models/order.model.js'
 import { OAuth2Client } from 'google-auth-library'
@@ -135,6 +136,15 @@ export async function loginController(req, res) {
         if (user.status !== "Active") {
             return res.status(400).json({
                 message: "Liên hệ Admin",
+                error: true,
+                success: false
+            });
+        }
+
+        // Tài khoản đăng ký qua Google không có mật khẩu
+        if (!user.password) {
+            return res.status(400).json({
+                message: "Tài khoản này được đăng ký bằng Google. Vui lòng đăng nhập bằng Google.",
                 error: true,
                 success: false
             });
@@ -711,6 +721,16 @@ export async function googleLoginController(req, res) {
                     status: "Active"
                 });
                 await user.save();
+
+                // Gửi email chào mừng cho user đăng ký lần đầu qua Google
+                sendEmail({
+                    sendTo: email,
+                    subject: "Chào mừng bạn đến với EatEase Restaurant! 🎉",
+                    html: welcomeEmailTemplate({
+                        name,
+                        loginUrl: process.env.FRONTEND_URL || "/"
+                    })
+                }).catch((err) => console.error("[sendEmail] Welcome email error:", err));
             }
         }
 
