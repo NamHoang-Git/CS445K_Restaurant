@@ -1,30 +1,28 @@
-import { Resend } from 'resend';
-import dotenv from "dotenv";
-dotenv.config()
+import nodemailer from 'nodemailer';
+import dotenv from 'dotenv';
+dotenv.config();
 
-if (process.env.RESEND_API) {
-    // console.log("Provide RESEND_API in side the .env file")
-}
-
-const resend = new Resend(process.env.RESEND_API);
+const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: process.env.EMAIL_USER,   // Gmail của bạn, vd: myapp@gmail.com
+        pass: process.env.EMAIL_PASS,   // Gmail App Password (không phải mật khẩu Gmail thường)
+    },
+});
 
 const sendEmail = async ({ sendTo, subject, html }) => {
     try {
-        const { data, error } = await resend.emails.send({
-            from: 'EatEase Restaurant <onboarding@resend.dev>',
+        const info = await transporter.sendMail({
+            from: `"EatEase Restaurant" <${process.env.EMAIL_USER}>`,
             to: sendTo,
             subject: subject,
             html: html,
         });
 
-        if (error) {
-            return console.error({ error });
-        }
-
-        return data
+        return info;
     } catch (error) {
-        console.log(error)
+        console.error('Send email error:', error);
     }
-}
+};
 
-export default sendEmail
+export default sendEmail;

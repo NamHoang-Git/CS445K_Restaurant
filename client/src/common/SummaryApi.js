@@ -230,6 +230,30 @@ const SummaryApi = {
         method: 'put'
     },
 
+    // AI Chat
+    chat_message: {
+        url: '/api/chat/message',
+        method: 'post'
+    },
+
+    // Support Chat (Admin REST)
+    get_support_conversations: {
+        url: '/api/support/conversations',
+        method: 'get'
+    },
+    get_support_conversation_by_id: {
+        url: '/api/support/conversations/:id',
+        method: 'get'
+    },
+    close_support_conversation: {
+        url: '/api/support/conversations/:id/close',
+        method: 'patch'
+    },
+    mark_support_conversation_read: {
+        url: '/api/support/conversations/:id/read',
+        method: 'patch'
+    },
+
     // Table
     create_table: {
         url: '/api/table/create',

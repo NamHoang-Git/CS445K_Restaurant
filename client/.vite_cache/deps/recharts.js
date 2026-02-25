@@ -3,9 +3,6 @@ import {
   shallowEqual
 } from "./chunk-KFBFG2HF.js";
 import {
-  clsx
-} from "./chunk-KDVGFZWC.js";
-import {
   autoBatchEnhancer,
   castDraft,
   combineReducers,
@@ -17,6 +14,9 @@ import {
   current,
   prepareAutoBatched
 } from "./chunk-2FWI6FFA.js";
+import {
+  clsx
+} from "./chunk-KDVGFZWC.js";
 import {
   require_shim
 } from "./chunk-4JZ7BQXM.js";

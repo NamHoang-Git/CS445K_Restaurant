@@ -1,6 +1,14 @@
 import { Button } from '../components/ui/button';
 import { Sheet, SheetContent, SheetTrigger } from '../components/ui/sheet';
-import { Menu, Briefcase, Tag, HelpCircle, FileText, Info } from 'lucide-react';
+import {
+    Menu,
+    Briefcase,
+    Tag,
+    HelpCircle,
+    FileText,
+    Info,
+    MessageSquare,
+} from 'lucide-react';
 import logo from '../assets/logo.png';
 import React, { useState, useRef, useEffect, useCallback } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
@@ -25,9 +33,12 @@ import defaultAvatar from '../assets/defaultAvatar.png';
 import Search from './Search';
 import { valideURLConvert } from '@/utils/valideURLConvert';
 import { ThemeToggle } from './theme-toggle';
+import { useSupportChat } from '../contexts/SupportChatContext';
 
 export default function Header() {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+    const user = useSelector((state) => state?.user);
+    const { unreadCount } = useSupportChat();
     const categoryData =
         useSelector((state) => state.product.allCategory) || [];
     const firstCategory = categoryData.length > 0 ? categoryData[0] : null;
@@ -55,7 +66,6 @@ export default function Header() {
     ];
 
     const navigate = useNavigate();
-    const user = useSelector((state) => state?.user);
     const [openUserMenu, setOpenUserMenu] = useState(false);
     const menuRef = useRef(null);
     const cartItem = useSelector((state) => state.cartItem.cart);
@@ -175,82 +185,103 @@ export default function Header() {
 
                             <div className="flex items-center justify-end gap-5">
                                 {user?._id ? (
-                                    <div className="relative" ref={menuRef}>
-                                        <div className="relative">
-                                            <button
-                                                onClick={toggleUserMenu}
-                                                className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-background/15 transition-colors"
-                                                aria-expanded={openUserMenu}
-                                                aria-haspopup="true"
-                                                aria-label="User menu"
-                                                type="button"
+                                    <div className="flex items-center gap-4">
+                                        {user.role === 'ADMIN' && (
+                                            <Link
+                                                to="/dashboard/support-chat"
+                                                className="relative p-2 rounded-full hover:bg-white/10 transition-colors text-gray-300 hover:text-white"
+                                                title="Hỗ trợ khách hàng"
                                             >
-                                                <div className="relative p-0.5 overflow-hidden rounded-full liquid-glass-2">
-                                                    <img
-                                                        src={
-                                                            user.avatar ||
-                                                            defaultAvatar
-                                                        }
-                                                        alt={user.name}
-                                                        className="w-8 h-8 rounded-full object-cover"
-                                                        width={32}
-                                                        height={32}
-                                                    />
-                                                </div>
-                                                <div className="flex flex-col items-start flex-1 min-w-0">
-                                                    <span
-                                                        title={user.name}
-                                                        className="text-sm font-medium  truncate max-w-16 lg:max-w-20 xl:max-w-max"
-                                                    >
-                                                        {user.name}
+                                                <MessageSquare className="h-5 w-5" />
+                                                {unreadCount > 0 && (
+                                                    <span className="absolute top-1 right-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-500 text-[9px] font-bold text-white border-2 border-[#1a1a1a]">
+                                                        {unreadCount > 9
+                                                            ? '9+'
+                                                            : unreadCount}
                                                     </span>
-                                                    {user.role === 'ADMIN' && (
-                                                        <span className="text-xs text-highlight py-0.5 px-1 bg-background rounded-md">
-                                                            Quản trị
-                                                        </span>
-                                                    )}
-                                                </div>
-                                                {openUserMenu ? (
-                                                    <FaCaretUp
-                                                        className="flex-shrink-0 ml-2"
-                                                        size={15}
-                                                    />
-                                                ) : (
-                                                    <FaCaretDown
-                                                        className="flex-shrink-0 ml-2"
-                                                        size={15}
-                                                    />
                                                 )}
-                                            </button>
-                                        </div>
-                                        <AnimatePresence>
-                                            {openUserMenu && (
-                                                <motion.div
-                                                    className="absolute right-0 top-full mt-2 z-50 w-64"
-                                                    initial={{
-                                                        opacity: 0,
-                                                        y: -10,
-                                                    }}
-                                                    animate={{
-                                                        opacity: 1,
-                                                        y: 0,
-                                                    }}
-                                                    exit={{
-                                                        opacity: 0,
-                                                        y: -10,
-                                                    }}
-                                                    transition={{
-                                                        duration: 0.15,
-                                                        ease: 'easeOut',
-                                                    }}
+                                            </Link>
+                                        )}
+                                        <div className="relative" ref={menuRef}>
+                                            <div className="relative">
+                                                <button
+                                                    onClick={toggleUserMenu}
+                                                    className="flex items-center gap-2 w-full px-2 py-1.5 rounded-lg hover:bg-background/15 transition-colors"
+                                                    aria-expanded={openUserMenu}
+                                                    aria-haspopup="true"
+                                                    aria-label="User menu"
+                                                    type="button"
                                                 >
-                                                    <UserMenu
-                                                        close={closeMenu}
-                                                        menuTriggerRef={menuRef}
-                                                    />
-                                                </motion.div>
-                                            )}
-                                        </AnimatePresence>
+                                                    <div className="relative p-0.5 overflow-hidden rounded-full liquid-glass-2">
+                                                        <img
+                                                            src={
+                                                                user.avatar ||
+                                                                defaultAvatar
+                                                            }
+                                                            alt={user.name}
+                                                            className="w-8 h-8 rounded-full object-cover"
+                                                            width={32}
+                                                            height={32}
+                                                        />
+                                                    </div>
+                                                    <div className="flex flex-col items-start flex-1 min-w-0">
+                                                        <span
+                                                            title={user.name}
+                                                            className="text-sm font-medium  truncate max-w-16 lg:max-w-20 xl:max-w-max"
+                                                        >
+                                                            {user.name}
+                                                        </span>
+                                                        {user.role ===
+                                                            'ADMIN' && (
+                                                            <span className="text-xs text-highlight py-0.5 px-1 bg-background rounded-md">
+                                                                Quản trị
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {openUserMenu ? (
+                                                        <FaCaretUp
+                                                            className="flex-shrink-0 ml-2"
+                                                            size={15}
+                                                        />
+                                                    ) : (
+                                                        <FaCaretDown
+                                                            className="flex-shrink-0 ml-2"
+                                                            size={15}
+                                                        />
+                                                    )}
+                                                </button>
+                                            </div>
+                                            <AnimatePresence>
+                                                {openUserMenu && (
+                                                    <motion.div
+                                                        className="absolute right-0 top-full mt-2 z-50 w-64"
+                                                        initial={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        animate={{
+                                                            opacity: 1,
+                                                            y: 0,
+                                                        }}
+                                                        exit={{
+                                                            opacity: 0,
+                                                            y: -10,
+                                                        }}
+                                                        transition={{
+                                                            duration: 0.15,
+                                                            ease: 'easeOut',
+                                                        }}
+                                                    >
+                                                        <UserMenu
+                                                            close={closeMenu}
+                                                            menuTriggerRef={
+                                                                menuRef
+                                                            }
+                                                        />
+                                                    </motion.div>
+                                                )}
+                                            </AnimatePresence>
+                                        </div>
                                     </div>
                                 ) : (
                                     <button
@@ -323,13 +354,13 @@ export default function Header() {
                                         >
                                             <img
                                                 src={logo}
-                                                alt="TechSpace logo"
+                                                alt="EatEase logo"
                                                 width={25}
                                                 height={25}
                                                 className="h-5 w-5"
                                             />
                                             <span className="font-semibold tracking-wide">
-                                                TechSpace
+                                                EatEase
                                             </span>
                                         </Link>
                                     </div>

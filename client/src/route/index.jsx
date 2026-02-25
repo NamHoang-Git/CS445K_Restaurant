@@ -46,6 +46,7 @@ import TableLoginPage from '../pages/TableLoginPage';
 import TableMenuPage from '../pages/TableMenuPage';
 import TableOrderManagementPage from '../pages/TableOrderManagementPage';
 import TablePaymentSuccessPage from '../pages/TablePaymentSuccessPage';
+import SupportChatAdmin from '@/pages/SupportChatAdmin';
 
 const router = createBrowserRouter([
     {
@@ -245,6 +246,14 @@ const router = createBrowserRouter([
                         element: (
                             <AdminPermission>
                                 <VoucherPage />
+                            </AdminPermission>
+                        ),
+                    },
+                    {
+                        path: 'support-chat',
+                        element: (
+                            <AdminPermission>
+                                <SupportChatAdmin />
                             </AdminPermission>
                         ),
                     },

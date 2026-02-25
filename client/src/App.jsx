@@ -30,6 +30,9 @@ import Header from './components/Header';
 import { Footer } from './components/footer';
 import ProductListPage from './pages/ProductListPage';
 import LiquidEther from './components/LiquidEther';
+import AiChatBox from './components/AiChatBox';
+import SupportChatBox from './components/SupportChatBox';
+import { SupportChatProvider } from './contexts/SupportChatContext';
 
 function App() {
     const dispatch = useDispatch();
@@ -94,10 +97,37 @@ function App() {
 
     return (
         <GlobalProvider>
-            {!hideLayout && !dashBoardLayout && (
-                <>
-                    <Header />
-                    <main className="min-h-[80vh]">
+            <SupportChatProvider>
+                {!hideLayout && !dashBoardLayout && (
+                    <>
+                        <Header />
+                        <main className="min-h-[80vh]">
+                            <div className="fixed inset-0 z-0 pointer-events-none">
+                                <LiquidEther
+                                    colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
+                                    isViscous={false}
+                                    iterationsViscous={8}
+                                    iterationsPoisson={8}
+                                    resolution={0.3}
+                                    autoDemo={true}
+                                    autoSpeed={0.2}
+                                    autoRampDuration={0.8}
+                                    style={{ width: '100%', height: '100%' }}
+                                />
+                            </div>
+                            <div className="relative">
+                                <Outlet />
+                            </div>
+                        </main>
+                        <Footer />
+                        {!hiddenCartLinkPaths.includes(location.pathname) && (
+                            <CartMobileLink />
+                        )}
+                    </>
+                )}
+
+                {hideLayout && (
+                    <main className="min-h-screen">
                         <div className="fixed inset-0 z-0 pointer-events-none">
                             <LiquidEther
                                 colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
@@ -115,55 +145,34 @@ function App() {
                             <Outlet />
                         </div>
                     </main>
-                    <Footer />
-                    {!hiddenCartLinkPaths.includes(location.pathname) && (
-                        <CartMobileLink />
-                    )}
-                </>
-            )}
+                )}
 
-            {hideLayout && (
-                <main className="min-h-screen">
-                    <div className="fixed inset-0 z-0 pointer-events-none">
-                        <LiquidEther
-                            colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
-                            isViscous={false}
-                            iterationsViscous={8}
-                            iterationsPoisson={8}
-                            resolution={0.3}
-                            autoDemo={true}
-                            autoSpeed={0.2}
-                            autoRampDuration={0.8}
-                            style={{ width: '100%', height: '100%' }}
-                        />
-                    </div>
-                    <div className="relative">
-                        <Outlet />
-                    </div>
-                </main>
-            )}
+                {dashBoardLayout && (
+                    <main className="min-h-screen">
+                        <div className="fixed inset-0 z-0 pointer-events-none">
+                            <LiquidEther
+                                colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
+                                isViscous={false}
+                                iterationsViscous={8}
+                                iterationsPoisson={8}
+                                resolution={0.3}
+                                autoDemo={true}
+                                autoSpeed={0.2}
+                                autoRampDuration={0.8}
+                                style={{ width: '100%', height: '100%' }}
+                            />
+                        </div>
+                        <div className="relative">
+                            <Outlet />
+                        </div>
+                    </main>
+                )}
+                <Toaster />
 
-            {dashBoardLayout && (
-                <main className="min-h-screen">
-                    <div className="fixed inset-0 z-0 pointer-events-none">
-                        <LiquidEther
-                            colors={['#f5e6d3', '#e8d5c4', '#d4a574']}
-                            isViscous={false}
-                            iterationsViscous={8}
-                            iterationsPoisson={8}
-                            resolution={0.3}
-                            autoDemo={true}
-                            autoSpeed={0.2}
-                            autoRampDuration={0.8}
-                            style={{ width: '100%', height: '100%' }}
-                        />
-                    </div>
-                    <div className="relative">
-                        <Outlet />
-                    </div>
-                </main>
-            )}
-            <Toaster />
+                {/* AI Chatbox & Support Chat — chỉ hiện trên trang khách hàng */}
+                {!hideLayout && !dashBoardLayout && <AiChatBox />}
+                {!hideLayout && !dashBoardLayout && <SupportChatBox />}
+            </SupportChatProvider>
         </GlobalProvider>
     );
 }

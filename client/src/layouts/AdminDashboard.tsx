@@ -6,6 +6,7 @@ import { useEffect, useState } from 'react';
 
 import { Sidebar } from '@/components/adminDashboard/sidebar';
 import { TopNav } from '@/components/adminDashboard/top-nav';
+import { SupportChatProvider } from '@/contexts/SupportChatContext';
 
 export default function AdminDashboard() {
     // Update colors based on theme

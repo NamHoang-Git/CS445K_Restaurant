@@ -12,6 +12,7 @@ import {
     LocateIcon,
     Clock,
     FileText,
+    MessageSquare,
     ChevronDown,
     Users,
     Calendar,
@@ -32,6 +33,7 @@ import { Link, useLocation } from 'react-router-dom';
 import logo from '@/assets/logo.png';
 import { useSelector } from 'react-redux';
 import { RootState } from '@/store/store';
+import { useSupportChat } from '@/contexts/SupportChatContext';
 // TypeScript types for navigation
 interface NavigationItem {
     name: string;
@@ -176,7 +178,12 @@ const navigationSections: NavigationSection[] = [
 ];
 const bottomNavigation = [
     { name: 'Tài khoản', href: '/dashboard/profile', icon: Settings },
-    { name: 'Hỗ trợ', href: '/help', icon: HelpCircle },
+    {
+        name: 'Hỗ trợ khách hàng',
+        href: '/dashboard/support-chat',
+        icon: MessageSquare,
+        roles: ['ADMIN', 'MANAGER', 'WAITER', 'CASHIER'],
+    },
 ];
 export function Sidebar() {
     const { pathname } = useLocation();
@@ -194,6 +201,7 @@ export function Sidebar() {
         personal: false,
     });
     const user = useSelector((state: RootState) => state.user);
+    const { unreadCount } = useSupportChat();
     // Auto-expand section based on current route (accordion behavior)
     useEffect(() => {
         const path = pathname;
@@ -269,6 +277,16 @@ export function Sidebar() {
                         className={cn('h-4 w-4', !isCollapsed && 'mr-3 mb-0.5')}
                     />
                     {!isCollapsed && <span>{item.name}</span>}
+                    {item.name === 'Hỗ trợ khách hàng' && unreadCount > 0 && (
+                        <span
+                            className={cn(
+                                'ml-auto flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white',
+                                isCollapsed && 'absolute -top-1 -right-1'
+                            )}
+                        >
+                            {unreadCount > 9 ? '9+' : unreadCount}
+                        </span>
+                    )}
                 </Link>
             </TooltipTrigger>
             {isCollapsed && (
@@ -384,7 +402,7 @@ export function Sidebar() {
                                         height={25}
                                     />
                                     <span className="tracking-wide">
-                                        TechSpace
+                                        EatEase
                                     </span>
                                 </Link>
                             )}
